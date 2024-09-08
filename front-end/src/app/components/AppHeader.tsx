@@ -18,8 +18,8 @@ import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 
 
-const pages = ['Products', 'Pricing', 'Blog'];
-const urlPages = ['/', '/', 'blog-page'];
+const pages = ['Products', 'Marketing', 'Blog'];
+const urlPages = ['/', '/marketing-page', 'blog-page'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 
