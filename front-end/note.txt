@@ -1,0 +1,7 @@
+NEXTJS SNIPPER:
+
+napage (nextjs app directory page)
+
+export default function Page() {
+  return <div></div>;
+}
