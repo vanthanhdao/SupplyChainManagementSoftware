@@ -6,3 +6,4 @@ interface IBlog {
     author: string;
     title: string;
 }
+

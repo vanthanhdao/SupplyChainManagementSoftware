@@ -10,6 +10,7 @@ import TablePagination from '@mui/material/TablePagination';
 import TableRow from '@mui/material/TableRow';
 import { clear } from 'console';
 import { Button } from '@mui/material';
+import EditFromDialog from "../components/EditFromDialog";
 
 interface Column {
     id: 'code' | 'action' | 'author' | 'title';
@@ -73,7 +74,7 @@ export default function AppTable(props: IProps) {
                                         <TableCell>{row.author}</TableCell>
                                         <TableCell className='flex justify-between'>
                                             <Button className='bg-slate-400'>View</Button>
-                                            <Button className='bg-yellow-300'>Edit</Button>
+                                            <EditFromDialog blog={row}/>
                                             <Button className='bg-red-500'>Delete</Button>
                                         </TableCell>
                                     </TableRow>
