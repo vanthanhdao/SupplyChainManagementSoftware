@@ -26,14 +26,15 @@ export default function AddFormDialog(props: IProps) {
         setOpen(true);
     };
 
-    const handleClose = (event:React.SyntheticEvent,reason:string) => {
-        if (reason !== 'backdropClick') setOpen(false);
-          setSuccess(false);
-          setLoading(false);
-          mutate("https://g6gzvn-8000.csb.app/blogs")
+    const handleClose = (reason: string) => {
+        if (reason === 'backdropClick') setOpen(true);
+        setSuccess(false);
+        setLoading(false);
+        //   mutate("http://localhost:8000/blogs")
+        mutate("http://localhost:8000/blogs")
     };
 
-    const {blog} = props;
+    const { blog } = props;
 
     return (
         <React.Fragment>
@@ -52,14 +53,14 @@ export default function AddFormDialog(props: IProps) {
                         if (!loading) {
                             setSuccess(true);
                             setLoading(true);
-                            await fetch(`https://g6gzvn-8000.csb.app/blogs/${blog.id}`, {
+                            await fetch(`http://localhost:8000/blogs/${blog.id}`, {
                                 method: 'PUT',
                                 headers: {
                                     'Content-Type': 'application/json',
                                 },
                                 body: JSON.stringify({ title: formJson.title, author: formJson.author, content: formJson.content }),
                             });
-                          }
+                        }
                         // handleClose();
                     },
                 }}
@@ -108,25 +109,25 @@ export default function AddFormDialog(props: IProps) {
                     />
                 </DialogContent>
                 <DialogActions>
-                    <Button disabled={loading} onClick={() => handleClose(null, 'buttonClick')}>Cancel</Button>
+                    <Button disabled={loading} onClick={() => setOpen(false)}>Cancel</Button>
                     <Button
-                       disabled={loading}
-                       type="submit"
+                        disabled={loading}
+                        type="submit"
                     >
                         Save
-                        </Button>
-                        {loading && (
-          <CircularProgress
-            size={24}
-            sx={{
-              color: yellow[500],
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              marginTop: '-12px',
-              marginLeft: '-12px',
-            }}/>
-                        )}
+                    </Button>
+                    {loading && (
+                        <CircularProgress
+                            size={24}
+                            sx={{
+                                color: yellow[500],
+                                position: 'absolute',
+                                top: '50%',
+                                left: '50%',
+                                marginTop: '-12px',
+                                marginLeft: '-12px',
+                            }} />
+                    )}
                 </DialogActions>
             </Dialog>
         </React.Fragment>
