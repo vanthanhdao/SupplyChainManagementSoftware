@@ -8,9 +8,9 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import { clear } from "console";
 import { Button } from "@mui/material";
-import EditFromDialog from "../components/EditFromDialog";
+import EditFromDialog from "./EditFromDialog";
+import DeleteFromDialog from "./DeleteFromDialog";
 import Link from "next/link";
 
 interface Column {
@@ -81,7 +81,7 @@ export default function AppTable(props: IProps) {
                       View
                     </Link>
                     <EditFromDialog blog={row} />
-                    <Button className="m-2 bg-red-500">Delete</Button>
+                    <DeleteFromDialog blog={row} />
                   </TableCell>
                 </TableRow>
               );
