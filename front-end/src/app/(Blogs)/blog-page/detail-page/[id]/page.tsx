@@ -7,7 +7,7 @@ export default function DetailPage() {
   const params = useParams();
   console.log(params.id);
   const { data, error, isLoading } = useSWR(
-    `https://g6gzvn-8000.csb.app/blogs/${params.id}`,
+    `https://stgwss-8000.csb.app/blogs/${params.id}`,
     // "http://localhost:8000/blogs",
     fetcher
   );

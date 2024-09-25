@@ -19,7 +19,7 @@ import useSWR from "swr";
 
 const pages = ["Products", "Marketing", "Blog"];
 const urlPages = ["/", "/marketing-page", "/blog-page"];
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Register", "Login"];
 
 export default function AppHeader() {
   const router = useRouter();
@@ -42,8 +42,9 @@ export default function AppHeader() {
     router.push(urlPages[index]);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
+  const handleCloseUserMenu = (index: number) => {
+    const urlPages = ["register-page", "login-page"];
+    router.push(`/${urlPages[index]}`)
   };
 
   const handleCloseNavMenu = () => {
@@ -128,8 +129,8 @@ export default function AppHeader() {
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
             >
-              {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+              {settings.map((setting,index) => (
+                <MenuItem key={setting} onClick={()=>handleCloseUserMenu(index)}>
                   <Typography sx={{ textAlign: "center" }}>
                     {setting}
                   </Typography>

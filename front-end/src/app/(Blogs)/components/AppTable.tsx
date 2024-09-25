@@ -11,10 +11,10 @@ import TableRow from "@mui/material/TableRow";
 import { Button } from "@mui/material";
 import EditFromDialog from "./EditFromDialog";
 import DeleteFromDialog from "./DeleteFromDialog";
-import Link from "next/link";
+import Link from "next/link"; 
 
 interface Column {
-  id: "code" | "action" | "author" | "title";
+  id: "code" | "action" | "author" | "title" | "number";
   label: string;
   minWidth?: number;
   align?: "right";
@@ -22,6 +22,7 @@ interface Column {
 }
 
 const columns: readonly Column[] = [
+  { id: "number", label: "NO", minWidth: 170 },
   { id: "code", label: "ID", minWidth: 170 },
   { id: "title", label: "TITLE", minWidth: 170 },
   { id: "author", label: "AUTHOR", minWidth: 170 },
@@ -66,10 +67,11 @@ export default function AppTable(props: IProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {blogs.map((row) => {
-              console.log(row);
+            {blogs.map((row,index) => {
+
               return (
                 <TableRow hover role="checkbox" tabIndex={-1} key={row.id}>
+                  <TableCell>{index+1}</TableCell>
                   <TableCell>{row.id}</TableCell>
                   <TableCell>{row.title}</TableCell>
                   <TableCell>{row.author}</TableCell>

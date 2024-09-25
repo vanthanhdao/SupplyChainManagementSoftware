@@ -17,7 +17,7 @@ export default function AddFormDialog() {
   };
 
   const handleClose = () => {
-    mutate("https://g6gzvn-8000.csb.app/blogs");
+    mutate("https://stgwss-8000.csb.app/blogs");
     // mutate("http://localhost:8000/blogs")
     setOpen(false);
   };
@@ -37,7 +37,7 @@ export default function AddFormDialog() {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
             const formJson = Object.fromEntries((formData as any).entries());
-            await fetch("https://g6gzvn-8000.csb.app/blogs", {
+            await fetch("https://stgwss-8000.csb.app/blogs", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",

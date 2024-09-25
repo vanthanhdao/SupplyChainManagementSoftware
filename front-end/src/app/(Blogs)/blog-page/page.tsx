@@ -9,7 +9,7 @@ export default function BlogPage() {
   // Dùng useSWR để lưu data khi gọi api 1 lần duy nhất
   const fetcher = (url: string) => fetch(url).then((res) => res.json());
   const { data, error, isLoading } = useSWR(
-    "https://g6gzvn-8000.csb.app/blogs",
+    "https://stgwss-8000.csb.app/blogs",
     // "http://localhost:8000/blogs",
     fetcher,
     {
