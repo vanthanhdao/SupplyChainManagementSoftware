@@ -13,6 +13,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ToggleColorMode from './ToggleColorMode';
 import Sitemark from './SitemarkIcon';
+import SignUp from './SignUp';
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
@@ -80,9 +81,10 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
             <Button color="primary" variant="text" size="small">
               Sign in
             </Button>
-            <Button color="primary" variant="contained" size="small">
+            {/* <Button color="primary" variant="contained" size="small">
               Sign up
-            </Button>
+            </Button> */}
+            <SignUp/>
             <ToggleColorMode
               data-screenshot="toggle-mode"
               mode={mode}

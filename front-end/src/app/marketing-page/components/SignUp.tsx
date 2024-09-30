@@ -9,7 +9,7 @@ import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { mutate } from "swr";
 
-export default function AddFormDialog() {
+export default function SignUp() {
   const [open, setOpen] = React.useState(false);
 
   const handleClickOpen = () => {
@@ -17,14 +17,14 @@ export default function AddFormDialog() {
   };
 
   const handleClose = () => {
-    mutate("https://stgwss-8000.csb.app/blogs");
+    // mutate("https://stgwss-8000.csb.app/blogs");
     setOpen(false);
   };
 
   return (
     <React.Fragment>
-      <Button className="bg-green-500 text-slate-200" onClick={handleClickOpen}>
-        Add new blog
+      <Button color="primary" variant="contained" size="small" onClick={handleClickOpen}>
+       Sign up
       </Button>
       <Dialog
         fullWidth
@@ -57,6 +57,7 @@ export default function AddFormDialog() {
             This is the from that allows users to add a new blog.
           </DialogContentText>
           <TextField
+            error
             autoFocus
             required
             margin="dense"

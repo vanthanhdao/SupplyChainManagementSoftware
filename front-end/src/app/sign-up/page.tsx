@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
@@ -13,7 +14,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
-import MuiCard from '@mui/material/Card';
+import Card from '@mui/material/Card';
 import {
   createTheme,
   ThemeProvider,
@@ -73,7 +74,7 @@ function ToggleCustomTheme({
   );
 }
 
-const Card = styled(MuiCard)(({ theme }) => ({
+const CardCus = styled(Card)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignSelf: 'center',
@@ -140,9 +141,6 @@ export default function SignUp() {
     localStorage.setItem('themeMode', newMode); // Save the selected mode to localStorage
   };
 
-  const toggleCustomTheme = () => {
-    setShowCustomTheme((prev) => !prev);
-  };
 
   const validateInputs = () => {
     const email = document.getElementById('email') as HTMLInputElement;
@@ -205,13 +203,6 @@ export default function SignUp() {
             p: { xs: 2, sm: 4 },
           }}
         >
-          <Button
-            startIcon={<ArrowBackRoundedIcon />}
-            component="a"
-            href="/material-ui/getting-started/templates/"
-          >
-            Back
-          </Button>
           <ToggleColorMode
             data-screenshot="toggle-mode"
             mode={mode}
@@ -225,7 +216,7 @@ export default function SignUp() {
             p: 2,
           }}
         >
-          <Card variant="outlined">
+          <CardCus variant="outlined">
             <SitemarkIcon />
             <Typography
               component="h1"
@@ -248,9 +239,9 @@ export default function SignUp() {
                   fullWidth
                   id="name"
                   placeholder="Jon Snow"
-                  error={nameError}
+                  error
                   helperText={nameErrorMessage}
-                  color={nameError ? 'error' : 'primary'}
+                  // color={nameError ? 'error' : 'primary'}
                 />
               </FormControl>
               <FormControl>
@@ -332,13 +323,9 @@ export default function SignUp() {
                 Sign up with Facebook
               </Button>
             </Box>
-          </Card>
+          </CardCus>
         </Stack>
       </SignUpContainer>
-      <ToggleCustomTheme
-        showCustomTheme={showCustomTheme}
-        toggleCustomTheme={toggleCustomTheme}
-      />
     </ThemeProvider>
   );
 }
