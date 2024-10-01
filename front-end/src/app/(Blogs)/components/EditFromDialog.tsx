@@ -50,7 +50,7 @@ export default function AddFormDialog(props: IProps) {
             const formJson = Object.fromEntries((formData as any).entries());
             if (!loading) {
               setLoading(true);
-              await fetch(`https://stgwss-8000.csb.app/blogs/${blog.id}`, {
+              await fetch(`http://localhost:8000/blogs/${blog.id}`, {
                 method: "PUT",
                 headers: {
                   "Content-Type": "application/json",
@@ -65,7 +65,7 @@ export default function AddFormDialog(props: IProps) {
             setOpen(false);
             setLoading(false);
             //   mutate("http://localhost:8000/blogs")
-            mutate("https://stgwss-8000.csb.app/blogs");
+            mutate("http://localhost:8000/blogs");
           },
         }}
       >

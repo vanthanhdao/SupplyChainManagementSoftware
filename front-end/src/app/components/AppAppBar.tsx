@@ -1,3 +1,4 @@
+"use client";
 import * as React from 'react';
 import { PaletteMode, styled, alpha } from '@mui/material/styles';
 import Box from '@mui/material/Box';
@@ -13,7 +14,8 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import ToggleColorMode from './ToggleColorMode';
 import Sitemark from './SitemarkIcon';
-import SignUp from './SignUp';
+import { useRouter } from "next/navigation";
+
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: 'flex',
@@ -36,11 +38,13 @@ interface AppAppBarProps {
 
 export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
   const [open, setOpen] = React.useState(false);
+  const router = useRouter();
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
 
+  
   return (
     <AppBar
       position="fixed"
@@ -66,7 +70,7 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
               <Button variant="text" color="info" size="small" sx={{ minWidth: 0 }}>
                 FAQ
               </Button>
-              <Button variant="text" color="info" size="small" sx={{ minWidth: 0 }}>
+              <Button variant="text" color="info" size="small" sx={{ minWidth: 0 }} onClick={()=>router.push('/blog-page')}>
                 Blog
               </Button>
             </Box>
@@ -81,10 +85,9 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
             <Button color="primary" variant="text" size="small">
               Sign in
             </Button>
-            {/* <Button color="primary" variant="contained" size="small">
+            <Button color="primary" variant="contained" size="small" onClick={()=>router.push('/signup-page')}>
               Sign up
-            </Button> */}
-            <SignUp/>
+            </Button>
             <ToggleColorMode
               data-screenshot="toggle-mode"
               mode={mode}
