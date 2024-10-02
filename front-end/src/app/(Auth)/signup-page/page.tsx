@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import Card from '@mui/material/Card';
 import { styled } from '@mui/system';
+import InputValidate from '../signup-page/components/InputValidate';
 
 import  SitemarkIcon from '../../components/SitemarkIcon';
 
@@ -48,88 +49,21 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignUp() {
-  const [emailError, setEmailError] = React.useState(false);
-  const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
-  const [passwordError, setPasswordError] = React.useState(false);
-  const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
-  const [nameError, setNameError] = React.useState(false);
-  const [nameErrorMessage, setNameErrorMessage] = React.useState('');
+  const [showButton, setShowButton] = React.useState(true);
 
-  const validateInputs = () => {
-    const email = document.getElementById('email') as HTMLInputElement;
-    const password = document.getElementById('password') as HTMLInputElement;
-    const name = document.getElementById('name') as HTMLInputElement;
-
-    let isValid = true;
-
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
-      setEmailError(true);
-      setEmailErrorMessage('Please enter a valid email address.');
-      isValid = false;
-    } else {
-      setEmailError(false);
-      setEmailErrorMessage('');
-    }
-
-    if (!password.value || password.value.length < 6) {
-      setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
-      isValid = false;
-    } else {
-      setPasswordError(false);
-      setPasswordErrorMessage('');
-    }
-
-    if (!name.value || name.value.length < 1) {
-      setNameError(true);
-      setNameErrorMessage('Name is required.');
-      isValid = false;
-    } else {
-      setNameError(false);
-      setNameErrorMessage('');
-    }
-
-    return isValid;
-  };
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {  
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      name: data.get('name'),
-      lastName: data.get('lastName'),
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const form = document.getElementById('signup') as HTMLFormElement;
+    // if(!form.checkValidity()){
+    //   event.preventDefault();
+   
+    // }
+    console.log(form.checkValidity())
   };
 
-  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const focus = event.target.value ? true : false;
-    if (focus) {
-      setNameError(false);
-      setNameErrorMessage('');
-    } else {
-      setNameError(true);
-      setNameErrorMessage('Company Name is required.');
-    }
-  };
-
-  const handleOnFocus = (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    // Xóa lỗi khi người dùng focus vào ô input
-    setNameError(false);
-    setNameErrorMessage('');
-  };
-
-  const handleOnBlur = (event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const focus = event.target.value ? true : false;
-    if (!focus) {
-      setNameError(true);
-      setNameErrorMessage('Company Name is required.');
-    }
-  };
 
   return (
-        <SignUpContainer direction="column" justifyContent="space-between" sx={{
+        <SignUpContainer  direction="column" justifyContent="space-between" sx={{
           py: { xs: 8, sm: 16 }
         }}>
           <Stack
@@ -148,73 +82,17 @@ export default function SignUp() {
                 Sign up
               </Typography>
               <Box
-                component="form"
+                onClick={()=>setShowButton(false)}
                 onSubmit={handleSubmit}
+                component="form"
+                id="signup"
                 sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}
               >
 
-                <FormControl>
-                  <FormLabel htmlFor="name">Company Name</FormLabel>
-                  <TextField
-                    onFocus={handleOnFocus}
-                    onBlur={handleOnBlur}
-                    autoComplete="name"
-                    name="name"
-                    fullWidth
-                    id="name"
-                    placeholder="Jon Snow"
-                    error={nameError}
-                    helperText={nameErrorMessage}
-                    color={nameError ? 'error' : 'primary'}
-                    onChange={handleOnChange}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel htmlFor="email">Email</FormLabel>
-                  <TextField
-                    required
-                    fullWidth
-                    id="email"
-                    placeholder="your@email.com"
-                    name="email"
-                    autoComplete="email"
-                    variant="outlined"
-                    error={emailError}
-                    helperText={emailErrorMessage}
-                    color={passwordError ? 'error' : 'primary'}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel htmlFor="password">Password</FormLabel>
-                  <TextField
-                    required
-                    fullWidth
-                    name="password"
-                    placeholder="••••••"
-                    type="password"
-                    id="password"
-                    autoComplete="new-password"
-                    variant="outlined"
-                    error={passwordError}
-                    helperText={passwordErrorMessage}
-                    color={passwordError ? 'error' : 'primary'}
-                  />
-                </FormControl>
-                <FormControl>
-                  <FormLabel htmlFor="taxcode">Tax Code</FormLabel>
-                  <TextField
-                    required
-                    fullWidth
-                    id="taxcode"
-                    placeholder="0000000001"
-                    name="email"
-                    autoComplete="email"
-                    variant="outlined"
-                    error={emailError}
-                    helperText={emailErrorMessage}
-                    color={passwordError ? 'error' : 'primary'}
-                  />
-                </FormControl>
+                <InputValidate nameLable='Company Name' idLable='name' placeholder='Jon Snow' type='text'/>
+                <InputValidate nameLable='Email' idLable='email' placeholder='your@email.com' type='email'/>
+                <InputValidate nameLable='Password' idLable='password' placeholder='••••••' type='password'/>
+                <InputValidate nameLable='Tax Code' idLable='taxcode' placeholder='0000000001' type='text'/>
 
                 <FormControlLabel
                   control={<Checkbox value="allowExtraEmails" color="primary" />}
@@ -224,7 +102,7 @@ export default function SignUp() {
                   type="submit"
                   fullWidth
                   variant="contained"
-                  onClick={validateInputs}
+                  disabled={showButton}
                 >
                   Sign up
                 </Button>
