@@ -1,7 +1,32 @@
 NEXTJS SNIPPER:
 
+narootlayout (nextjs app directory root layout)
+
+              Typescript
+              export default function RootLayout({
+                children,
+              }: {
+                children: React.ReactNode;
+              }) {
+                return (
+                  <html lang="en">
+                    <body>
+                      <main>{children}</main>
+                    </body>
+                  </html>
+                );
+              }
+
 napage (nextjs app directory page)
 
-export default function Page() {
-  return <div></div>;
-}
+              export default function Page() {
+                return <div></div>;
+              }
+
+nafe (nextjs arrow function (export at the end))
+
+              const FileName = () => {
+                return <div>CONTENT</div>;
+              };
+
+              export default FileName;
