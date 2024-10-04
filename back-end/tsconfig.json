@@ -1,14 +1,21 @@
 {
   "compilerOptions": {
-    "target": "ES2020", // Phiên bản ECMAScript đầu ra
-    "module": "commonjs", // Sử dụng CommonJS cho Node.js
-    "strict": true, // Kích hoạt các kiểm tra nghiêm ngặt
-    "esModuleInterop": true, // Tương thích với các module ES
-    "skipLibCheck": true, // Bỏ qua kiểm tra định nghĩa type trong thư viện
-    "forceConsistentCasingInFileNames": true, // Buộc sử dụng cùng kiểu chữ cho tên file
-    "outDir": "./dist", // Thư mục đầu ra sau khi biên dịch
-    "rootDir": "./src" // Thư mục chứa mã nguồn TypeScript
-  },
-  "include": ["src/**/*"], // Bao gồm tất cả các file trong thư mục src
-  "exclude": ["node_modules"] // Loại bỏ thư mục node_modules khỏi việc biên dịch
+    "module": "commonjs",
+    "declaration": true,
+    "removeComments": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "ES2021",
+    "sourceMap": true,
+    "outDir": "./dist",
+    "baseUrl": "./",
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": false,
+    "noImplicitAny": false,
+    "strictBindCallApply": false,
+    "forceConsistentCasingInFileNames": false,
+    "noFallthroughCasesInSwitch": false
+  }
 }
