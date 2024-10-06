@@ -5,6 +5,7 @@ import {
   IsPhoneNumber,
   Max,
   Min,
+  MinLength,
 } from 'class-validator';
 
 export class CreateUserDto {
@@ -16,7 +17,7 @@ export class CreateUserDto {
   email: string;
 
   @IsNotEmpty({ message: 'Password is required' })
-  @Min(6, { message: 'Password must be at least 6 character' })
+  @MinLength(6, { message: 'Password must be at least 6 character' })
   password: string;
 
   @IsNotEmpty({ message: 'Tax Code is required' })
@@ -31,6 +32,6 @@ export class CreateUserDto {
 
   @IsNotEmpty({ message: 'Phone Number is required' })
   @IsInt()
-  @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
+  // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
   phoneNumber: number;
 }
