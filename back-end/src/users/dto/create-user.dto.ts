@@ -1,9 +1,36 @@
+import {
+  IsEmail,
+  IsInt,
+  IsNotEmpty,
+  IsPhoneNumber,
+  Max,
+  Min,
+} from 'class-validator';
+
 export class CreateUserDto {
-  firstName: string;
+  @IsNotEmpty({ message: 'Name Company is required' })
+  nameCompany: string;
 
-  lastName: string;
+  @IsNotEmpty({ message: 'Email is required' })
+  @IsEmail()
+  email: string;
 
-  //   @IsNotEmpty({ message: 'The field rating cannot be empty' })
-  //   @IsInt({ message: 'rating must be of type number' })
-  //   rating: number;
+  @IsNotEmpty({ message: 'Password is required' })
+  @Min(6, { message: 'Password must be at least 6 character' })
+  password: string;
+
+  @IsNotEmpty({ message: 'Tax Code is required' })
+  @IsInt()
+  taxCode: number;
+
+  @IsNotEmpty({ message: 'Wallet Address is required' })
+  walletAdress: string;
+
+  @IsNotEmpty({ message: 'Certificates is required' })
+  certificates: string;
+
+  @IsNotEmpty({ message: 'Phone Number is required' })
+  @IsInt()
+  @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
+  phoneNumber: number;
 }
