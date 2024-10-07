@@ -5,7 +5,7 @@ import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 
 export default function InputValidate(props: IInputValidate) {
-  const { nameLable, idLable, placeholder, type } = props;
+  const { nameLable, idLable, placeholder, type, multiple } = props;
   const [error, setError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -37,8 +37,7 @@ export default function InputValidate(props: IInputValidate) {
           break;
 
         case "taxcode":
-          const check = isNaN(parseInt(value));
-          if (check) {
+          if (!/^\d+$/.test(value)) {
             setError(true);
             setErrorMessage("Tax code must is a number.");
           } else {
@@ -92,6 +91,9 @@ export default function InputValidate(props: IInputValidate) {
         helperText={errorMessage}
         color={errorMessage ? "error" : "primary"}
         onChange={handleOnChange}
+        inputProps={{
+          multiple: { multiple },
+        }}
       />
     </FormControl>
   );

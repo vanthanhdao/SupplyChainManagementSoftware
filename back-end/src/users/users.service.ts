@@ -27,7 +27,7 @@ export class UsersService {
       const [result, total] = await this.usersRepository.findAndCount({
         skip: (page - 1) * limit,
         take: limit,
-        order: { id: 'DESC' },
+        // order: { id: 'DESC' },
       });
       return { data: result, total };
     }

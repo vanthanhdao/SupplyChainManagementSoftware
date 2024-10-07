@@ -52,12 +52,11 @@ export default function SignUp() {
     event.preventDefault();
     const name = document.getElementById("name") as HTMLInputElement;
     const email = document.getElementById("email") as HTMLInputElement;
-    const password = document.getElementById("password") as HTMLInputElement;
     const taxcode = document.getElementById("taxcode") as HTMLInputElement;
+
     const data = {
       name: name.value,
       email: email.value,
-      password: password.value,
       taxcode: taxcode.value,
     };
     // Handle  Call api
@@ -113,16 +112,17 @@ export default function SignUp() {
                 type="text"
               />
               <InputValidate
-                nameLable="Password"
-                idLable="password"
-                placeholder="••••••"
-                type="password"
-              />
-              <InputValidate
                 nameLable="Tax Code"
                 idLable="taxcode"
                 placeholder="0000000001"
                 type="text"
+              />
+              <InputValidate
+                nameLable="Certificates"
+                idLable="certificate"
+                placeholder="Certificate.png"
+                type="file"
+                multiple={true}
               />
             </Box>
             <FormControlLabel
