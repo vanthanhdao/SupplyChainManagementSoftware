@@ -5,7 +5,7 @@ import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 
 export default function InputValidate(props: IInputValidate) {
-  const { nameLable, idLable, placeholder, type, multiple } = props;
+  const { nameLable, idLable, placeholder, type, multiple,onSendData } = props;
   const [error, setError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -58,9 +58,10 @@ export default function InputValidate(props: IInputValidate) {
   };
 
   const handleOnChange = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement>
   ) => {
     validateInputs(event);
+    onSendData(event.target.files);
   };
 
   const handleOnFocus = (

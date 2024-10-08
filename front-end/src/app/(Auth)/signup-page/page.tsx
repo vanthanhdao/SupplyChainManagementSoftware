@@ -47,22 +47,29 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
 
 export default function SignUp() {
   const [showButton, setShowButton] = React.useState(true);
+  const [certificate, setCertificate] = React.useState({});
+
+  const handleDataFromChild = (childData: any)=>{
+    setCertificate(childData);
+  }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const name = document.getElementById("name") as HTMLInputElement;
-    const email = document.getElementById("email") as HTMLInputElement;
-    const taxcode = document.getElementById("taxcode") as HTMLInputElement;
+    const name = document.getElementById("name") as HTMLFormElement ;
+    const email = document.getElementById("email") as HTMLFormElement ;
+    const taxcode = document.getElementById("taxcode") as HTMLFormElement ;
 
     const data = {
       name: name.value,
       email: email.value,
       taxcode: taxcode.value,
+      certificate: certificate
     };
-    // Handle  Call api
-    if (Object.values(data).every((value) => value && value.length > 0)) {
-      alert(Object.values(data));
-    } else alert("You must provide a valid information");
+    console.log(data)
+    // // Handle  Call api
+    // if (Object.values(data).every((value) => value && value.length > 0)) {
+    //   alert(Object.values(data));
+    // } else alert("You must provide a valid information");
   };
 
   return (
@@ -123,7 +130,9 @@ export default function SignUp() {
                 placeholder="Certificate.png"
                 type="file"
                 multiple={true}
+                onSendData={handleDataFromChild}
               />
+              
             </Box>
             <FormControlLabel
               control={

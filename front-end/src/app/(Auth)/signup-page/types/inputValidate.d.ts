@@ -4,4 +4,5 @@ interface IInputValidate {
   placeholder: string;
   type?: "text" | "email" | "password" | "file";
   multiple?: boolean;
+  onSendData?: any;
 }
