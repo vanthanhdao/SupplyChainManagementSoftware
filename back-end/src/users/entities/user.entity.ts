@@ -1,6 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
 
-@Entity()
+@Entity('tblSCMS_Users')
 export class Users {
   @PrimaryGeneratedColumn()
   id: number;
@@ -8,8 +14,6 @@ export class Users {
   nameCompany: string;
   @Column()
   email: string;
-  @Column()
-  password: string;
   @Column()
   taxCode: number;
   @Column()
@@ -22,4 +26,8 @@ export class Users {
   isActive: boolean;
   @Column({ default: 'USER_CUSTOMER' })
   role: string;
+  @CreateDateColumn()
+  createAt: string;
+  @UpdateDateColumn()
+  updateAt: string;
 }

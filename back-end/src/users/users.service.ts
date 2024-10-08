@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from '../users/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { hashPassword } from 'src/utils/hash';
+import { hashHelper } from 'src/utils/hash';
 // import aqp from 'api-query-params';
 
 @Injectable()
@@ -49,7 +49,6 @@ export class UsersService {
     const {
       nameCompany,
       email,
-      password,
       taxCode,
       walletAdress,
       certificates,
@@ -57,13 +56,12 @@ export class UsersService {
     } = createUserDto;
     const checkEmail = (await this.isEmailExits(email)) ? true : false;
     if (!checkEmail) {
-      const hashedPassword = await hashPassword(password);
+      const hashedWalletAddress = await hashHelper(walletAdress);
       const user = this.usersRepository.create({
         nameCompany,
         email,
-        password: hashedPassword,
         taxCode,
-        walletAdress,
+        walletAdress: hashedWalletAddress,
         certificates,
         phoneNumber,
       });
@@ -71,5 +69,9 @@ export class UsersService {
       return user;
     }
     throw new Error(`Email address ${email} already exists`);
+  }
+
+  async findByEmail(email: string) {
+    return await this.usersRepository.findOneBy({ email });
   }
 }

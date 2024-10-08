@@ -16,9 +16,9 @@ export class CreateUserDto {
   @IsEmail()
   email: string;
 
-  @IsNotEmpty({ message: 'Password is required' })
-  @MinLength(6, { message: 'Password must be at least 6 character' })
-  password: string;
+  // @IsNotEmpty({ message: 'Password is required' })
+  // @MinLength(6, { message: 'Password must be at least 6 character' })
+  // password: string;
 
   @IsNotEmpty({ message: 'Tax Code is required' })
   @IsInt()
