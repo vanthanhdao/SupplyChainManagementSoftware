@@ -14,16 +14,15 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, walletAdress: string) {
+  async signIn(email: string, password: string) {
     const user = await this.usersService.findByEmail(email);
-    const isValidWalletAdress = compareHelper(walletAdress, user.walletAdress);
+    const isValidWalletAdress = compareHelper(password, user.password);
     if (!user && !isValidWalletAdress) {
       throw new UnauthorizedException();
     }
     const payload = {
-      nameCompany: user.nameCompany,
       email: user.email,
-      walletAdress: user.walletAdress,
+      publicKey: user.publicKey,
       role: user.role,
     };
     return {

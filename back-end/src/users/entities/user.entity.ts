@@ -1,3 +1,4 @@
+import { Allow } from 'class-validator';
 import {
   Entity,
   Column,
@@ -10,21 +11,25 @@ import {
 export class Users {
   @PrimaryGeneratedColumn()
   id: number;
-  @Column()
+  @Column({nullable:true})
   nameCompany: string;
   @Column()
   email: string;
   @Column()
+  password: string;
+  @Column({nullable:true})
   taxCode: number;
   @Column()
-  walletAdress: string;
+  publicKey: string;
   @Column()
+  privateKey: string;
+  @Column({nullable:true})
   certificates: string;
-  @Column()
+  @Column({nullable:true})
   phoneNumber: number;
   @Column({ default: false })
   isActive: boolean;
-  @Column({ default: 'USER_CUSTOMER' })
+  @Column({ default: 'USER' })
   role: string;
   @CreateDateColumn()
   createAt: string;

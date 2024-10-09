@@ -5,7 +5,7 @@ import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
 
 export default function InputValidate(props: IInputValidate) {
-  const { nameLable, idLable, placeholder, type, multiple,onSendData } = props;
+  const { nameLable, idLable, placeholder, type, multiple, onSendData } = props;
   const [error, setError] = React.useState(false);
   const [errorMessage, setErrorMessage] = React.useState("");
 
@@ -26,7 +26,8 @@ export default function InputValidate(props: IInputValidate) {
           }
           break;
 
-        case "password":
+        case "password" :
+        case "repassword":
           if (value.length < 6) {
             setError(true);
             setErrorMessage("Password must be at least 6 characters long.");
@@ -61,7 +62,7 @@ export default function InputValidate(props: IInputValidate) {
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
     validateInputs(event);
-    onSendData(event.target.files);
+    if(onSendData) onSendData(event.target.files);
   };
 
   const handleOnFocus = (

@@ -3,7 +3,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from '../users/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { hashHelper } from 'src/utils/hash';
+import { hashPassHelper, hashWalletHelper } from 'src/utils/hash';
+import { ConfigService } from '@nestjs/config';
+
 // import aqp from 'api-query-params';
 
 @Injectable()
@@ -11,6 +13,7 @@ export class UsersService {
   constructor(
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
+    private configService: ConfigService,
   ) {}
 
   // Check email address is exits
@@ -46,24 +49,17 @@ export class UsersService {
 
   // Add a new user to the database
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    const {
-      nameCompany,
-      email,
-      taxCode,
-      walletAdress,
-      certificates,
-      phoneNumber,
-    } = createUserDto;
+    const {email, password,walletAdress } = createUserDto;
     const checkEmail = (await this.isEmailExits(email)) ? true : false;
+    const secretKey = this.configService.get<string>('JWT_SECRET');
     if (!checkEmail) {
-      const hashedWalletAddress = await hashHelper(walletAdress);
+      const hashedPassword = await hashPassHelper(password);
+      const hashedWallet = await hashWalletHelper(walletAdress.privateKey,secretKey)
       const user = this.usersRepository.create({
-        nameCompany,
         email,
-        taxCode,
-        walletAdress: hashedWalletAddress,
-        certificates,
-        phoneNumber,
+        password:hashedPassword,
+        publicKey:walletAdress.publicKey,
+        privateKey:hashedWallet
       });
       await this.usersRepository.save(user);
       return user;
