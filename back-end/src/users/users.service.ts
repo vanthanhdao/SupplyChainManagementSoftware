@@ -49,17 +49,20 @@ export class UsersService {
 
   // Add a new user to the database
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    const {email, password,walletAdress } = createUserDto;
+    const { email, password, walletAddress } = createUserDto;
     const checkEmail = (await this.isEmailExits(email)) ? true : false;
     const secretKey = this.configService.get<string>('JWT_SECRET');
     if (!checkEmail) {
       const hashedPassword = await hashPassHelper(password);
-      const hashedWallet = await hashWalletHelper(walletAdress.privateKey,secretKey)
+      const hashedWallet = await hashWalletHelper(
+        walletAddress.privateKey,
+        secretKey,
+      );
       const user = this.usersRepository.create({
         email,
-        password:hashedPassword,
-        publicKey:walletAdress.publicKey,
-        privateKey:hashedWallet
+        password: hashedPassword,
+        publicKey: walletAddress.publicKey,
+        privateKey: hashedWallet,
       });
       await this.usersRepository.save(user);
       return user;

@@ -25,9 +25,9 @@ export class CreateUserDto {
   // taxCode: number;
 
   @IsNotEmpty({ message: 'Wallet Address is required' })
-  walletAdress: {
-    publicKey:string
-    privateKey:string
+  walletAddress: {
+    publicKey: string;
+    privateKey: string;
   };
 
   // @IsNotEmpty({ message: 'Certificates is required' })

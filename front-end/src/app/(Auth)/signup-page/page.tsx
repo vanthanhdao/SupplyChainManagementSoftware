@@ -16,7 +16,7 @@ import SitemarkIcon from "../../components/SitemarkIcon";
 import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
 import axios from "axios";
-import 'dotenv/config';
+require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
   display: "flex",
@@ -49,7 +49,7 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
   }),
 }));
 
-const baseApiUrl = process.env.BASE_API_URL;
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 export default function SignUp() {
   const router = useRouter();
@@ -62,59 +62,61 @@ export default function SignUp() {
   //   setCertificate(childData);
   // }
 
-  
   // Create wallet using ethers.js
   // Update Wallet info into state
-  const generateWallet = () => {
+  const generateWallet = (): any => {
     try {
       const newWallet = ethers.Wallet.createRandom();
       return {
         publicKey: newWallet.address,
         privateKey: newWallet.privateKey,
-      }
-      
+      };
     } catch (error) {
-      console.error('Create wallet error:', error);
+      console.error("Create wallet error:", error);
     }
   };
 
   // Call api with axios
-  const createUser = async(data: Object)=> {
+  const createUser = async (data: any) => {
     try {
-      const response = await axios.post(`${baseApiUrl}/users`, {
-        //data
-      })
+      const response = await axios.post(`${apiUrl}/users`, data);
+      // Handle signin page route
+      router.push("/signin-page");
       console.log(response.data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
     }
-  }
+  };
 
   // Handle Sunmit Sign In From
-  const  handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const password = document.getElementById("password") as HTMLFormElement ;
-    const email = document.getElementById("email") as HTMLFormElement ;
-    const repassword = document.getElementById("repassword") as HTMLFormElement ;
+    const password = document.getElementById("password") as HTMLFormElement;
+    const email = document.getElementById("email") as HTMLFormElement;
+    const repassword = document.getElementById("repassword") as HTMLFormElement;
     const valueInput = {
       email: email.value,
       password: password.value,
-      repassword: repassword.value
+      repassword: repassword.value,
     };
 
     // ***Add fuction check password equal re-password (check trước khi gọi api)
-    const checkEmtyData = Object.values(valueInput).every((value) => value && value.length > 0);
-    const checkValidPass = (valueInput.password === valueInput.repassword);
+    const checkEmtyData = Object.values(valueInput).every(
+      (value) => value && value.length > 0
+    );
+    const checkValidPass = valueInput.password === valueInput.repassword;
     if (checkEmtyData && checkValidPass) {
       const wallet = generateWallet();
       const data = {
-        valueInput,
-        wallet
-      }
-          // Handle Call api
+        email: valueInput.email,
+        password: valueInput.password,
+        walletAddress: {
+          publicKey: wallet.publicKey,
+          privateKey: wallet.privateKey,
+        },
+      };
+      // Handle Call api
       createUser(data);
-          // Handle signin page route
-      router.push('/signin-page')
     } else alert("You must provide a valid information");
   };
 
@@ -164,13 +166,13 @@ export default function SignUp() {
                 placeholder="your@email.com"
                 type="text"
               />
-               <InputValidate
+              <InputValidate
                 nameLable="Password"
                 idLable="password"
                 placeholder="••••••"
                 type="password"
               />
-               <InputValidate
+              <InputValidate
                 nameLable="Re Password"
                 idLable="repassword"
                 placeholder="••••••"
@@ -190,7 +192,6 @@ export default function SignUp() {
                 multiple={true}
                 onSendData={handleDataFromChild}
               /> */}
-              
             </Box>
             <FormControlLabel
               control={
@@ -219,4 +220,3 @@ export default function SignUp() {
     </SignUpContainer>
   );
 }
-
