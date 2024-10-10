@@ -3,8 +3,7 @@ import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Users } from './entities/user.entity';
-import { JwtStrategy } from 'src/auth/jwt.strategy';
-
+import { JwtStrategy } from 'src/auth/passport/jwt.strategy';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Users])],

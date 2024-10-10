@@ -1,10 +1,10 @@
-import { UsersService } from './../users/users.service';
 import {
   Dependencies,
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { UsersService } from 'src/modules/users/users.service';
 import { compareHelper } from 'src/utils/hash';
 
 @Injectable()
@@ -42,10 +42,14 @@ export class AuthService {
   }
 
   async signIn(user: any) {
+    const payload = {
+      id: user.id,
+      email: user.email,
+      isActive: user.isActive,
+      role: user.role,
+    };
     return {
-      access_token: await this.jwtService.signAsync(user),
+      access_token: await this.jwtService.signAsync(payload),
     };
   }
-
-
 }

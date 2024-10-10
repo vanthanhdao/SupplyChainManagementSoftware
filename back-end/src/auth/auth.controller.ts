@@ -8,20 +8,26 @@ import {
   Delete,
   Query,
   UseGuards,
-  Request
+  Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SignInAuthDto } from './dto/signin-auth.dto';
-import { AuthGuard } from '@nestjs/passport';
+import { LocalAuthGuard } from './passport/local-auth.guard';
+import { Public } from 'src/decorators/publicRouter';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(LocalAuthGuard) //Kiểm tra router với email và password
   @Post('login')
-  signin(@Body() signInDto: SignInAuthDto) {
-    return this.authService.signIn(signInDto);
+  @Public() // Không áp dụng guards JwtAuthGuard cho router này /auth/login
+  signin(@Request() req) {
+    return this.authService.signIn(req.user);
+  }
+
+  @Get('profile')
+  getProfile(@Request() req) {
+    return req.user;
   }
 
   // @Get()

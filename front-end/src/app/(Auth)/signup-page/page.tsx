@@ -16,7 +16,6 @@ import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
 import axios from "axios";
 import { DataContext, DataProvider } from "../hook/errorContext";
-import exp from "constants";
 require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
@@ -50,12 +49,11 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
   }),
 }));
 
-
-const SignUp = ()=> {
+const SignUp = () => {
   const router = useRouter();
   const [showButton, setShowButton] = React.useState(true);
 
-  // Use context for error variable 
+  // Use context for error variable
   const context = React.useContext(DataContext);
   if (!context) {
     return <div>Loading...</div>; // Kiểm tra nếu context không tồn tại
@@ -79,10 +77,12 @@ const SignUp = ()=> {
   // Call api with axios
   const createUser = async (data: any) => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users`, data);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/users`,
+        data
+      );
       // Handle signin page route
       router.push("/signin-page");
-      console.log(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -91,7 +91,7 @@ const SignUp = ()=> {
   // Handle Sunmit Sign In From
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-  
+
     const password = document.getElementById("password") as HTMLFormElement;
     const email = document.getElementById("email") as HTMLFormElement;
     const repassword = document.getElementById("repassword") as HTMLFormElement;
@@ -102,16 +102,17 @@ const SignUp = ()=> {
     };
     // ***Add fuction check errorGlobal (check trước khi gọi api)
     const checkErrorGlobal = Object.values(errorGlobal).every(
-      (value) => !value 
+      (value) => !value
     );
     // ***Add fuction check empty valueInput  (check trước khi gọi api)
     const checkEmtyData = Object.values(valueInput).every(
       (value) => value && value.length > 0
     );
     if (checkErrorGlobal && checkEmtyData) {
-       // ***Add fuction check password easswqual re-pord (check trước khi gọi api)
+      // ***Add fuction check password easswqual re-pord (check trước khi gọi api)
       const checkValidPass = valueInput.password === valueInput.repassword;
-      if(!checkValidPass) return alert("You must provide RePassword a valid information");
+      if (!checkValidPass)
+        return alert("You must provide RePassword a valid information");
 
       const wallet = generateWallet();
       const data = {
@@ -126,7 +127,6 @@ const SignUp = ()=> {
       createUser(data);
     } else alert("You must provide a valid information");
   };
-
 
   return (
     <SignUpContainer
@@ -161,8 +161,7 @@ const SignUp = ()=> {
               onClick={() => setShowButton(false)}
               sx={{ display: "flex", flexDirection: "column", gap: 2 }}
             >
-              
-                 {/* Input Custom Component */}
+              {/* Input Custom Component */}
               {/* <InputValidate
                 nameLable="Company Name"
                 idLable="name"
@@ -201,7 +200,6 @@ const SignUp = ()=> {
                 multiple={true}
                 onSendData={handleDataFromChild}
               /> */}
-               
             </Box>
             <FormControlLabel
               control={
@@ -229,7 +227,7 @@ const SignUp = ()=> {
       </Stack>
     </SignUpContainer>
   );
-}
+};
 
 // Bao bọc ParentComponent bằng DataProvider
 const Page: React.FC = () => {
