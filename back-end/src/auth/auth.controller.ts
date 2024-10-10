@@ -7,20 +7,21 @@ import {
   Param,
   Delete,
   Query,
+  UseGuards,
+  Request
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SignInAuthDto } from './dto/signin-auth.dto';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
+  @UseGuards(AuthGuard('local'))
   @Post('login')
-  signin(@Body() signinAuthDto: SignInAuthDto) {
-    return this.authService.signIn(
-      signinAuthDto.email,
-      signinAuthDto.walletAddress,
-    );
+  signin(@Body() signInDto: SignInAuthDto) {
+    return this.authService.signIn(signInDto);
   }
 
   // @Get()

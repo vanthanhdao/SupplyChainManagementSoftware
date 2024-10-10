@@ -32,8 +32,12 @@ const SignIn = () => {
     try {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, data);
       // Handle signin page route
-      router.push("/");
-      console.log(response.data);
+      const access_token =  response.data.access_token;
+      if(access_token && access_token.length>0){
+        router.push("/");
+        // Save access_token into localStorage
+        localStorage.setItem('access_token', response.data.access_token);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }

@@ -14,19 +14,38 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(email: string, password: string) {
+  // async signIn(email: string, password: string) {
+  //   const user = await this.usersService.findByEmail(email);
+  //   const isValidWalletAdress = compareHelper(password, user.password);
+  //   if (!user && !isValidWalletAdress) {
+  //     throw new UnauthorizedException();
+  //   }
+  //   const payload = {
+  //     email: user.email,
+  //     publicKey: user.publicKey,
+  //     isActive:user.isActive,
+  //     role: user.role,
+  //   };
+  //   return {
+  //     data:payload,
+  //     access_token: await this.jwtService.signAsync(payload),
+  //   };
+  // }
+
+  async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     const isValidWalletAdress = compareHelper(password, user.password);
     if (!user && !isValidWalletAdress) {
       throw new UnauthorizedException();
     }
-    const payload = {
-      email: user.email,
-      publicKey: user.publicKey,
-      role: user.role,
-    };
+    return user;
+  }
+
+  async signIn(user: any) {
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: await this.jwtService.signAsync(user),
     };
   }
+
+
 }
