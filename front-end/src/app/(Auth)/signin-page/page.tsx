@@ -12,23 +12,56 @@ import InputValidate from "../components/InputValidate";
 import SitemarkIcon from "../../components/SitemarkIcon";
 import CardCustom from "../components/CardCustom";
 import StackCustom from "../components/StackCustom";
+import { DataContext, DataProvider } from "../hook/errorContext";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 
-export default function SignIn() {
+const SignIn = () => {
+  const router = useRouter();
   const [showButton, setShowButton] = React.useState(true);
 
+  // Use context for error variable 
+    const context = React.useContext(DataContext);
+    if (!context) {
+      return <div>Loading...</div>; // Kiểm tra nếu context không tồn tại
+    }
+    const { errorEmail,errorPassword } = context.errorGlobal;
+
+  // Call api /auth with axios when user signin
+  const authUserSignIn = async (data: any) => {
+    try {
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, data);
+      // Handle signin page route
+      router.push("/");
+      console.log(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  // Handle from Submit
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     const email = document.getElementById("email") as HTMLInputElement;
     const password = document.getElementById("password") as HTMLInputElement;
-    const taxcode = document.getElementById("taxcode") as HTMLInputElement;
-    const data = {
+    const valueInput = {
       email: email.value,
       password: password.value,
-      taxcode: taxcode.value,
     };
-    // Handle  Call api
-    if (Object.values(data).every((value) => value && value.length > 0)) {
-      alert(Object.values(data));
+
+    // ***Add fuction check empty valueInput  (check trước khi gọi api)
+    const checkEmtyData = Object.values(valueInput).every(
+      (value) => value && value.length > 0
+    );
+
+    if (checkEmtyData && !errorEmail && !errorPassword) {
+      const data = {
+        email: valueInput.email,
+        password: valueInput.password,
+      };
+      // Handle Call api
+      authUserSignIn(data)
     } else alert("You must provide a valid information");
   };
 
@@ -106,3 +139,14 @@ export default function SignIn() {
     </StackCustom>
   );
 }
+
+// Bao bọc ParentComponent bằng DataProvider
+const Page: React.FC = () => {
+  return (
+    <DataProvider>
+      <SignIn />
+    </DataProvider>
+  );
+};
+
+export default Page;

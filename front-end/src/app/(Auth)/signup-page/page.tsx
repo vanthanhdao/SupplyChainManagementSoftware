@@ -11,11 +11,12 @@ import Stack from "@mui/material/Stack";
 import Card from "@mui/material/Card";
 import { styled } from "@mui/system";
 import InputValidate from "../components/InputValidate";
-
 import SitemarkIcon from "../../components/SitemarkIcon";
 import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
 import axios from "axios";
+import { DataContext, DataProvider } from "../hook/errorContext";
+import exp from "constants";
 require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
@@ -49,18 +50,17 @@ const SignUpContainer = styled(Stack)(({ theme }) => ({
   }),
 }));
 
-const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-export default function SignUp() {
+const SignUp = ()=> {
   const router = useRouter();
   const [showButton, setShowButton] = React.useState(true);
-  const [certificate, setCertificate] = React.useState({});
-  // const [wallet, setWallet] = React.useState<IWalletAddress | null>(null);
 
-  // Handle transfer data from child to parent
-  // const handleDataFromChild = (childData: any)=>{
-  //   setCertificate(childData);
-  // }
+  // Use context for error variable 
+  const context = React.useContext(DataContext);
+  if (!context) {
+    return <div>Loading...</div>; // Kiểm tra nếu context không tồn tại
+  }
+  const { errorGlobal } = context;
 
   // Create wallet using ethers.js
   // Update Wallet info into state
@@ -79,7 +79,7 @@ export default function SignUp() {
   // Call api with axios
   const createUser = async (data: any) => {
     try {
-      const response = await axios.post(`${apiUrl}/users`, data);
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/users`, data);
       // Handle signin page route
       router.push("/signin-page");
       console.log(response.data);
@@ -91,6 +91,7 @@ export default function SignUp() {
   // Handle Sunmit Sign In From
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+  
     const password = document.getElementById("password") as HTMLFormElement;
     const email = document.getElementById("email") as HTMLFormElement;
     const repassword = document.getElementById("repassword") as HTMLFormElement;
@@ -99,13 +100,19 @@ export default function SignUp() {
       password: password.value,
       repassword: repassword.value,
     };
-
-    // ***Add fuction check password equal re-password (check trước khi gọi api)
+    // ***Add fuction check errorGlobal (check trước khi gọi api)
+    const checkErrorGlobal = Object.values(errorGlobal).every(
+      (value) => !value 
+    );
+    // ***Add fuction check empty valueInput  (check trước khi gọi api)
     const checkEmtyData = Object.values(valueInput).every(
       (value) => value && value.length > 0
     );
-    const checkValidPass = valueInput.password === valueInput.repassword;
-    if (checkEmtyData && checkValidPass) {
+    if (checkErrorGlobal && checkEmtyData) {
+       // ***Add fuction check password easswqual re-pord (check trước khi gọi api)
+      const checkValidPass = valueInput.password === valueInput.repassword;
+      if(!checkValidPass) return alert("You must provide RePassword a valid information");
+
       const wallet = generateWallet();
       const data = {
         email: valueInput.email,
@@ -119,6 +126,7 @@ export default function SignUp() {
       createUser(data);
     } else alert("You must provide a valid information");
   };
+
 
   return (
     <SignUpContainer
@@ -153,7 +161,8 @@ export default function SignUp() {
               onClick={() => setShowButton(false)}
               sx={{ display: "flex", flexDirection: "column", gap: 2 }}
             >
-              {/* Input Custom Component */}
+              
+                 {/* Input Custom Component */}
               {/* <InputValidate
                 nameLable="Company Name"
                 idLable="name"
@@ -173,7 +182,7 @@ export default function SignUp() {
                 type="password"
               />
               <InputValidate
-                nameLable="Re Password"
+                nameLable="RePassword"
                 idLable="repassword"
                 placeholder="••••••"
                 type="password"
@@ -192,6 +201,7 @@ export default function SignUp() {
                 multiple={true}
                 onSendData={handleDataFromChild}
               /> */}
+               
             </Box>
             <FormControlLabel
               control={
@@ -220,3 +230,14 @@ export default function SignUp() {
     </SignUpContainer>
   );
 }
+
+// Bao bọc ParentComponent bằng DataProvider
+const Page: React.FC = () => {
+  return (
+    <DataProvider>
+      <SignUp />
+    </DataProvider>
+  );
+};
+
+export default Page;
