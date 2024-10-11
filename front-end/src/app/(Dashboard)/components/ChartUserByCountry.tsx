@@ -1,7 +1,8 @@
+"use client"
 import * as React from 'react';
 import { PieChart } from '@mui/x-charts/PieChart';
 import { useDrawingArea } from '@mui/x-charts/hooks';
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/system";
 import Typography from '@mui/material/Typography';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
@@ -50,48 +51,6 @@ const countries = [
   },
 ];
 
-interface StyledTextProps {
-  variant: 'primary' | 'secondary';
-}
-
-const StyledText = styled('text', {
-  shouldForwardProp: (prop) => prop !== 'variant',
-})<StyledTextProps>(({ theme }) => ({
-  textAnchor: 'middle',
-  dominantBaseline: 'central',
-  fill: theme.palette.text.secondary,
-  variants: [
-    {
-      props: {
-        variant: 'primary',
-      },
-      style: {
-        fontSize: theme.typography.h5.fontSize,
-      },
-    },
-    {
-      props: ({ variant }) => variant !== 'primary',
-      style: {
-        fontSize: theme.typography.body2.fontSize,
-      },
-    },
-    {
-      props: {
-        variant: 'primary',
-      },
-      style: {
-        fontWeight: theme.typography.h5.fontWeight,
-      },
-    },
-    {
-      props: ({ variant }) => variant !== 'primary',
-      style: {
-        fontWeight: theme.typography.body2.fontWeight,
-      },
-    },
-  ],
-}));
-
 interface PieCenterLabelProps {
   primaryText: string;
   secondaryText: string;
@@ -104,12 +63,6 @@ function PieCenterLabel({ primaryText, secondaryText }: PieCenterLabelProps) {
 
   return (
     <React.Fragment>
-      <StyledText variant="primary" x={left + width / 2} y={primaryY}>
-        {primaryText}
-      </StyledText>
-      <StyledText variant="secondary" x={left + width / 2} y={secondaryY}>
-        {secondaryText}
-      </StyledText>
     </React.Fragment>
   );
 }

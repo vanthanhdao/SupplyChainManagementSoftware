@@ -1,15 +1,17 @@
+"use client"
 import * as React from 'react';
-import { styled, PaletteMode } from '@mui/material/styles';
+import { PaletteMode } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
-import MuiToolbar from '@mui/material/Toolbar';
+  import MuiToolbar from '@mui/material/Toolbar';
 import { tabsClasses } from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
 import DashboardRoundedIcon from '@mui/icons-material/DashboardRounded';
 import SideMenuMobile from './SideMenuMobile';
 import MenuButton from './MenuButton';
+import { styled } from "@mui/system";
 
 interface NavBarProps {
   mode: PaletteMode;
@@ -61,13 +63,13 @@ export default function Navbar({ mode, toggleColorMode }: NavBarProps) {
             width: '100%',
           }}
         >
-          <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
+          {/* <Stack direction="row" spacing={1} sx={{ justifyContent: 'center' }}>
             <CustomIcon />
             <Typography variant="h4" component="h1" sx={{ color: 'text.primary' }}>
               Dashboard
             </Typography>
-          </Stack>
-          <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
+          </Stack> */}
+          {/* <MenuButton aria-label="menu" onClick={toggleDrawer(true)}>
             <MenuRoundedIcon />
           </MenuButton>
           <SideMenuMobile
@@ -75,7 +77,7 @@ export default function Navbar({ mode, toggleColorMode }: NavBarProps) {
             toggleDrawer={toggleDrawer}
             mode={mode}
             toggleColorMode={toggleColorMode}
-          />
+          /> */}
         </Stack>
       </Toolbar>
     </AppBar>

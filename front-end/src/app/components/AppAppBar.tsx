@@ -60,8 +60,8 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
           >
             <Sitemark />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <Button variant="text" color="info" size="small">
-                Features
+              <Button variant="text" color="info" size="small" onClick={()=>router.push('/dashboard-page')}>
+                Dashboard
               </Button>
               <Button variant="text" color="info" size="small">
                 Testimonials

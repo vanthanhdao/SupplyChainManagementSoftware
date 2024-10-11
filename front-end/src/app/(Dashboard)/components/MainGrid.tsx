@@ -11,6 +11,7 @@ import HighlightedCard from './HighlightedCard';
 import PageViewsBarChart from './PageViewsBarChart';
 import SessionsChart from './SessionsChart';
 import StatCard, { StatCardProps } from './StatCard';
+import { Card } from '@mui/material';
 
 const data: StatCardProps[] = [
   {
@@ -73,6 +74,7 @@ export default function MainGrid() {
           <PageViewsBarChart />
         </Grid>
       </Grid>
+      <Card variant="outlined" sx={{ width: '100%' }}>
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Details
       </Typography>
@@ -87,7 +89,7 @@ export default function MainGrid() {
           </Stack>
         </Grid>
       </Grid>
-      <Copyright sx={{ my: 4 }} />
+      </Card>
     </Box>
   );
 }
