@@ -34,8 +34,8 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    const isValidWalletAdress = compareHelper(password, user.password);
-    if (!user && !isValidWalletAdress) {
+    const isValidWalletAdress = await compareHelper(password, user.password);
+    if (!user || !isValidWalletAdress) {
       throw new UnauthorizedException();
     }
     return user;

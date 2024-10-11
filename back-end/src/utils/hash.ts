@@ -13,7 +13,8 @@ export const hashPassHelper = async (plainText: string) => {
 
 export const compareHelper = async (plainText: string, hashTest: string) => {
   try {
-    return await bcrypt.compare(plainText, hashTest);
+    const result = await bcrypt.compare(plainText, hashTest);
+    return result;
   } catch (err) {
     console.error(err);
     throw new Error('Error compare helper');

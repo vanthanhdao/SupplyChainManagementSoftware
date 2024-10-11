@@ -15,6 +15,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ToggleColorMode from "./ToggleColorMode";
 import Sitemark from "./SitemarkIcon";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -43,6 +44,7 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
     setOpen(newOpen);
   };
 
+
   return (
     <AppBar
       position="fixed"
@@ -60,7 +62,7 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
           >
             <Sitemark />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <Button variant="text" color="info" size="small" onClick={()=>router.push('/dashboard-page')}>
+              <Button variant="text" color="info" size="small" >
                 Dashboard
               </Button>
               <Button variant="text" color="info" size="small">

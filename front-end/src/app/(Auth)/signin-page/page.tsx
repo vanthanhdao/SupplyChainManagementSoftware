@@ -34,7 +34,6 @@ const SignIn = () => {
       // Handle signin page route
       const access_token =  response.data.access_token;
       if(access_token && access_token.length>0){
-        router.push("/");
         // Save access_token into localStorage
         localStorage.setItem('access_token', response.data.access_token);
       }
@@ -42,6 +41,24 @@ const SignIn = () => {
       console.error("Error fetching data:", error);
     }
   };
+
+    // Call api /users/profile with axios when user signin
+    const getTokenPayload = async () => {
+      try {
+        const accessToken = localStorage.getItem('access_token');
+        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,  { headers: {"Authorization" : `Bearer ${accessToken}`} });
+        // Handle signin page route
+        const payload =  response.data;
+        console.log(payload)
+        // if(payload){
+        //   // Save access_token into localStorage
+        //   router.push('/dashboard-page')
+        // }
+      } catch (error: any) {
+        console.error("Error fetching data:", error.response);
+      }
+    };
+  
 
   // Handle from Submit
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -65,7 +82,8 @@ const SignIn = () => {
         password: valueInput.password,
       };
       // Handle Call api
-      authUserSignIn(data)
+      authUserSignIn(data);
+      getTokenPayload();
     } else alert("You must provide a valid information");
   };
 
