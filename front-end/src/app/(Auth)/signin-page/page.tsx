@@ -15,50 +15,56 @@ import StackCustom from "../components/StackCustom";
 import { DataContext, DataProvider } from "../hook/errorContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const SignIn = () => {
   const router = useRouter();
   const [showButton, setShowButton] = React.useState(true);
 
-  // Use context for error variable 
-    const context = React.useContext(DataContext);
-    if (!context) {
-      return <div>Loading...</div>; // Kiểm tra nếu context không tồn tại
-    }
-    const { errorEmail,errorPassword } = context.errorGlobal;
+  // Use context for error variable
+  const context = React.useContext(DataContext);
+  if (!context) {
+    return <div>Loading...</div>; // Kiểm tra nếu context không tồn tại
+  }
+  const { errorEmail, errorPassword } = context.errorGlobal;
 
   // Call api /auth with axios when user signin
   const authUserSignIn = async (data: any) => {
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, data);
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
+        data
+      );
       // Handle signin page route
-      const access_token =  response.data.access_token;
-      if(access_token && access_token.length>0){
+      const access_token = response.data.access_token;
+      if (access_token && access_token.length > 0) {
         // Save access_token into localStorage
-        localStorage.setItem('access_token', response.data.access_token);
+        localStorage.setItem("access_token", response.data.access_token);
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-    // Call api /users/profile with axios when user signin
-    const getTokenPayload = async () => {
-      try {
-        const accessToken = localStorage.getItem('access_token');
-        const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,  { headers: {"Authorization" : `Bearer ${accessToken}`} });
-        // Handle signin page route
-        const payload =  response.data;
-        console.log(payload)
-        // if(payload){
-        //   // Save access_token into localStorage
-        //   router.push('/dashboard-page')
-        // }
-      } catch (error: any) {
-        console.error("Error fetching data:", error.response);
+  // Call api /users/profile with axios when user signin
+  const getTokenPayload = async () => {
+    try {
+      const accessToken = localStorage.getItem("access_token");
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
+        { headers: { Authorization: `Bearer ${accessToken}` } }
+      );
+      // Handle signin page route
+      const payload = response.data;
+      console.log(payload);
+      if (payload) {
+        // Save access_token into localStorage
+        router.push("/dashboard-page");
       }
-    };
-  
+    } catch (error: any) {
+      console.error("Error fetching data:", error.response);
+    }
+  };
 
   // Handle from Submit
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -160,7 +166,7 @@ const SignIn = () => {
       </Stack>
     </StackCustom>
   );
-}
+};
 
 // Bao bọc ParentComponent bằng DataProvider
 const Page: React.FC = () => {
