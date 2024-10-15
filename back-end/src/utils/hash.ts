@@ -31,3 +31,12 @@ export const hashWalletHelper = async (plainText: string, secretKey:string) => {
     throw new Error('Error hashing helper');
   }
 };
+
+export const reHashWalletHelper = async (hashText: string, secretKey:string) => {
+  try {
+    return await CryptoJS.AES.decrypt(hashText,secretKey).toString(CryptoJS.enc.Utf8);
+  } catch (err) {
+    console.error(err);
+    throw new Error('Error rehashing helper');
+  }
+};

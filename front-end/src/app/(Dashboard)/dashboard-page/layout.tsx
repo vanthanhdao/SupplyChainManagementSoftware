@@ -2,12 +2,28 @@
 import { Box, Stack } from "@mui/material";
 import Header from "../components/Header";
 import SideMenu from "../components/SideMenu";
+import * as React from "react";
+import { Inter } from "next/font/google";
+import { PaletteMode, ThemeProvider, createTheme } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import getMPTheme from "../../theme/getMPTheme";
+import { ProtectedPage } from "@/app/(Home)/middleware/protectRouter";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+
+const inter = Inter({ subsets: ["latin"] });
+
+export default function Layout({ children }: {  children: React.ReactNode }) {
+
+  ProtectedPage();
+  const [mode, setMode] = React.useState<PaletteMode>("light");
+  const [showCustomTheme, setShowCustomTheme] = React.useState(true);
+  const MPTheme = createTheme(getMPTheme(mode));
+  const defaultTheme = createTheme({ palette: { mode } });
   return (
     <html lang="en">
       <body>
-        <main>
+      <ThemeProvider theme={showCustomTheme ? MPTheme : defaultTheme}>
+      <CssBaseline />
           <Box sx={{ display: "flex" }}>
             <SideMenu />
             <Box
@@ -37,7 +53,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               </Stack>
             </Box>
           </Box>
-        </main>
+          </ThemeProvider>
       </body>
     </html>
   );

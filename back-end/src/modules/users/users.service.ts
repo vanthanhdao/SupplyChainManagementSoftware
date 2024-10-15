@@ -3,7 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from '../users/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { hashPassHelper, hashWalletHelper } from 'src/utils/hash';
+import { hashPassHelper, hashWalletHelper, reHashWalletHelper } from 'src/utils/hash';
 import { ConfigService } from '@nestjs/config';
 
 // import aqp from 'api-query-params';
@@ -38,8 +38,14 @@ export class UsersService {
   }
 
   // Find users by id
-  findOne(id: number): Promise<Users | null> {
-    return this.usersRepository.findOneBy({ id });
+  async findOne(id: number): Promise<any> {
+    const user = await this.usersRepository.findOneBy({ id });
+    const privateKeyDecrypt =  await reHashWalletHelper(user.privateKey,this.configService.get<string>('JWT_SECRET'));
+    const res = {
+      publicKey :user.publicKey,
+      privateKey :privateKeyDecrypt
+    }
+    return res
   }
 
   // Delete users by id
@@ -73,4 +79,6 @@ export class UsersService {
   async findByEmail(email: string) {
     return await this.usersRepository.findOneBy({ email });
   }
+
+
 }

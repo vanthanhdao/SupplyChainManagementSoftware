@@ -9,17 +9,18 @@ import Link from "next/link";
 import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import InputValidate from "../components/InputValidate";
-import SitemarkIcon from "../../components/SitemarkIcon";
-import CardCustom from "../components/CardCustom";
 import StackCustom from "../components/StackCustom";
 import { DataContext, DataProvider } from "../hook/errorContext";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import LinearProgress from "@mui/material/LinearProgress";
+import { ethers, verifyMessage } from "ethers";
+import CardCustom from "../components/CardCustom";
+import SitemarkIcon from "../../components/SitemarkIcon";
 
 const SignIn = () => {
   const router = useRouter();
   const [showButton, setShowButton] = React.useState(true);
+  const accessToken = localStorage.getItem("access_token");
 
   // Use context for error variable
   const context = React.useContext(DataContext);
@@ -28,7 +29,7 @@ const SignIn = () => {
   }
   const { errorEmail, errorPassword } = context.errorGlobal;
 
-  // Call api /auth with axios when user signin
+  // Call api /auth/login with axios when user signin
   const authUserSignIn = async (data: any) => {
     try {
       const response = await axios.post(
@@ -46,19 +47,44 @@ const SignIn = () => {
     }
   };
 
-  // Call api /users/profile with axios when user signin
+  // Ký thông báo bằng khóa riêng tư để thêm 1 lớp xác thực người dùng
+  const signMessage = async (userId: any) =>{
+  const response = await axios.get(
+    `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
+    { headers: { Authorization: `Bearer ${accessToken}` } }
+  );
+  // Khóa riêng tư của người dùng được truy xuất từ SQL Server
+const {privateKey} = response.data; 
+// Tạo một Wallet từ khóa riêng tư
+const wallet = new ethers.Wallet(privateKey);
+// console.log('wallet address',wallet.address)
+// Thông báo mà bạn muốn ký (message)
+const message = "Verify account ownership";
+  // Ký thông báo
+const signature = await wallet.signMessage(message);
+  // Lấy lại địa chỉ từ chữ ký
+  const recoveredAddress = verifyMessage(message, signature);
+  // Kiểm tra xem địa chỉ có khớp với địa chỉ của người dùng hay không
+  if (recoveredAddress === wallet.address) {
+      console.log("Verification successful! Address matches.");
+  } else {
+      console.log("Authentication failed! Addresses do not match.");
+  }
+  };
+
+  // Call api /auth/profile with axios when user signin
   const getTokenPayload = async () => {
     try {
-      const accessToken = localStorage.getItem("access_token");
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
       // Handle signin page route
-      const payload = response.data;
-      console.log(payload);
-      if (payload) {
+      const {isActive, email,userId,role} = response.data;
+      console.log(isActive);
+      if (isActive) {
         // Save access_token into localStorage
+        signMessage(userId);
         router.push("/dashboard-page");
       }
     } catch (error: any) {

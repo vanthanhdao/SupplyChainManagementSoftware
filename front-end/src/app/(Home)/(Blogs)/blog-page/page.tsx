@@ -4,7 +4,7 @@ import AppTable from "../components/AppTable";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import AddFormDialog from "../components/AddFromDialog";
 import Container from '@mui/material/Container';
-import { rows } from "@/app/(Dashboard)/internals/data/gridData";
+
 
 export default function BlogPage() {
   // Dùng useSWR để lưu data khi gọi api 1 lần duy nhất

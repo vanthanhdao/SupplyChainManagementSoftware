@@ -2,15 +2,14 @@
 import type { Metadata } from "next";
 import * as React from "react";
 import { Inter } from "next/font/google";
-import AppAppBar from "./components/AppAppBar";
-import Footer from "./components/Footer";
 import { PaletteMode, ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import getMPTheme from "./theme/getMPTheme";
+import AppAppBar from "./components/AppAppBar";
+import Footer from "./components/Footer";
+import getMPTheme from "../theme/getMPTheme";
 
 
 const inter = Inter({ subsets: ["latin"] });
-
 
 
 export default function RootLayout({
