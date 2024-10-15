@@ -30,6 +30,12 @@ export class AuthController {
     return req.user;
   }
 
+  
+  @Get('refreshToken')
+  refreshToken(@Request() req) {
+    return this.authService.signIn(req.user);
+  }
+
   // @Get()
   // findAll() {
   //   return this.authService.findAll();

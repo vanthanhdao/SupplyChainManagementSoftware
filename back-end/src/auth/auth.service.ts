@@ -6,6 +6,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from 'src/modules/users/users.service';
 import { compareHelper } from 'src/utils/hash';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class AuthService {
@@ -34,8 +35,8 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
-    const isValidWalletAdress = await compareHelper(password, user.password);
-    if (!user || !isValidWalletAdress) {
+    const isValidPassword = await compareHelper(password, user.password);
+    if (!user || !isValidPassword) {
       throw new UnauthorizedException();
     }
     return user;
@@ -48,8 +49,12 @@ export class AuthService {
       isActive: user.isActive,
       role: user.role,
     };
+    const tokenId = uuidv4();
     return {
       access_token: await this.jwtService.signAsync(payload),
+      refresh_token: await this.jwtService.signAsync({...payload,tokenId},{ expiresIn: '7d' })
     };
   }
+
+
 }

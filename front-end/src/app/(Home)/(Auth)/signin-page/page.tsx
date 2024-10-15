@@ -16,11 +16,12 @@ import { useRouter } from "next/navigation";
 import { ethers, verifyMessage } from "ethers";
 import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
+import useSWR from "swr";
 
 const SignIn = () => {
   const router = useRouter();
+  
   const [showButton, setShowButton] = React.useState(true);
-  const accessToken = localStorage.getItem("access_token");
 
   // Use context for error variable
   const context = React.useContext(DataContext);
@@ -37,21 +38,47 @@ const SignIn = () => {
         data
       );
       // Handle signin page route
-      const access_token = response.data.access_token;
-      if (access_token && access_token.length > 0) {
+      const dataRespone = response.data;
+      const checkData = Object.values(dataRespone).every(value=>value);
+      if (checkData) {
         // Save access_token into localStorage
-        localStorage.setItem("access_token", response.data.access_token);
+        sessionStorage.setItem("access_token", dataRespone.access_token);
+        sessionStorage.setItem("refresh_token", dataRespone.refresh_token);
+        getTokenPayload();
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
+  
+  // Call api /auth/profile with axios when user signin
+  const getTokenPayload = async () => {
+    const access_token = sessionStorage.getItem('access_token')
+    try {
+      const response = await axios.get(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
+        { headers: { Authorization: `Bearer ${access_token}` } }
+      );
+      // Handle signin page route
+      const infoUser = response.data;
+      console.log(infoUser)
+      const checkData = Object.values(infoUser).every((value) => value !== undefined && value !== null && value !== '');
+      if (checkData) {
+      //  Save access_token into localStorage
+        signMessage(infoUser);
+      } 
+    } catch (error: any) {
+      console.error("Error fetching data:", error.response);
+    }
+  };
 
+  
   // Ký thông báo bằng khóa riêng tư để thêm 1 lớp xác thực người dùng
-  const signMessage = async (userId: any) =>{
+  const signMessage = async (infoUser: any) =>{
+    const access_token = sessionStorage.getItem('access_token')
   const response = await axios.get(
-    `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
-    { headers: { Authorization: `Bearer ${accessToken}` } }
+    `${process.env.NEXT_PUBLIC_API_URL}/users/${infoUser.userId}`,
+    { headers: { Authorization: `Bearer ${access_token}` } }
   );
   // Khóa riêng tư của người dùng được truy xuất từ SQL Server
 const {privateKey} = response.data; 
@@ -67,30 +94,13 @@ const signature = await wallet.signMessage(message);
   // Kiểm tra xem địa chỉ có khớp với địa chỉ của người dùng hay không
   if (recoveredAddress === wallet.address) {
       console.log("Verification successful! Address matches.");
+      router.push("/dashboard-page");
+      sessionStorage.setItem('user',JSON.stringify(infoUser));
   } else {
       console.log("Authentication failed! Addresses do not match.");
   }
   };
 
-  // Call api /auth/profile with axios when user signin
-  const getTokenPayload = async () => {
-    try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
-        { headers: { Authorization: `Bearer ${accessToken}` } }
-      );
-      // Handle signin page route
-      const {isActive, email,userId,role} = response.data;
-      console.log(isActive);
-      if (isActive) {
-        // Save access_token into localStorage
-        signMessage(userId);
-        router.push("/dashboard-page");
-      }
-    } catch (error: any) {
-      console.error("Error fetching data:", error.response);
-    }
-  };
 
   // Handle from Submit
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -115,7 +125,6 @@ const signature = await wallet.signMessage(message);
       };
       // Handle Call api
       authUserSignIn(data);
-      getTokenPayload();
     } else alert("You must provide a valid information");
   };
 

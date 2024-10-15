@@ -22,6 +22,12 @@ export default function RootLayout({
     const MPTheme = createTheme(getMPTheme(mode));
     const defaultTheme = createTheme({ palette: { mode } });
 
+    
+  React.useEffect(()=>{
+    sessionStorage.clear();
+  },[]);
+
+
     const toggleColorMode = () => {
         const newMode = mode === "dark" ? "light" : "dark";
         setMode(newMode);

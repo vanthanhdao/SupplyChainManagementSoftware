@@ -6,8 +6,6 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { hashPassHelper, hashWalletHelper, reHashWalletHelper } from 'src/utils/hash';
 import { ConfigService } from '@nestjs/config';
 
-// import aqp from 'api-query-params';
-
 @Injectable()
 export class UsersService {
   constructor(
@@ -79,6 +77,23 @@ export class UsersService {
   async findByEmail(email: string) {
     return await this.usersRepository.findOneBy({ email });
   }
+
+  //  // Hàm cập nhật thông tin người dùng
+  //  async update(id: number, updateUserDto: UpdateUserDto): Promise<Users> {
+  //   // Tìm kiếm người dùng theo ID
+  //   const user = await this.usersRepository.findOne({ where: { id } });
+
+  //   // Nếu không tìm thấy người dùng, throw lỗi
+  //   if (!user) {
+  //     throw new NotFoundException(`User with ID ${id} not found`);
+  //   }
+
+  //   // Cập nhật thông tin người dùng với dữ liệu mới
+  //   Object.assign(user, updateUserDto);
+
+  //   // Lưu lại người dùng đã cập nhật vào cơ sở dữ liệu
+  //   return this.usersRepository.save(user);
+  // }
 
 
 }
