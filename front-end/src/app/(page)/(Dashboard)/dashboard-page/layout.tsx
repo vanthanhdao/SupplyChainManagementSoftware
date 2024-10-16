@@ -10,7 +10,6 @@ import getMPTheme from "../../../theme/getMPTheme";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import axios from "axios";
-import useAuthStore from "@/app/state/user-store";
 
 // const inter = Inter({ subsets: ["latin"] });
 
@@ -23,10 +22,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const defaultTheme = createTheme({ palette: { mode } });
   const [open, setOpen] = React.useState(false);
 
-  const { userId, email, isActive, role, setUser, clearUser } = useAuthStore();
 
   React.useEffect(() => {
-    if (!isActive) {
+    const userString = sessionStorage.getItem('user');
+    const user = userString ? JSON.parse(userString) : null;
+    if (!user.isActive) {
       const interval = setInterval(() => setOpen(true), 1000);
       return () => clearInterval(interval);
     }

@@ -11,16 +11,16 @@ import Stack from "@mui/material/Stack";
 import InputValidate from "../components/InputValidate";
 import StackCustom from "../components/StackCustom";
 import { DataContext, DataProvider } from "../hook/errorContext";
-import axios from "axios";
 import { useRouter } from "next/navigation";
 import { ethers, verifyMessage } from "ethers";
 import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
-import useAuthStore from "@/app/state/user-store";
+import { authJwtLogin, authJwtProfile,getAccountById } from "@/app/apis/index-api";
+
+
 
 const SignIn = () => {
   const router = useRouter();
-  const { setUser } = useAuthStore();
   const [showButton, setShowButton] = React.useState(true);
 
   // Use context for error variable
@@ -33,17 +33,12 @@ const SignIn = () => {
   // Call api /auth/login with axios when user signin
   const authUserSignIn = async (data: any) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
-        data
-      );
+      const response = await authJwtLogin(data);
       // Handle signin page route
-      const dataRespone = response.data;
-      const checkData = Object.values(dataRespone).every((value) => value);
-      if (checkData) {
+      if (response) {
         // Save access_token into localStorage
-        sessionStorage.setItem("access_token", dataRespone.access_token);
-        sessionStorage.setItem("refresh_token", dataRespone.refresh_token);
+        sessionStorage.setItem('access_token',response.data.access_token);
+        sessionStorage.setItem('refresh_token',response.data.refresh_token);
         getTokenPayload();
       }
     } catch (error) {
@@ -55,17 +50,16 @@ const SignIn = () => {
   const getTokenPayload = async () => {
     const access_token = sessionStorage.getItem("access_token");
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/profile`,
-        { headers: { Authorization: `Bearer ${access_token}` } }
-      );
+      const response = await authJwtProfile(access_token);
       // Handle signin page route
-      const infoUser = response.data;
+      const infoUser = response?.data;
+      console.log(infoUser)
       const checkData = Object.values(infoUser).every(
         (value) => value !== undefined && value !== null && value !== ""
       );
       if (checkData) {
         //  Save access_token into localStorage
+        sessionStorage.setItem('user',JSON.stringify(infoUser))
         signMessage(infoUser);
       }
     } catch (error: any) {
@@ -76,12 +70,9 @@ const SignIn = () => {
   // Ký thông báo bằng khóa riêng tư để thêm 1 lớp xác thực người dùng
   const signMessage = async (infoUser: any) => {
     const access_token = sessionStorage.getItem("access_token");
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL}/users/${infoUser.userId}`,
-      { headers: { Authorization: `Bearer ${access_token}` } }
-    );
+    const response = await getAccountById(infoUser,access_token)
     // Khóa riêng tư của người dùng được truy xuất từ SQL Server
-    const { privateKey } = response.data;
+    const { privateKey } = response?.data;
     // Tạo một Wallet từ khóa riêng tư
     const wallet = new ethers.Wallet(privateKey);
     // console.log('wallet address',wallet.address)
@@ -93,9 +84,7 @@ const SignIn = () => {
     const recoveredAddress = verifyMessage(message, signature);
     // Kiểm tra xem địa chỉ có khớp với địa chỉ của người dùng hay không
     if (recoveredAddress === wallet.address) {
-      const { userId, email, isActive, role } = infoUser;
       console.log("Verification successful! Address matches.");
-      setUser(userId, email, isActive, role);
       router.push("/dashboard-page");
     } else {
       console.log("Authentication failed! Addresses do not match.");

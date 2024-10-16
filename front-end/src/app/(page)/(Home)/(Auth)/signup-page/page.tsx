@@ -13,9 +13,9 @@ import { styled } from "@mui/system";
 import InputValidate from "../components/InputValidate";
 import { useRouter } from "next/navigation";
 import { ethers } from "ethers";
-import axios from "axios";
 import { DataContext, DataProvider } from "../hook/errorContext";
 import SitemarkIcon from "../../components/SitemarkIcon";
+import { createAccount } from "@/app/apis/index-api";
 require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
@@ -74,21 +74,21 @@ const SignUp = () => {
     }
   };
 
-  // Call api with axios
-  const createUser = async (data: any) => {
+  const handleCallApi = async (data: any) => {
     try {
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/users`,
-        data
-      );
-      // Handle signin page route
-      router.push("/signin-page");
+      const response = await createAccount(data); // Gọi API
+      if (response) {
+        // Kiểm tra xem trạng thái phản hồi có thành công (status 200) và có data hay không
+        router.push('/signin-page');
+      } else {
+        console.error("Error: Invalid response or no data returned");
+      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error calling API:", error);
     }
   };
 
-  // Handle Sunmit Sign In From
+  // Handle Sunmit Sign Up From
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
@@ -124,7 +124,7 @@ const SignUp = () => {
         },
       };
       // Handle Call api
-      createUser(data);
+      handleCallApi(data);
     } else alert("You must provide a valid information");
   };
 
