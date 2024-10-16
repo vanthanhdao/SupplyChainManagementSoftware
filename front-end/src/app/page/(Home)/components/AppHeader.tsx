@@ -2,7 +2,7 @@
 import * as React from "react";
 import AppAppBar from "./AppAppBar";
 import { PaletteMode, ThemeProvider, createTheme } from "@mui/material/styles";
-import getMPTheme from "../../theme/getMPTheme";
+import getMPTheme from "../../../theme/getMPTheme";
 
 export default function AppHeader() {
 

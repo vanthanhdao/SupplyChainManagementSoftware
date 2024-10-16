@@ -6,7 +6,7 @@ import * as React from "react";
 import { Inter } from "next/font/google";
 import { PaletteMode, ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import getMPTheme from "../../theme/getMPTheme";
+import getMPTheme from "../../../theme/getMPTheme";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import axios from "axios";

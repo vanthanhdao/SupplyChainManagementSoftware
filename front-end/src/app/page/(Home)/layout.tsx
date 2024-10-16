@@ -6,7 +6,7 @@ import { PaletteMode, ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import AppAppBar from "./components/AppAppBar";
 import Footer from "./components/Footer";
-import getMPTheme from "../theme/getMPTheme";
+import getMPTheme from "../../theme/getMPTheme";
 
 
 const inter = Inter({ subsets: ["latin"] });
