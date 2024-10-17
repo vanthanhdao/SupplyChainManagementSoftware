@@ -16,7 +16,11 @@ import { ethers } from "ethers";
 import { DataContext, DataProvider } from "../hook/errorContext";
 import SitemarkIcon from "../../components/SitemarkIcon";
 import { createAccount } from "@/app/apis/index-api";
-import { useProvideEthUser, useStoreSession } from "../hook/useEthereum";
+import {
+  useGenerateWallet,
+  useProvideEthUser,
+  useStoreSession,
+} from "../hook/useEthereum";
 require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
@@ -61,34 +65,22 @@ const SignUp = () => {
   }
   const { errorGlobal } = context;
 
-  // Create wallet using ethers.js
-  // Update Wallet info into state
-  const generateWallet = (): IWalletAddress | null => {
-    try {
-      const newWallet = ethers.Wallet.createRandom();
-      const result = {
-        publicKey: newWallet.address,
-        privateKey: newWallet.privateKey,
-      };
-      return result;
-    } catch (error) {
-      console.error("Create wallet error:", error);
-      return null;
-    }
-  };
-
   const handleCallApi = async (data: IUser) => {
-    if(!data) return;
+    if (!data) return;
     try {
-      const response = await createAccount(data); 
+      const response = await createAccount(data);
       if (response) {
-        useStoreSession(data.walletAddress,'SIGNUP');
-        router.push('/signin-page');
+        const walletAddress = {
+          publicKey: data.walletAddress.publicKey,
+          privateKey: data.walletAddress.privateKey,
+        };
+        useStoreSession(walletAddress, "SIGNUP");
+        router.push("/signin-page");
       } else {
         console.error("Error: Invalid response or no data returned");
       }
     } catch (error) {
-      console.error("Error calling API:", error);    
+      console.error("Error calling API:", error);
     }
   };
 
@@ -118,18 +110,19 @@ const SignUp = () => {
       if (!checkValidPass)
         return alert("You must provide RePassword a valid information");
 
-      const wallet = generateWallet();
+      const wallet = useGenerateWallet();
       const data = {
         email: valueInput.email,
         password: valueInput.password,
         walletAddress: {
-          publicKey: wallet?.publicKey ?? 'No wallet generated' ,
-          privateKey: wallet?.privateKey ?? 'No private key generated',
+          publicKey: wallet?.publicKey ?? "No wallet generated",
+          privateKey: wallet?.privateKey ?? "No private key generated",
         },
       };
-      useProvideEthUser(wallet?.publicKey ?? '');
-      // Handle Call api
-      handleCallApi(data);
+      useProvideEthUser(wallet?.publicKey ?? "").then(() =>
+        // Handle Call api
+        handleCallApi(data)
+      );
     } else alert("You must provide a valid information");
   };
 
