@@ -16,6 +16,7 @@ import { ethers, verifyMessage } from "ethers";
 import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
 import { authJwtLogin, authJwtProfile,getAccountById } from "@/app/apis/index-api";
+import { useProvideEthUser } from "../hook/useEthereum";
 
 
 
@@ -75,7 +76,6 @@ const SignIn = () => {
     const { privateKey } = response?.data;
     // Tạo một Wallet từ khóa riêng tư
     const wallet = new ethers.Wallet(privateKey);
-    // console.log('wallet address',wallet.address)
     // Thông báo mà bạn muốn ký (message)
     const message = "Verify account ownership";
     // Ký thông báo
@@ -84,8 +84,9 @@ const SignIn = () => {
     const recoveredAddress = verifyMessage(message, signature);
     // Kiểm tra xem địa chỉ có khớp với địa chỉ của người dùng hay không
     if (recoveredAddress === wallet.address) {
-      console.log("Verification successful! Address matches.");
       router.push("/dashboard-page");
+      console.log("Verification successful! Address matches.");
+      useProvideEthUser(wallet.address);
     } else {
       console.log("Authentication failed! Addresses do not match.");
     }

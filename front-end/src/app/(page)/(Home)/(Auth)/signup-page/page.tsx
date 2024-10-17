@@ -16,6 +16,7 @@ import { ethers } from "ethers";
 import { DataContext, DataProvider } from "../hook/errorContext";
 import SitemarkIcon from "../../components/SitemarkIcon";
 import { createAccount } from "@/app/apis/index-api";
+import { useProvideEthUser, useStoreSession } from "../hook/useEthereum";
 require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
@@ -62,29 +63,32 @@ const SignUp = () => {
 
   // Create wallet using ethers.js
   // Update Wallet info into state
-  const generateWallet = (): any => {
+  const generateWallet = (): IWalletAddress | null => {
     try {
       const newWallet = ethers.Wallet.createRandom();
-      return {
+      const result = {
         publicKey: newWallet.address,
         privateKey: newWallet.privateKey,
       };
+      return result;
     } catch (error) {
       console.error("Create wallet error:", error);
+      return null;
     }
   };
 
-  const handleCallApi = async (data: any) => {
+  const handleCallApi = async (data: IUser) => {
+    if(!data) return;
     try {
-      const response = await createAccount(data); // Gọi API
+      const response = await createAccount(data); 
       if (response) {
-        // Kiểm tra xem trạng thái phản hồi có thành công (status 200) và có data hay không
+        useStoreSession(data.walletAddress,'SIGNUP');
         router.push('/signin-page');
       } else {
         console.error("Error: Invalid response or no data returned");
       }
     } catch (error) {
-      console.error("Error calling API:", error);
+      console.error("Error calling API:", error);    
     }
   };
 
@@ -119,10 +123,11 @@ const SignUp = () => {
         email: valueInput.email,
         password: valueInput.password,
         walletAddress: {
-          publicKey: wallet.publicKey,
-          privateKey: wallet.privateKey,
+          publicKey: wallet?.publicKey ?? 'No wallet generated' ,
+          privateKey: wallet?.privateKey ?? 'No private key generated',
         },
       };
+      useProvideEthUser(wallet?.publicKey ?? '');
       // Handle Call api
       handleCallApi(data);
     } else alert("You must provide a valid information");
