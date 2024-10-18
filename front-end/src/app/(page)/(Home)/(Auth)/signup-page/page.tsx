@@ -74,6 +74,7 @@ const SignUp = () => {
           publicKey: data.walletAddress.publicKey,
           privateKey: data.walletAddress.privateKey,
         };
+        // Thao tác với contract
         useStoreSession(walletAddress, "SIGNUP");
         router.push("/signin-page");
       } else {
@@ -119,6 +120,7 @@ const SignUp = () => {
           privateKey: wallet?.privateKey ?? "No private key generated",
         },
       };
+      console.log(data)
       useProvideEthUser(wallet?.publicKey ?? "").then(() =>
         // Handle Call api
         handleCallApi(data)

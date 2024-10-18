@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ForbiddenException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from '../users/entities/user.entity';
@@ -15,7 +15,7 @@ export class UsersService {
   ) {}
 
   // Check email address is exits
-  async isEmailExits(email: string) {
+  async isEmailExits(email: string): Promise<Users> {
     const user = await this.usersRepository.findOne({ where: { email } });
     return user;
   }
@@ -36,7 +36,10 @@ export class UsersService {
   }
 
   // Find users by id
-  async findOne(id: number): Promise<any> {
+  async findOne(id: number, payload: any): Promise<any> {
+    if (id !== payload.userId) {
+      throw new ForbiddenException('You do not have permission to access this user');
+    }
     const user = await this.usersRepository.findOneBy({ id });
     const privateKeyDecrypt =  await reHashWalletHelper(user.privateKey,this.configService.get<string>('JWT_SECRET'));
     const res = {

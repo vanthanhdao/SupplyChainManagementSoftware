@@ -12,11 +12,11 @@ import InputValidate from "../components/InputValidate";
 import StackCustom from "../components/StackCustom";
 import { DataContext, DataProvider } from "../hook/errorContext";
 import { useRouter } from "next/navigation";
-import { ethers, verifyMessage } from "ethers";
 import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
-import { authJwtLogin, authJwtProfile,getAccountById } from "@/app/apis/index-api";
-import { useProvideEthUser } from "../hook/useEthereum";
+import { authJwtLogin,getAccountById } from "@/app/apis/index-api";
+import { useProvideEthUser, useStoreSession, useVerifyWallet } from "../hook/useEthereum";
+import { useGetAccessToken, useSetAccessToken, useTokenPayload } from "../hook/useAccessToken";
 
 
 
@@ -32,64 +32,53 @@ const SignIn = () => {
   const { errorEmail, errorPassword } = context.errorGlobal;
 
   // Call api /auth/login with axios when user signin
-  const authUserSignIn = async (data: any) => {
+  const authUserSignIn = async (data: IUserSignIn) => {
     try {
       const response = await authJwtLogin(data);
+      if(response) {
+      const {access_token,refresh_token} = response; 
       // Handle signin page route
-      if (response) {
         // Save access_token into localStorage
-        sessionStorage.setItem('access_token',response.data.access_token);
-        sessionStorage.setItem('refresh_token',response.data.refresh_token);
-        getTokenPayload();
+        await Promise.all([
+          useSetAccessToken('access_token', access_token),
+          useSetAccessToken('refresh_token', refresh_token)
+        ]);
+        const infoUser = await useTokenPayload();
+        if(infoUser){
+          await signMessage(infoUser?.userId);
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  // Call api /auth/profile with axios when user signin
-  const getTokenPayload = async () => {
-    const access_token = sessionStorage.getItem("access_token");
-    try {
-      const response = await authJwtProfile(access_token);
-      // Handle signin page route
-      const infoUser = response?.data;
-      console.log(infoUser)
-      const checkData = Object.values(infoUser).every(
-        (value) => value !== undefined && value !== null && value !== ""
-      );
-      if (checkData) {
-        //  Save access_token into localStorage
-        sessionStorage.setItem('user',JSON.stringify(infoUser))
-        signMessage(infoUser);
-      }
-    } catch (error: any) {
-      console.error("Error fetching data:", error.response);
-    }
-  };
-
   // Ký thông báo bằng khóa riêng tư để thêm 1 lớp xác thực người dùng
-  const signMessage = async (infoUser: any) => {
-    const access_token = sessionStorage.getItem("access_token");
-    const response = await getAccountById(infoUser,access_token)
-    // Khóa riêng tư của người dùng được truy xuất từ SQL Server
-    const { privateKey } = response?.data;
-    // Tạo một Wallet từ khóa riêng tư
-    const wallet = new ethers.Wallet(privateKey);
-    // Thông báo mà bạn muốn ký (message)
-    const message = "Verify account ownership";
-    // Ký thông báo
-    const signature = await wallet.signMessage(message);
-    // Lấy lại địa chỉ từ chữ ký
-    const recoveredAddress = verifyMessage(message, signature);
-    // Kiểm tra xem địa chỉ có khớp với địa chỉ của người dùng hay không
-    if (recoveredAddress === wallet.address) {
-      router.push("/dashboard-page");
-      console.log("Verification successful! Address matches.");
-      useProvideEthUser(wallet.address);
-    } else {
+  const signMessage = async (userId: number) => {
+    try {
+    const access_token = useGetAccessToken("access_token");
+    if(access_token) {
+    const response = await getAccountById(userId,access_token)
+    if(response){
+    const checkWallet = await useVerifyWallet(response.privateKey);
+    const wallet: IUserWallet = {
+      publicKey: response.publicKey,
+      privateKey: response.privateKey,
+    }
+    if (checkWallet) {
+      // router.push("/dashboard-page");
+      useProvideEthUser(response.publicKey).then(()=>
+        useStoreSession(wallet, "SIGNIN")
+      );
+    } 
+    else {
       console.log("Authentication failed! Addresses do not match.");
     }
+  }};
+  } 
+  catch (error) {
+    console.error("Error fetching data:", error);
+  }
   };
 
   // Handle from Submit
