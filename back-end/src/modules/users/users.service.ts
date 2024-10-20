@@ -3,7 +3,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Users } from '../users/entities/user.entity';
 import { CreateUserDto } from './dto/create-user.dto';
-import { hashPassHelper, hashWalletHelper, reHashWalletHelper } from 'src/utils/hash';
+import {
+  hashPassHelper,
+  hashWalletHelper,
+  reHashWalletHelper,
+} from 'src/utils/hash';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -35,18 +39,30 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  // Find users by id
-  async findOne(id: number, payload: any): Promise<any> {
-    if (id !== payload.userId) {
-      throw new ForbiddenException('You do not have permission to access this user');
-    }
-    const user = await this.usersRepository.findOneBy({ id });
-    const privateKeyDecrypt =  await reHashWalletHelper(user.privateKey,this.configService.get<string>('JWT_SECRET'));
+  // Find wallet users by id
+  async findOneWallet(payload: IUserAccessToken): Promise<IUserWalletAddress> {
+    const user = await this.usersRepository.findOneBy({ id: payload.userId });
+    const privateKeyDecrypt = await reHashWalletHelper(
+      user.privateKey,
+      this.configService.get<string>('JWT_SECRET'),
+    );
     const res = {
-      publicKey :user.publicKey,
-      privateKey :privateKeyDecrypt
-    }
-    return res
+      publicKey: user.publicKey,
+      privateKey: privateKeyDecrypt,
+    };
+    return res;
+  }
+
+  // Find wallet users by id
+  async findOneProfile(payload: IUserAccessToken): Promise<IUserAccessToken> {
+    const user = await this.usersRepository.findOneBy({ id: payload.userId });
+    const res = {
+      userId: user.id,
+      email: user.email,
+      isActive: user.isActive,
+      role: user.role,
+    };
+    return res;
   }
 
   // Delete users by id
@@ -97,6 +113,4 @@ export class UsersService {
   //   // Lưu lại người dùng đã cập nhật vào cơ sở dữ liệu
   //   return this.usersRepository.save(user);
   // }
-
-
 }

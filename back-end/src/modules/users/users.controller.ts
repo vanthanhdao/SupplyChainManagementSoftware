@@ -24,16 +24,19 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-
   @Get()
   findAll(@Query() query: string) {
     return this.usersService.findAll(query);
   }
 
+  @Get('profileWallet')
+  findOne(@Request() req) {
+    return this.usersService.findOneWallet(req.user);
+  }
 
-  @Get(':id')
-  findOne(@Param('id') id: string, @Request() req) {
-    return this.usersService.findOne(+id, req.user);
+  @Get('profile')
+  findOneProfile(@Request() req) {
+    return this.usersService.findOneProfile(req.user);
   }
 
   // @Patch(':id')
@@ -45,6 +48,4 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id);
   }
-
-
 }

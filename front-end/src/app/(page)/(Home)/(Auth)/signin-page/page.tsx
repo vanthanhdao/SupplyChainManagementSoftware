@@ -10,19 +10,31 @@ import Typography from "@mui/material/Typography";
 import Stack from "@mui/material/Stack";
 import InputValidate from "../components/InputValidate";
 import StackCustom from "../components/StackCustom";
-import { DataContext, DataProvider } from "../hook/errorContext";
+import { DataContext, DataProvider } from "../../../../hook/errorContext";
 import { useRouter } from "next/navigation";
 import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
-import { authJwtLogin,getAccountById } from "@/app/apis/index-api";
-import { useProvideEthUser, useStoreSession, useVerifyWallet } from "../hook/useEthereum";
-import { useGetAccessToken, useSetAccessToken, useTokenPayload } from "../hook/useAccessToken";
-
-
+import {
+  authJwtLogin,
+  getAccountWallet,
+  getAccount,
+} from "@/app/apis/index-api";
+import {
+  useProvideEthUser,
+  useStoreSession,
+  useVerifyWallet,
+} from "@/app/hook/useEthereum";
+import {
+  useGetAccessToken,
+  useSetAccessToken,
+  useTokenPayload,
+} from "@/app/hook/useAccessToken";
+import useUserStore from "@/app/zustands/userStore";
 
 const SignIn = () => {
   const router = useRouter();
   const [showButton, setShowButton] = React.useState(true);
+  const { setStateUser } = useUserStore();
 
   // Use context for error variable
   const context = React.useContext(DataContext);
@@ -35,50 +47,33 @@ const SignIn = () => {
   const authUserSignIn = async (data: IUserSignIn) => {
     try {
       const response = await authJwtLogin(data);
-      if(response) {
-      const {access_token,refresh_token} = response; 
-      // Handle signin page route
+      if (response) {
+        const { access_token, refresh_token } = response;
+        // Handle signin page route
         // Save access_token into localStorage
         await Promise.all([
-          useSetAccessToken('access_token', access_token),
-          useSetAccessToken('refresh_token', refresh_token)
+          useSetAccessToken("access_token", access_token),
+          useSetAccessToken("refresh_token", refresh_token),
         ]);
-        const infoUser = await useTokenPayload();
-        if(infoUser){
-          await signMessage(infoUser?.userId);
+        const walletAddress = await getAccountWallet(access_token);
+        if (walletAddress) {
+          await useProvideEthUser(walletAddress.publicKey);
+          await useStoreSession(walletAddress, "SIGNIN");
+          // Ký thông báo bằng khóa riêng tư để thêm 1 lớp xác thực người dùng
+          const checkWallet = await useVerifyWallet(walletAddress.privateKey);
+          if (checkWallet !== undefined && checkWallet !== null) {
+            const user = await getAccount(access_token);
+            if (user) {
+              const { userId, email, isActive, role } = user;
+              setStateUser(userId, email, isActive, role);
+              router.push("/dashboard-page");
+            } else console.error("GetAccount failed!.");
+          } else console.error("GetAccountWallet failed!.");
         }
-      }
+      } else console.error("AuthJwtLogin failed!.");
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Signin-page authUserSignIn failed:", error);
     }
-  };
-
-  // Ký thông báo bằng khóa riêng tư để thêm 1 lớp xác thực người dùng
-  const signMessage = async (userId: number) => {
-    try {
-    const access_token = useGetAccessToken("access_token");
-    if(access_token) {
-    const response = await getAccountById(userId,access_token)
-    if(response){
-    const checkWallet = await useVerifyWallet(response.privateKey);
-    const wallet: IUserWallet = {
-      publicKey: response.publicKey,
-      privateKey: response.privateKey,
-    }
-    if (checkWallet) {
-      // router.push("/dashboard-page");
-      useProvideEthUser(response.publicKey).then(()=>
-        useStoreSession(wallet, "SIGNIN")
-      );
-    } 
-    else {
-      console.log("Authentication failed! Addresses do not match.");
-    }
-  }};
-  } 
-  catch (error) {
-    console.error("Error fetching data:", error);
-  }
   };
 
   // Handle from Submit

@@ -12,15 +12,14 @@ import Card from "@mui/material/Card";
 import { styled } from "@mui/system";
 import InputValidate from "../components/InputValidate";
 import { useRouter } from "next/navigation";
-import { ethers } from "ethers";
-import { DataContext, DataProvider } from "../hook/errorContext";
+import { DataContext, DataProvider } from "@/app/hook/errorContext";
 import SitemarkIcon from "../../components/SitemarkIcon";
 import { createAccount } from "@/app/apis/index-api";
 import {
   useGenerateWallet,
   useProvideEthUser,
   useStoreSession,
-} from "../hook/useEthereum";
+} from "@/app/hook/useEthereum";
 require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
@@ -70,23 +69,19 @@ const SignUp = () => {
     try {
       const response = await createAccount(data);
       if (response) {
-        const walletAddress = {
-          publicKey: data.walletAddress.publicKey,
-          privateKey: data.walletAddress.privateKey,
-        };
-        // Thao tác với contract
-        useStoreSession(walletAddress, "SIGNUP");
         router.push("/signin-page");
       } else {
-        console.error("Error: Invalid response or no data returned");
+        console.error(
+          " Signup-page Error: Invalid response or no data returned"
+        );
       }
     } catch (error) {
-      console.error("Error calling API:", error);
+      console.error("Signup-page handleCallApi failed: ", error);
     }
   };
 
   // Handle Sunmit Sign Up From
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     const password = document.getElementById("password") as HTMLFormElement;
@@ -112,19 +107,23 @@ const SignUp = () => {
         return alert("You must provide RePassword a valid information");
 
       const wallet = useGenerateWallet();
-      const data = {
-        email: valueInput.email,
-        password: valueInput.password,
-        walletAddress: {
-          publicKey: wallet?.publicKey ?? "No wallet generated",
-          privateKey: wallet?.privateKey ?? "No private key generated",
-        },
-      };
-      console.log(data)
-      useProvideEthUser(wallet?.publicKey ?? "").then(() =>
+      if (wallet) {
+        const data = {
+          email: valueInput.email,
+          password: valueInput.password,
+          walletAddress: {
+            publicKey: wallet.publicKey,
+            privateKey: wallet.privateKey,
+          },
+        };
+        console.log(data);
+        // Cung cấp eth cho tài khoản ví
+        await useProvideEthUser(wallet.publicKey);
+        // Thao tác với contract
+        await useStoreSession(wallet, "SIGNUP");
         // Handle Call api
-        handleCallApi(data)
-      );
+        await handleCallApi(data);
+      }
     } else alert("You must provide a valid information");
   };
 

@@ -1,4 +1,10 @@
-import {createAccount,getAccountById} from './users-api'
-import {authJwtLogin,authJwtProfile} from './auth-api'
+import { createAccount, getAccount, getAccountWallet } from "./users-api";
+import { authJwtLogin, authJwtProfile } from "./auth-api";
 
-export {createAccount,authJwtLogin,authJwtProfile,getAccountById}
+export {
+  createAccount,
+  authJwtLogin,
+  authJwtProfile,
+  getAccount,
+  getAccountWallet,
+};

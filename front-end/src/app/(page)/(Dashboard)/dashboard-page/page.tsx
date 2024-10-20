@@ -14,8 +14,6 @@ import CustomizedDataGrid from "../components/CustomizedDataGrid";
 import CustomizedTreeView from "../components/CustomizedTreeView";
 import ChartUserByCountry from "../components/ChartUserByCountry";
 
-
-
 const data: StatCardProps[] = [
   {
     title: "Users",

@@ -34,27 +34,36 @@ export class AuthService {
   // }
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
-    const isValidPassword = await compareHelper(password, user.password);
-    if (!user || !isValidPassword) {
-      throw new UnauthorizedException();
+    try {
+      const user = await this.usersService.findByEmail(email);
+      const isValidPassword = await compareHelper(password, user.password);
+      if (!user || !isValidPassword) {
+        throw new UnauthorizedException();
+      }
+      return user;
+    } catch (err) {
+      throw new Error(`AuthService ValidateUser failed: ${err}`);
     }
-    return user;
   }
 
   async signIn(user: any) {
-    const payload = {
-      id: user.id,
-      email: user.email,
-      isActive: user.isActive,
-      role: user.role,
-    };
-    const tokenId = uuidv4();
-    return {
-      access_token: await this.jwtService.signAsync(payload),
-      refresh_token: await this.jwtService.signAsync({...payload,tokenId},{ expiresIn: '7d' })
-    };
+    try {
+      const payload = {
+        id: user.id,
+        email: user.email,
+        isActive: user.isActive,
+        role: user.role,
+      };
+      const tokenId = uuidv4();
+      return {
+        access_token: await this.jwtService.signAsync(payload),
+        refresh_token: await this.jwtService.signAsync(
+          { ...payload, tokenId },
+          { expiresIn: '7d' },
+        ),
+      };
+    } catch (err) {
+      throw new Error(`AuthService SignIn failed: ${err}`);
+    }
   }
-
-
 }

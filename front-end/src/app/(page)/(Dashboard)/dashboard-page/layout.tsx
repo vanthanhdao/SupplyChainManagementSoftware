@@ -3,30 +3,24 @@ import { Box, Stack, Link } from "@mui/material";
 import Header from "../components/Header";
 import SideMenu from "../components/SideMenu";
 import * as React from "react";
-import { Inter } from "next/font/google";
 import { PaletteMode, ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import getMPTheme from "../../../theme/getMPTheme";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import axios from "axios";
-
-// const inter = Inter({ subsets: ["latin"] });
+import useUserStore from "@/app/zustands/userStore";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  // ProtectedPage();
-
   const [mode, setMode] = React.useState<PaletteMode>("light");
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const MPTheme = createTheme(getMPTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
   const [open, setOpen] = React.useState(false);
-
+  const { isActive } = useUserStore();
 
   React.useEffect(() => {
-    const userString = sessionStorage.getItem('user');
-    const user = userString ? JSON.parse(userString) : null;
-    if (!user.isActive) {
+    if (!isActive) {
       const interval = setInterval(() => setOpen(true), 1000);
       return () => clearInterval(interval);
     }

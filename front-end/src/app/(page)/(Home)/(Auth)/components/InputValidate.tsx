@@ -3,7 +3,7 @@ import * as React from "react";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
-import { DataContext } from "../hook/errorContext";
+import { DataContext } from "../../../../hook/errorContext";
 
 export default function InputValidate(props: IInputValidate) {
   const { nameLable, idLable, placeholder, type, multiple, onSendData } = props;
@@ -15,7 +15,7 @@ export default function InputValidate(props: IInputValidate) {
   if (!context) {
     return <div>Loading...</div>; // Kiểm tra nếu context không tồn tại
   }
-  const { errorGlobal,setErrorGlobal } = context;
+  const { errorGlobal, setErrorGlobal } = context;
 
   // Handle validate for inputs box
   const validateInputs = (
@@ -43,7 +43,7 @@ export default function InputValidate(props: IInputValidate) {
           }
           break;
 
-        case "password" :
+        case "password":
           if (value.length < 6) {
             setError(true);
             setErrorMessage("Password must be at least 6 characters long.");
@@ -61,23 +61,25 @@ export default function InputValidate(props: IInputValidate) {
           }
           break;
 
-          case "repassword":
-              if (value.length < 6) {
-                setError(true);
-                setErrorMessage("Replay Password must be at least 6 characters long.");
-                setErrorGlobal({
-                  ...errorGlobal,
-                  errorRePassword: true,
-                });
-              } else {
-                setError(false);
-                setErrorMessage("");
-                setErrorGlobal({
-                  ...errorGlobal,
-                  errorRePassword: false,
-                });
-              }
-            break;
+        case "repassword":
+          if (value.length < 6) {
+            setError(true);
+            setErrorMessage(
+              "Replay Password must be at least 6 characters long."
+            );
+            setErrorGlobal({
+              ...errorGlobal,
+              errorRePassword: true,
+            });
+          } else {
+            setError(false);
+            setErrorMessage("");
+            setErrorGlobal({
+              ...errorGlobal,
+              errorRePassword: false,
+            });
+          }
+          break;
 
         // case "taxcode":
         //   if (!/^\d+$/.test(value)) {
@@ -97,20 +99,20 @@ export default function InputValidate(props: IInputValidate) {
     } else {
       setError(true);
       setErrorMessage(`${nameLable} is required.`);
-      switch(id){
-        case 'email':
+      switch (id) {
+        case "email":
           setErrorGlobal({
             ...errorGlobal,
             errorEmail: true,
           });
           break;
-        case 'password':
+        case "password":
           setErrorGlobal({
             ...errorGlobal,
             errorPassword: true,
           });
-        break;
-        case 'repassword':
+          break;
+        case "repassword":
           setErrorGlobal({
             ...errorGlobal,
             errorRePassword: true,
@@ -121,14 +123,12 @@ export default function InputValidate(props: IInputValidate) {
   };
 
   // Handle when user onChange in inputs box
-  const handleOnChange = (
-    event: React.ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     validateInputs(event);
-    // if(onSendData) onSendData(event.target.files);    
+    // if(onSendData) onSendData(event.target.files);
   };
 
-   // Handle when user onFocus in inputs box
+  // Handle when user onFocus in inputs box
   const handleOnFocus = (
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -136,7 +136,7 @@ export default function InputValidate(props: IInputValidate) {
     setErrorMessage("");
   };
 
-   // Handle when user onBlur in inputs box
+  // Handle when user onBlur in inputs box
   const handleOnBlur = (
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
