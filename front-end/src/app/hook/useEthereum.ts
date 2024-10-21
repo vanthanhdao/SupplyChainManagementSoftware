@@ -3,15 +3,16 @@ import { ethers, verifyMessage } from "ethers";
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
-const contractAddress = "0x86a080b9a473EFce0EB97d59937310C42682523F"; // Địa chỉ contract ở nhà
-// const contractAddress = "0xdd7B6DbEE63c282eAFa32FF7DD45f2858cB16B7a"; // Địa chỉ contract khác
+// const contractAddress = "0x86a080b9a473EFce0EB97d59937310C42682523F"; // Địa chỉ contract ở nhà
+const contractAddress = "0x763775E16Eb290726Ac0383842210dD069F55402"; 
 // Các hàm trong smart contract
 const contractABI = contract.abi;
 // Kết nối tới mạng Ethereum qua JSON-RPC
 const provider = new ethers.JsonRpcProvider("http://localhost:8545");
 // Pivate key của tài khoản admin
 const privateKey =
-  "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7";
+  // "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
+  "0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
 
 // Create wallet using ethers.js
 // Update Wallet info into state
@@ -97,7 +98,7 @@ export const useDeleteEth = async () => {
   const signer = new ethers.Wallet(privateKey, provider);
   // Địa chỉ của người nhận và số lượng ETH để gửi
   const recipient = "0x0000000000000000000000000000000000000000"; // Địa chỉ người nhận
-  const amountInEther = "100"; // Số lượng ETH muốn gửi,
+  const amountInEther = "1000"; // Số lượng ETH muốn gửi,
   // Chuyển số lượng ETH sang đơn vị Wei
   const amount = ethers.parseEther(amountInEther);
   // Tạo giao dịch
@@ -108,4 +109,29 @@ export const useDeleteEth = async () => {
   // Ký và gửi giao dịch
   const transaction = await signer.sendTransaction(tx);
   await transaction.wait();
+};
+
+
+export const useGetBlock = async () => {
+  try {
+    // // Lấy thông tin block từ block hash
+    // const blockHash = "0x0454c6768d85a2bf5f79d7ec2f70974f9308984d9b81deada785edf773c5fc65"
+    // const block = await provider.getBlock(blockHash);
+    // console.log('Thông tin block:', block);
+    const transaction = await provider.getTransaction("0xbb7382a09df46f15128ff447becb5693bbfae4ca497c8f0a62377237a3b65768");
+        
+    if (transaction) {
+        // Tạo contract interface từ ABI
+        const iface = new ethers.Interface(contractABI);
+        
+        // Giải mã dữ liệu giao dịch
+        const decodedData = iface.decodeFunctionData("storeSession", transaction.data);
+        
+        console.log('Thông tin giải mã từ giao dịch:', decodedData);
+    } else {
+        console.log('Không tìm thấy giao dịch');
+    }
+} catch (error) {
+    console.error('Lỗi khi lấy block:', error);
+}
 };
