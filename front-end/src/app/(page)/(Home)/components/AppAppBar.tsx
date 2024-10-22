@@ -15,7 +15,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ToggleColorMode from "./ToggleColorMode";
 import Sitemark from "./SitemarkIcon";
 import { useRouter } from "next/navigation";
-import { useDeleteEth, useGetBlock } from "@/app/hook/useEthereum";
+import { useDeleteEth, useGetAllUsers, useGetBlock } from "@/app/hook/useEthereum";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -75,8 +75,8 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
               <Button variant="text" onClick={useGetBlock} color="info" size="small">
                View Block
               </Button>
-              <Button variant="text" color="info" size="small">
-                Pricing
+              <Button variant="text" color="info" onClick={useGetAllUsers} size="small">
+               Get All Users
               </Button>
               <Button
                 variant="text"

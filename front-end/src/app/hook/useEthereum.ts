@@ -1,12 +1,16 @@
 import contract from "@/app/contracts/UserSession.json";
+import contractSC from "@/app/contracts/SupplyChain.json";
 import { ethers, verifyMessage } from "ethers";
+import { timeStamp } from "console";
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
 // const contractAddress = "0x86a080b9a473EFce0EB97d59937310C42682523F"; // Địa chỉ contract ở nhà
-const contractAddress = "0x763775E16Eb290726Ac0383842210dD069F55402"; 
+// const contractAddress = "0x0498B7c793D7432Cd9dB27fb02fc9cfdBAfA1Fd3"; 
+const contractAddress = "0x5e1A88Dcf52F5Ca91C3FA8aeDc834AeF0D7ffDF9"; // SuppyChain
 // Các hàm trong smart contract
 const contractABI = contract.abi;
+const contractABISuppyChain = contractSC.abi;
 // Kết nối tới mạng Ethereum qua JSON-RPC
 const provider = new ethers.JsonRpcProvider("http://localhost:8545");
 // Pivate key của tài khoản admin
@@ -135,3 +139,58 @@ export const useGetBlock = async () => {
     console.error('Lỗi khi lấy block:', error);
 }
 };
+
+
+export const useGetAllUserSession = async () =>{
+  try {
+    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, provider);
+    const allUsers = await contract.getAllUserSession();
+        //    // Chuyển đổi dữ liệu thành một mảng đơn giản để dễ xử lý
+        //    const formattedUsers = allUsers.map((user: any) => ({
+        //     name: user[0],
+        //     email: user[1],
+        //     isActive: user[2],
+        //     role: user[3],
+        //     phone: user[4],
+        //     certificates: user[5]
+        // }));
+           const formattedUsers = allUsers.map((user: any) => ({
+            isLogin: user[0],
+            timeStamp: user[1],
+            data: user[2],
+            method: user[3],
+        }));
+        // Lắng nghe sự kiện UserRegistered
+        console.log("All Users:", allUsers);
+        //  console.log("All Users:", formattedUsers);
+} catch (error) {
+    console.error("Error fetching user data:", error);
+}
+}
+
+export const useStoreUserSession = async () =>{
+  try {
+    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, provider);
+    const allUsers = await contract.storeUserSession();
+        //    // Chuyển đổi dữ liệu thành một mảng đơn giản để dễ xử lý
+        //    const formattedUsers = allUsers.map((user: any) => ({
+        //     name: user[0],
+        //     email: user[1],
+        //     isActive: user[2],
+        //     role: user[3],
+        //     phone: user[4],
+        //     certificates: user[5]
+        // }));
+           const formattedUsers = allUsers.map((user: any) => ({
+            isLogin: user[0],
+            timeStamp: user[1],
+            data: user[2],
+            method: user[3],
+        }));
+        // Lắng nghe sự kiện UserRegistered
+        console.log("All Users:", allUsers);
+        //  console.log("All Users:", formattedUsers);
+} catch (error) {
+    console.error("Error fetching user data:", error);
+}
+}
