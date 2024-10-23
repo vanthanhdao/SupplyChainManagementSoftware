@@ -18,7 +18,7 @@ import { createAccount } from "@/app/apis/index-api";
 import {
   useGenerateWallet,
   useProvideEthUser,
-  useStoreSession,
+  useStoreUserSession,
 } from "@/app/hook/useEthereum";
 require("dotenv").config();
 
@@ -119,10 +119,16 @@ const SignUp = () => {
         console.log(data);
         // Cung cấp eth cho tài khoản ví
         await useProvideEthUser(wallet.publicKey);
+        Promise.all([
         // Thao tác với contract
-        await useStoreSession(wallet, "SIGNUP");
+        useStoreUserSession(wallet,valueInput.email,"IGNORE","SIGNUP"),
         // Handle Call api
-        await handleCallApi(data);
+        handleCallApi(data)
+        ]).then(results => {
+          console.log('Both operations completed successfully:', results);
+        }).catch(error => {
+          console.error('Error in one of the operations:', error);
+        });
       }
     } else alert("You must provide a valid information");
   };

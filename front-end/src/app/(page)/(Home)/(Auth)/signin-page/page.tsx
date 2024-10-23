@@ -22,6 +22,7 @@ import {
 import {
   useProvideEthUser,
   useStoreSession,
+  useStoreUserSession,
   useVerifyWallet,
 } from "@/app/hook/useEthereum";
 import {
@@ -58,13 +59,14 @@ const SignIn = () => {
         const walletAddress = await getAccountWallet(access_token);
         if (walletAddress) {
           await useProvideEthUser(walletAddress.publicKey);
-          await useStoreSession(walletAddress, "SIGNIN");
           // Ký thông báo bằng khóa riêng tư để thêm 1 lớp xác thực người dùng
           const checkWallet = await useVerifyWallet(walletAddress.privateKey);
           if (checkWallet !== undefined && checkWallet !== null) {
             const user = await getAccount(access_token);
             if (user) {
               const { userId, email, isActive, role } = user;
+              const blockHash = await useStoreUserSession(walletAddress,email,"IGNORE", "SIGNIN");
+              console.log(blockHash);
               setStateUser(userId, email, isActive, role);
               router.push("/dashboard-page");
             } else console.error("GetAccount failed!.");

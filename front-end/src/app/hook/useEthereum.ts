@@ -1,13 +1,13 @@
 import contract from "@/app/contracts/UserSession.json";
 import contractSC from "@/app/contracts/SupplyChain.json";
 import { ethers, verifyMessage } from "ethers";
-import { timeStamp } from "console";
+
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
 // const contractAddress = "0x86a080b9a473EFce0EB97d59937310C42682523F"; // Địa chỉ contract ở nhà
 // const contractAddress = "0x0498B7c793D7432Cd9dB27fb02fc9cfdBAfA1Fd3"; 
-const contractAddress = "0x5e1A88Dcf52F5Ca91C3FA8aeDc834AeF0D7ffDF9"; // SuppyChain
+const contractAddress = "0x9565BE43D8d1e3f4D98FC7Bb6cAa3A22c76c48C3"; // SuppyChain
 // Các hàm trong smart contract
 const contractABI = contract.abi;
 const contractABISuppyChain = contractSC.abi;
@@ -116,30 +116,73 @@ export const useDeleteEth = async () => {
 };
 
 
-export const useGetBlock = async () => {
+export const useGetBlockByHash = async () => {
   try {
-    // // Lấy thông tin block từ block hash
-    // const blockHash = "0x0454c6768d85a2bf5f79d7ec2f70974f9308984d9b81deada785edf773c5fc65"
-    // const block = await provider.getBlock(blockHash);
-    // console.log('Thông tin block:', block);
-    const transaction = await provider.getTransaction("0xbb7382a09df46f15128ff447becb5693bbfae4ca497c8f0a62377237a3b65768");
-        
-    if (transaction) {
-        // Tạo contract interface từ ABI
-        const iface = new ethers.Interface(contractABI);
-        
-        // Giải mã dữ liệu giao dịch
-        const decodedData = iface.decodeFunctionData("storeSession", transaction.data);
-        
-        console.log('Thông tin giải mã từ giao dịch:', decodedData);
-    } else {
-        console.log('Không tìm thấy giao dịch');
-    }
+    const block = await provider.getBlock("0x1acc7be4dceaaaf1b28530f8ed0450948cea91eb9b1c75598548fa7ebe1ba560");
+
+    if (block && block.transactions.length > 0) {
+        // Lấy hash của giao dịch đầu tiên trong block
+        const transactionHash = "0xa9f2269a0e753c05b3575b2f39a70440cc86ae6263bed82ac80ecf495c28be1b";        
+        // Lấy chi tiết giao dịch từ transaction hash
+        const transaction = await provider.getTransaction(transactionHash);
+        if (!transaction) {
+          console.log('Giao dịch không tồn tại');
+          return;
+        }
+        // Khởi tạo interface từ ABI
+        const contractInterface = new ethers.Interface(contractABISuppyChain);
+        // Decode dữ liệu từ transaction.data
+        const decodedData = contractInterface.decodeFunctionData("storeUserSession",transaction.data);
+        console.log("Block:", block);
+        console.log("Decoded data:", decodedData);
+      }
 } catch (error) {
     console.error('Lỗi khi lấy block:', error);
 }
 };
 
+
+export const useGetBlockByEvent = async () => {
+  try {
+    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, provider);
+        // Định nghĩa từBlock và đếnBlock (optional)
+        const fromBlock = 0; // hoặc một block cụ thể
+        const toBlock = "latest"; // lấy đến block mới nhất
+    
+        // // Lấy các sự kiện UserRegistered đã phát ra
+        const filter = contract.filters.storeUserSignUp(); // Tạo filter cho sự kiện
+        const logs = await provider.getLogs({ ...filter, fromBlock, toBlock });
+        console.log(logs)
+    
+  // Chuyển đổi log thành sự kiện và in ra block hash
+  const events = logs.map(log => {
+    const parsedLog = contract.interface.parseLog(log);
+    return {
+      userAddress: parsedLog?.args.userAddress,
+      email: parsedLog?.args.email,
+      isLogin: parsedLog?.args.isLogin,
+      method: parsedLog?.args.method,
+      blockHash: log.blockHash, // Lấy blockHash từ log
+      transactionHash: log.transactionHash // Lấy transactionHash từ log
+    };
+  });
+
+  // In ra các sự kiện cùng với block hash
+  events.forEach(event => {
+    console.log(`Past Event: 
+      User Address: ${event.userAddress || "null"}, 
+      Email: ${event.email || "null"}, 
+      Is Login: ${event.isLogin || "null"}, 
+      Method: ${event.method || "null"},
+      Block Hash: ${event.blockHash}, 
+      Transaction Hash: ${event.transactionHash}
+    `);
+  });
+
+} catch (error) {
+    console.error('Lỗi khi lấy block:', error);
+}
+};
 
 export const useGetAllUserSession = async () =>{
   try {
@@ -154,12 +197,12 @@ export const useGetAllUserSession = async () =>{
         //     phone: user[4],
         //     certificates: user[5]
         // }));
-           const formattedUsers = allUsers.map((user: any) => ({
-            isLogin: user[0],
-            timeStamp: user[1],
-            data: user[2],
-            method: user[3],
-        }));
+        //    const formattedUsers = allUsers.map((user: any) => ({
+        //     isLogin: user[0],
+        //     timeStamp: user[1],
+        //     data: user[2],
+        //     method: user[3],
+        // }));
         // Lắng nghe sự kiện UserRegistered
         console.log("All Users:", allUsers);
         //  console.log("All Users:", formattedUsers);
@@ -168,29 +211,28 @@ export const useGetAllUserSession = async () =>{
 }
 }
 
-export const useStoreUserSession = async () =>{
+export const useStoreUserSession = async (walletAddress: IWalletAddress, email: string,data: string, type: string): Promise<IBlockHash | null> =>{
   try {
-    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, provider);
-    const allUsers = await contract.storeUserSession();
-        //    // Chuyển đổi dữ liệu thành một mảng đơn giản để dễ xử lý
-        //    const formattedUsers = allUsers.map((user: any) => ({
-        //     name: user[0],
-        //     email: user[1],
-        //     isActive: user[2],
-        //     role: user[3],
-        //     phone: user[4],
-        //     certificates: user[5]
-        // }));
-           const formattedUsers = allUsers.map((user: any) => ({
-            isLogin: user[0],
-            timeStamp: user[1],
-            data: user[2],
-            method: user[3],
-        }));
-        // Lắng nghe sự kiện UserRegistered
-        console.log("All Users:", allUsers);
-        //  console.log("All Users:", formattedUsers);
+    const {publicKey,privateKey}=walletAddress;
+    const signer = new ethers.Wallet(privateKey, provider);
+    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, signer);
+    const txResponse = await contract.storeUserSession(publicKey,email,data,type);
+    // Đợi cho giao dịch được xác nhận
+    const txReceipt = await txResponse.wait();
+    // Lấy thông tin từ txReceipt
+    const transactionHash = txResponse.hash; 
+    const blockHash = txReceipt.blockHash; 
+    const blockNumber = txReceipt.blockNumber;
+    const from = txReceipt.from;
+    const result: IBlockHash = {
+      blockHash,
+      blockNumber,
+      transactionHash,
+      userAddress:from
+    };
+    return result;
 } catch (error) {
     console.error("Error fetching user data:", error);
+    return null;
 }
 }
