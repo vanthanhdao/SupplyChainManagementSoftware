@@ -7,7 +7,7 @@ import { ethers, verifyMessage } from "ethers";
 // Địa chỉ của smart contract
 // const contractAddress = "0x86a080b9a473EFce0EB97d59937310C42682523F"; // Địa chỉ contract ở nhà
 // const contractAddress = "0x0498B7c793D7432Cd9dB27fb02fc9cfdBAfA1Fd3"; 
-const contractAddress = "0x9565BE43D8d1e3f4D98FC7Bb6cAa3A22c76c48C3"; // SuppyChain
+const contractAddress = "0x641eADb81A050B2f95f965808A6563c4ec59AF7c"; // SuppyChain
 // Các hàm trong smart contract
 const contractABI = contract.abi;
 const contractABISuppyChain = contractSC.abi;
@@ -149,35 +149,77 @@ export const useGetBlockByEvent = async () => {
         const fromBlock = 0; // hoặc một block cụ thể
         const toBlock = "latest"; // lấy đến block mới nhất
     
-        // // Lấy các sự kiện UserRegistered đã phát ra
-        const filter = contract.filters.storeUserSignUp(); // Tạo filter cho sự kiện
-        const logs = await provider.getLogs({ ...filter, fromBlock, toBlock });
-        console.log(logs)
+      //   const filterUser = {
+      //     address: contractAddress, // Địa chỉ hợp đồng
+      //     fromBlock: fromBlock,
+      //     toBlock: toBlock,
+      //     topics: [ethers.id("StoreUserSignUp(address,string,string,bool,string,string,string)")] 
+      // };
+      const filterSession = {
+        address: contractAddress, // Địa chỉ hợp đồng
+        fromBlock: fromBlock,
+        toBlock: toBlock,
+        topics: [ethers.id("StoreUserSession(address,bool,uint,string,string)")] 
+    };
+      // const userLogs = await provider.getLogs(filterUser);
+      const sessionLogs = await provider.getLogs(filterSession);
     
   // Chuyển đổi log thành sự kiện và in ra block hash
-  const events = logs.map(log => {
+  // const userEvents = userLogs.map(log => {
+  //   const parsedLog = contract.interface.parseLog(log);
+  //   return {
+  //     userAddress: parsedLog?.args.userAddress,
+  //     name: parsedLog?.args.name,
+  //     email: parsedLog?.args.email,
+  //     phone: parsedLog?.args.phone,
+  //     certificates: parsedLog?.args.certificates,
+  //     isAtive: parsedLog?.args.isAtive,
+  //     role: parsedLog?.args.role,
+  //     blockHash: log.blockHash, 
+  //     transactionHash: log.transactionHash 
+  //   };
+  // });
+
+  const sessionEvents = sessionLogs.map(log => {
     const parsedLog = contract.interface.parseLog(log);
     return {
       userAddress: parsedLog?.args.userAddress,
-      email: parsedLog?.args.email,
-      isLogin: parsedLog?.args.isLogin,
+      data: parsedLog?.args.data,
       method: parsedLog?.args.method,
-      blockHash: log.blockHash, // Lấy blockHash từ log
-      transactionHash: log.transactionHash // Lấy transactionHash từ log
+      isLogin: parsedLog?.args.isLogin,
+      timeStamp: parsedLog?.args.timeStamp,
+      blockHash: log.blockHash, 
+      transactionHash: log.transactionHash 
     };
   });
 
-  // In ra các sự kiện cùng với block hash
-  events.forEach(event => {
-    console.log(`Past Event: 
+  // // In ra các sự kiện cùng với block hash
+  // userEvents.forEach(event => {
+  //   console.log(`Past StoreUserSignUp Event: 
+  //     User Address: ${event.userAddress || "null"}, 
+  //     Name: ${event.name || "null"}, 
+  //     Email: ${event.email || "null"}, 
+  //     Phone: ${event.phone || "null"}, 
+  //     Certificates: ${event.certificates || "null"}, 
+  //     IsActive: ${event.isAtive || "null"}, 
+  //     Role: ${event.role || "null"},
+  //     Block Hash: ${event.blockHash}, 
+  //     Transaction Hash: ${event.transactionHash}
+  //   `);
+  // });
+
+  sessionEvents.forEach(event => {
+    console.log(`Past StoreUserSession Event: 
       User Address: ${event.userAddress || "null"}, 
-      Email: ${event.email || "null"}, 
-      Is Login: ${event.isLogin || "null"}, 
-      Method: ${event.method || "null"},
+      Data: ${event.data || "null"}, 
+      Method: ${event.method || "null"}, 
+      IsLogin: ${event.isLogin || "null"},
+      TimeStamp: ${event.timeStamp || "null"},
       Block Hash: ${event.blockHash}, 
       Transaction Hash: ${event.transactionHash}
     `);
   });
+
 
 } catch (error) {
     console.error('Lỗi khi lấy block:', error);
