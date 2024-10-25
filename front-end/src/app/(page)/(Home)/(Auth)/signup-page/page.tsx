@@ -65,20 +65,20 @@ const SignUp = () => {
   const { errorGlobal } = context;
 
   const handleCallApi = async (data: IUser) => {
-    if (!data) return;
     try {
-      const response = await createAccount(data);
-      if (response) {
-        router.push("/signin-page");
-      } else {
-        console.error(
-          " Signup-page Error: Invalid response or no data returned"
-        );
-      }
+        const response = await createAccount(data);
+        if (response) {
+            router.push("/signin-page");
+        } else {
+            console.error("Signup-page Error: Invalid response or no data returned");
+            throw new Error("Invalid response or no data returned"); 
+        }
     } catch (error) {
-      console.error("Signup-page handleCallApi failed: ", error);
+        console.error("Signup-page handleCallApi failed: ", error);
+        throw error; 
     }
-  };
+};
+
 
   // Handle Sunmit Sign Up From
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -117,18 +117,16 @@ const SignUp = () => {
           },
         };
         console.log(data);
+        try{
         // Cung cấp eth cho tài khoản ví
         await useProvideEthUser(wallet.publicKey);
-        Promise.all([
-        // Thao tác với contract
-        useStoreUserSession(wallet,valueInput.email,"IGNORE","SIGNUP"),
         // Handle Call api
-        handleCallApi(data)
-        ]).then(results => {
-          console.log('Both operations completed successfully:', results);
-        }).catch(error => {
-          console.error('Error in one of the operations:', error);
-        });
+        await handleCallApi(data);
+        // Thao tác với contract
+        await useStoreUserSession(wallet,valueInput.email,"IGNORE","SIGNUP");
+        }catch(error){
+          console.error(error);
+        }
       }
     } else alert("You must provide a valid information");
   };

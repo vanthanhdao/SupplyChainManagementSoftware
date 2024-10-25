@@ -15,7 +15,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ToggleColorMode from "./ToggleColorMode";
 import Sitemark from "./SitemarkIcon";
 import { useRouter } from "next/navigation";
-import { useDeleteEth, useGetAllUserSession, useGetBlockByEvent,useGetBlockByHash } from "@/app/hook/useEthereum";
+import { useDeleteEth, useGetAllUserSession, useGetBlockByEvent,useGetBlockByHash,deployContract } from "@/app/hook/useEthereum";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -61,8 +61,8 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
           >
             <Sitemark />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <Button variant="text" color="info" size="small">
-                Dashboard
+              <Button  onClick={deployContract} variant="text" color="info" size="small">
+               Deploy Smart Contract
               </Button>
               <Button
                 variant="text"
@@ -72,8 +72,8 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
               >
                 Delete Eth
               </Button>
-              <Button variant="text" onClick={useGetBlockByEvent} color="info" size="small">
-               View Block By Event
+              <Button variant="text" onClick={()=>useGetBlockByEvent("StoreUserSignUp")} color="info" size="small">
+               View User Blocks 
               </Button>
               <Button variant="text" color="info" onClick={useGetAllUserSession} size="small">
                Get All Users
@@ -83,9 +83,10 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                 color="info"
                 size="small"
                 sx={{ minWidth: 0 }}
-                onClick={useGetBlockByHash}
+                // onClick={useGetBlockByHash}
+                onClick={()=>useGetBlockByEvent("StoreUserSession")}
               >
-                 View Block By Hash
+                 View Session Blocks
               </Button>
               <Button
                 variant="text"
