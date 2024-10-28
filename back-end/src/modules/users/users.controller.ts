@@ -13,6 +13,7 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Public } from 'src/decorators/publicRouter';
+import { DeleteUserDto } from './dto/delete-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -44,8 +45,9 @@ export class UsersController {
   //   return this.usersService.update(+id, updateUserDto);
   // }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @Public()
+  @Delete('revert')
+  remove(@Body() deleteUserDto: DeleteUserDto) {
+    return this.usersService.remove(deleteUserDto);
   }
 }

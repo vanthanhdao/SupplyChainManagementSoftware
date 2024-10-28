@@ -9,6 +9,7 @@ import {
   reHashWalletHelper,
 } from 'src/utils/hash';
 import { ConfigService } from '@nestjs/config';
+import { DeleteUserDto } from './dto/delete-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -66,8 +67,15 @@ export class UsersService {
   }
 
   // Delete users by id
-  async remove(id: number): Promise<void> {
-    await this.usersRepository.delete(id);
+  async remove(deleteUserDto: DeleteUserDto): Promise<void> {
+    const { email, walletAddress } = deleteUserDto;
+    const user = await this.usersRepository.findOneBy({ 
+      email,
+      publicKey: walletAddress.publicKey,
+      privateKey: walletAddress.privateKey
+    });
+    if(!user) throw new Error(`User with ${email} is not exists`);
+    await this.usersRepository.delete(user.id);
   }
 
   // Add a new user to the database

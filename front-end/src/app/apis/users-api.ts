@@ -14,6 +14,19 @@ export const createAccount = async (data: IUser) => {
 };
 
 // Call api for create a new account
+export const revertAccount = async (data: IUser) => {
+  try {
+    const response = await axios.delete(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/revert`,
+    { data }
+    );
+    return response;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+  }
+};
+
+// Call api for create a new account
 export const getAccountWallet = async (
   access_token: string
 ): Promise<IUserWallet | null> => {

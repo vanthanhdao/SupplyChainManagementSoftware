@@ -20,6 +20,7 @@ import {
   useProvideEthUser,
   useStoreUserSession,
 } from "@/app/hook/useEthereum";
+import { revertAccount } from "@/app/apis/users-api";
 require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
@@ -108,7 +109,7 @@ const SignUp = () => {
 
       const wallet = useGenerateWallet();
       if (wallet) {
-        const data = {
+        const data: IUser = {
           email: valueInput.email,
           password: valueInput.password,
           walletAddress: {
@@ -119,11 +120,16 @@ const SignUp = () => {
         console.log(data);
         try{
         // Cung cấp eth cho tài khoản ví
-        await useProvideEthUser(wallet.publicKey);
-        // Handle Call api
+        await useProvideEthUser(wallet.publicKey);          
+        // Thêm tài khoản người dùng cào databas e
         await handleCallApi(data);
         // Thao tác với contract
-        await useStoreUserSession(wallet,valueInput.email,"IGNORE","SIGNUP");
+          try {
+            await useStoreUserSession(wallet, valueInput.email, "IGNORE", "SIGNUP");
+          } catch (error) {
+            console.error("Error during useStoreUserSession:", error);
+            await revertAccount(data);
+          }
         }catch(error){
           console.error(error);
         }
