@@ -15,7 +15,7 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ToggleColorMode from "./ToggleColorMode";
 import Sitemark from "./SitemarkIcon";
 import { useRouter } from "next/navigation";
-import { useDeleteEth, useGetAllUserSession, useGetBlockByEvent,useGetBlockByHash,deployContract } from "@/app/hook/useEthereum";
+import { useDeleteEth, useGetAllUserSession,deployContract, useGetBlockByAllEvent, useGetBlockByOneEvent } from "@/app/hook/useEthereum";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -72,11 +72,11 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
               >
                 Delete Eth
               </Button>
-              <Button variant="text" onClick={()=>useGetBlockByEvent("StoreUserSignUp")} color="info" size="small">
-               View User Blocks 
+              <Button variant="text" onClick={()=>useGetBlockByAllEvent()} color="info" size="small">
+               View Blocks All Event
               </Button>
-              <Button variant="text" color="info" onClick={useGetAllUserSession} size="small">
-               Get All Users
+              <Button variant="text" color="info" onClick={()=>useGetBlockByOneEvent("StoreUserSignUp")} size="small">
+              View Blocks Users Event
               </Button>
               <Button
                 variant="text"
@@ -84,9 +84,9 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                 size="small"
                 sx={{ minWidth: 0 }}
                 // onClick={useGetBlockByHash}
-                onClick={()=>useGetBlockByEvent("StoreUserSession")}
+                onClick={()=>useGetBlockByOneEvent("StoreUserSession")}
               >
-                 View Session Blocks
+                 View Blocks UserSession Event
               </Button>
               <Button
                 variant="text"

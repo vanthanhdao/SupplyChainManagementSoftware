@@ -2,246 +2,75 @@
 import * as React from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import {
-  Button,
-  Card,
-  Checkbox,
-  FormControlLabel,
-  FormLabel,
-  List,
-  ListItem,
-  ListItemText,
-  OutlinedInput,
-} from "@mui/material";
-import { styled } from "@mui/system";
+import StatCard, { StatCardProps } from "../../../components/StatCard";
+import HighlightedCard from "../../../components/HighlightedCard";
+import SessionsChart from "../../../components/SessionsChart";
+import PageViewsBarChart from "../../../components/PageViewsBarChart";
 
-const FormGrid = styled(Grid)(() => ({
-  display: "flex",
-  flexDirection: "column",
-}));
 
-const products = [
+const data: StatCardProps[] = [
   {
-    name: "Professional plan",
-    desc: "Monthly subscription",
-    price: "$15.00",
+    title: "Users",
+    value: "14k",
+    interval: "Last 30 days",
+    trend: "up",
+    data: [
+      200, 24, 220, 260, 240, 380, 100, 240, 280, 240, 300, 340, 320, 360, 340,
+      380, 360, 400, 380, 420, 400, 640, 340, 460, 440, 480, 460, 600, 880, 920,
+    ],
   },
   {
-    name: "Dedicated support",
-    desc: "Included in the Professional plan",
-    price: "Free",
+    title: "Conversions",
+    value: "325",
+    interval: "Last 30 days",
+    trend: "down",
+    data: [
+      1640, 1250, 970, 1130, 1050, 900, 720, 1080, 900, 450, 920, 820, 840, 600,
+      820, 780, 800, 760, 380, 740, 660, 620, 840, 500, 520, 480, 400, 360, 300,
+      220,
+    ],
   },
   {
-    name: "Hardware",
-    desc: "Devices needed for development",
-    price: "$69.99",
-  },
-  {
-    name: "Landing page template",
-    desc: "License",
-    price: "$49.99",
+    title: "Event count",
+    value: "200k",
+    interval: "Last 30 days",
+    trend: "neutral",
+    data: [
+      500, 400, 510, 530, 520, 600, 530, 520, 510, 730, 520, 510, 530, 620, 510,
+      530, 520, 410, 530, 520, 610, 530, 520, 610, 530, 420, 510, 430, 520, 510,
+    ],
   },
 ];
 
-const shippingAddress = [
-  {
-    name: "Company Name*",
-    desc: "Monthly subscription",
-  },
-  {
-    name: "Email*",
-    desc: "user1@gmail.com",
-  },
-  {
-    name: "Address line 1 *",
-    desc: "Binh Duong",
-  },
-  {
-    name: "Country *",
-    desc: "VN",
-  },
-];
-
-const Demo = () => {
+export default function Demo() {
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       {/* cards */}
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-        Demo
+        Overview
       </Typography>
-      <Card variant="outlined" sx={{ width: "100%" }}>
-        <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-          Order Details
-        </Typography>
-        <Grid container spacing={2} columns={12}>
-          <Grid size={{ md: 12, lg: 9 }}>
-            {/* <Grid container spacing={3}>
-              <FormGrid size={{ xs: 12, md: 6 }}>
-                <FormLabel htmlFor="first-name" required>
-                  First name
-                </FormLabel>
-                <OutlinedInput
-                  id="first-name"
-                  name="first-name"
-                  type="name"
-                  placeholder="John"
-                  autoComplete="first name"
-                  required
-                  size="small"
-                />
-              </FormGrid>
-              <FormGrid size={{ xs: 12, md: 6 }}>
-                <FormLabel htmlFor="last-name" required>
-                  Last name
-                </FormLabel>
-                <OutlinedInput
-                  id="last-name"
-                  name="last-name"
-                  type="last-name"
-                  placeholder="Snow"
-                  autoComplete="last name"
-                  required
-                  size="small"
-                />
-              </FormGrid>
-              <FormGrid size={{ xs: 12 }}>
-                <FormLabel htmlFor="address1" required>
-                  Address line 1
-                </FormLabel>
-                <OutlinedInput
-                  id="address1"
-                  name="address1"
-                  type="address1"
-                  placeholder="Street name and number"
-                  autoComplete="shipping address-line1"
-                  required
-                  size="small"
-                />
-              </FormGrid>
-              <FormGrid size={{ xs: 12 }}>
-                <FormLabel htmlFor="address2">Address line 2</FormLabel>
-                <OutlinedInput
-                  id="address2"
-                  name="address2"
-                  type="address2"
-                  placeholder="Apartment, suite, unit, etc. (optional)"
-                  autoComplete="shipping address-line2"
-                  required
-                  size="small"
-                />
-              </FormGrid>
-              <FormGrid size={{ xs: 6 }}>
-                <FormLabel htmlFor="city" required>
-                  City
-                </FormLabel>
-                <OutlinedInput
-                  id="city"
-                  name="city"
-                  type="city"
-                  placeholder="New York"
-                  autoComplete="City"
-                  required
-                  size="small"
-                />
-              </FormGrid>
-              <FormGrid size={{ xs: 6 }}>
-                <FormLabel htmlFor="state" required>
-                  State
-                </FormLabel>
-                <OutlinedInput
-                  id="state"
-                  name="state"
-                  type="state"
-                  placeholder="NY"
-                  autoComplete="State"
-                  required
-                  size="small"
-                />
-              </FormGrid>
-              <FormGrid size={{ xs: 6 }}>
-                <FormLabel htmlFor="zip" required>
-                  Zip / Postal code
-                </FormLabel>
-                <OutlinedInput
-                  id="zip"
-                  name="zip"
-                  type="zip"
-                  placeholder="12345"
-                  autoComplete="shipping postal-code"
-                  required
-                  size="small"
-                />
-              </FormGrid>
-              <FormGrid size={{ xs: 6 }}>
-                <FormLabel htmlFor="country" required>
-                  Country
-                </FormLabel>
-                <OutlinedInput
-                  id="country"
-                  name="country"
-                  type="country"
-                  placeholder="United States"
-                  autoComplete="shipping country"
-                  required
-                  size="small"
-                />
-              </FormGrid>
-            </Grid> */}
-            <Stack
-              gap={2}
-              direction={{ xs: "column", sm: "row", lg: "column" }}
-            >
-              <Typography variant="subtitle2" sx={{ color: "text.secondary" }}>
-                Shipping address
-              </Typography>
-              <List disablePadding>
-                {shippingAddress.map((product) => (
-                  <ListItem key={product.name} sx={{ py: 1, px: 0 }}>
-                    <ListItemText
-                      sx={{ mr: 2 }}
-                      primary={product.name}
-                      secondary={product.desc}
-                    />
-                  </ListItem>
-                ))}
-              </List>
-            </Stack>
-            <Stack
-              gap={2}
-              direction={{ xs: "column", sm: "row", lg: "column" }}
-            >
-              <Typography variant="subtitle2" sx={{ color: "text.secondary" }}>
-                Total
-              </Typography>
-              <Typography variant="h4" gutterBottom>
-                $134.98
-              </Typography>
-              <List disablePadding>
-                {products.map((product) => (
-                  <ListItem key={product.name} sx={{ py: 1, px: 0 }}>
-                    <ListItemText
-                      sx={{ mr: 2 }}
-                      primary={product.name}
-                      secondary={product.desc}
-                    />
-                    <Typography variant="body1" sx={{ fontWeight: "medium" }}>
-                      {product.price}
-                    </Typography>
-                  </ListItem>
-                ))}
-              </List>
-            </Stack>
+      <Grid
+        container
+        spacing={2}
+        columns={12}
+        sx={{ mb: (theme) => theme.spacing(2) }}
+      >
+        {data.map((card, index) => (
+          <Grid key={index} size={{ xs: 12, sm: 6, lg: 3 }}>
+            <StatCard {...card} />
           </Grid>
-          <Grid size={{ xs: 12, lg: 3 }}></Grid>
+        ))}
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }}>
+          <HighlightedCard />
         </Grid>
-        <Button variant="contained" size="small">
-          Confirm Order
-        </Button>
-      </Card>
+        <Grid size={{ sm: 12, md: 6 }}>
+          <SessionsChart />
+        </Grid>
+        <Grid size={{ sm: 12, md: 6 }}>
+          <PageViewsBarChart />
+        </Grid>
+      </Grid>
     </Box>
   );
-};
-
-export default Demo;
+}

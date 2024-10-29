@@ -83,24 +83,6 @@ export const useProvideEthUser = async (walletAddress: string) => {
   }
 };
 
-// Gọi hàm StoreSession tre6nsmart contract
-export const useStoreSession = async (
-  wallet: IWalletAddress,
-  active: string
-) => {
-  if (!wallet && !active) return;
-  try {
-    const { publicKey, privateKey } = wallet;
-    console.log(publicKey, privateKey, active);
-    const signer = new ethers.Wallet(privateKey, provider);
-    const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    const transaction = await contract.storeSession(publicKey, active);
-    await transaction.wait();
-  } catch (error) {
-    console.log("Failed transaction!: ", error);
-  }
-};
-
 // Xác thực wallet address CSDL với 1 wallet khởi tạo
 export const useVerifyWallet = async (
   privateKey: string
@@ -140,7 +122,6 @@ export const useDeleteEth = async () => {
   await transaction.wait();
 };
 
-
 export const useGetBlockByHash = async () => {
   try {
     const block = await provider.getBlock("0x4f36f8ae9d4658fdc48592ee0bf23ae2747907ad2cc758ac0e4e2966d9353343");
@@ -162,14 +143,36 @@ export const useGetBlockByHash = async () => {
         console.log("Decoded data:", decodedData);
       }
 } catch (error) {
-    console.error('Lỗi khi lấy block:', error);
+    console.error('Get Block Failed: ', error);
 }
 };
 
-
-export const useGetBlockByEvent = async (topic: string) => {
+export const useGetBlockByAllEvent = async () => {
   try {
-    console.log(topic)
+    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, provider);
+    const filter = { address: contractAddress, fromBlock: 0, toBlock: 'latest' };
+    const events = await provider.getLogs(filter);
+
+    events.forEach((log:any) => {
+      // Decode tên event và các giá trị từ log
+      const decodedLog = contract.interface.parseLog(log);
+      if(decodedLog){
+      const result = {
+        eventName: decodedLog.name,
+        agrs:decodedLog.args,
+        blockHash: log.blockHash,
+        blockNumber: log.blockNumber
+      };
+      console.log(result);
+    }
+    });
+} catch (error) {
+    console.error('Get Block Failed: ', error);
+}
+};
+
+export const useGetBlockByOneEvent = async (topic: string) => {
+  try {
     const contract = new ethers.Contract(contractAddress, contractABISuppyChain, provider);
     const eventName = topic;
     const filter = contract.filters[eventName]();
@@ -182,13 +185,10 @@ export const useGetBlockByEvent = async (topic: string) => {
       const data = decodedLog[3];
       const action = decodedLog[4]; 
       const result = {
-        decodedLog:{
-          address,
-          isActive,
-          timestamp,
-          data,
-          action
-        },
+        // decodedLog:{
+        //   address,isActive,timestamp,data,action
+        // },
+        decodedLog,
         blockHash: log.blockHash,
         blockNumber: log.blockNumber
       }

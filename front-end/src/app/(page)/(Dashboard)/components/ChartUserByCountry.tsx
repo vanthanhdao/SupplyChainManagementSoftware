@@ -82,9 +82,9 @@ export default function ChartUserByCountry() {
     >
       <CardContent>
         <Typography component="h2" variant="subtitle2">
-          Users by country
+        Technical Specifications  
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        {/* <Box sx={{ display: 'flex', alignItems: 'center' }}>
           <PieChart
             colors={colors}
             margin={{
@@ -146,7 +146,7 @@ export default function ChartUserByCountry() {
               />
             </Stack>
           </Stack>
-        ))}
+        ))} */}
       </CardContent>
     </Card>
   );
