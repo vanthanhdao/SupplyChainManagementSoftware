@@ -29,7 +29,3 @@ interface IUserToken{
   refresh_token:string,
 }
 
-interface IUserRevert{
- email:string,
- walletAddress: IUserWallet,
-}

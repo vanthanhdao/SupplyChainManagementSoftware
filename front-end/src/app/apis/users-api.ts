@@ -7,9 +7,8 @@ export const createAccount = async (data: IUser) => {
       `${process.env.NEXT_PUBLIC_API_URL}/users`,
       data
     );
-    return response;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    throw new Error(`CreateAccount failed - ${error}`);
   }
 };
 
@@ -20,32 +19,30 @@ export const revertAccount = async (data: IUser) => {
       `${process.env.NEXT_PUBLIC_API_URL}/users/revert`,
     { data }
     );
-    return response;
   } catch (error) {
-    console.error("Error fetching data:", error);
+    throw new Error(`RevertAccount failed - ${error}`);
   }
 };
 
 // Call api for create a new account
 export const getAccountWallet = async (
   access_token: string
-): Promise<IUserWallet | null> => {
+): Promise<IUserWallet> => {
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/users/profileWallet`,
       { headers: { Authorization: `Bearer ${access_token}` } }
     );
-    return response?.data;
+    return response.data;
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return null;
+    throw new Error(`GetAccountWallet Failed: ${error}`);
   }
 };
 
 // Call api for create a new account
 export const getAccount = async (
   access_token: string
-): Promise<IUserAccessToken | null> => {
+): Promise<IUserAccessToken> => {
   try {
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/users/profile`,
@@ -53,7 +50,6 @@ export const getAccount = async (
     );
     return response?.data;
   } catch (error) {
-    console.error("Error fetching data:", error);
-    return null;
+    throw new Error(`GetAccount failed: ${error}`);
   }
 };

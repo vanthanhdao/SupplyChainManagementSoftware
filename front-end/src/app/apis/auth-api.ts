@@ -3,16 +3,15 @@ import axios from "axios";
 // Call api for create a new account
 export const authJwtLogin = async (
   data: IUserSignIn
-): Promise<IUserToken | null> => {
+): Promise<IUserToken> => {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
       data
     );
-    return response?.data;
+    return response.data;
   } catch (error) {
-    console.error("Auth-api AuthJwtLogin Failed: ", error);
-    return null;
+    throw new Error(`AuthJwtLogin Failed: ${error}`);
   }
 };
 

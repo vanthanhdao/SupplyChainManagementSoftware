@@ -17,6 +17,7 @@ export class UsersService {
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
     private configService: ConfigService,
+    
   ) {}
 
   // Check email address is exits
@@ -72,7 +73,6 @@ export class UsersService {
     const user = await this.usersRepository.findOneBy({ 
       email,
       publicKey: walletAddress.publicKey,
-      privateKey: walletAddress.privateKey
     });
     if(!user) throw new Error(`User with ${email} is not exists`);
     await this.usersRepository.delete(user.id);

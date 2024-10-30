@@ -21,7 +21,6 @@ import {
 } from "@/app/apis/index-api";
 import {
   useProvideEthUser,
-  useStoreSession,
   useStoreUserSession,
   useVerifyWallet,
 } from "@/app/hook/useEthereum";
@@ -44,39 +43,54 @@ const SignIn = () => {
   }
   const { errorEmail, errorPassword } = context.errorGlobal;
 
-  // Call api /auth/login with axios when user signin
-  const authUserSignIn = async (data: IUserSignIn) => {
-    try {
-      const response = await authJwtLogin(data);
-      if (response) {
-        const { access_token, refresh_token } = response;
-        // Handle signin page route
-        // Save access_token into localStorage
-        await Promise.all([
-          useSetAccessToken("access_token", access_token),
-          useSetAccessToken("refresh_token", refresh_token),
-        ]);
-        const walletAddress = await getAccountWallet(access_token);
-        if (walletAddress) {
-          await useProvideEthUser(walletAddress.publicKey);
-          // Ký thông báo bằng khóa riêng tư để thêm 1 lớp xác thực người dùng
-          const checkWallet = await useVerifyWallet(walletAddress.privateKey);
-          if (checkWallet !== undefined && checkWallet !== null) {
-            const user = await getAccount(access_token);
-            if (user) {
-              const { userId, email, isActive, role } = user;
-              const blockHash = await useStoreUserSession(walletAddress,email,"IGNORE", "SIGNIN");
-              console.log(blockHash);
-              setStateUser(userId, email, isActive, role);
-              router.push("/dashboard-page");
-            } else console.error("GetAccount failed!.");
-          } else console.error("GetAccountWallet failed!.");
-        }
-      } else console.error("AuthJwtLogin failed!.");
-    } catch (error) {
-      console.error("Signin-page authUserSignIn failed:", error);
-    }
-  };
+  // Handle Sign In
+const authUserSignIn = async (data: IUserSignIn) => {
+  if (!data) {
+    console.error("You must provide valid data");
+    return;
+  }
+
+  try {
+    // Handle veryfired email and password
+    const response = await authJwtLogin(data);
+    const { access_token, refresh_token } = response;
+
+    // Save access_token and refresh_token in sessionStorage
+    await Promise.all([
+      useSetAccessToken("access_token", access_token),
+      useSetAccessToken("refresh_token", refresh_token),
+    ]);
+
+    // Handle get Wallet Address
+    const walletAddress = await getAccountWallet(access_token);
+    const { publicKey, privateKey } = walletAddress;
+
+    // Handle provide ETH for user account 
+    await useProvideEthUser(publicKey);
+
+    // Sign and verify wallet for additional security
+    const isWalletVerified = await useVerifyWallet(privateKey);
+    if (!isWalletVerified) throw new Error("Wallet verification failed");
+
+    // Handle save transaction in Blockchain
+    const blockHash = await useStoreUserSession(walletAddress, data.email, "IGNORE", "SIGNIN");
+    console.log("Block hash:", blockHash);
+
+    // Handle get User Account 
+    const user = await getAccount(access_token);
+    if (!user) throw new Error("User retrieval failed");
+    const { userId, email, isActive, role } = user;
+
+    // Save User in state Zustand
+    setStateUser(userId, email, isActive, role);
+
+    // Route to the dashboard
+    router.push("/dashboard-page");
+  } catch (error) {
+    throw new Error(`AuthUserSignIn failed - ${error}`);
+  }
+};
+
 
   // Handle from Submit
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

@@ -65,18 +65,29 @@ const SignUp = () => {
   }
   const { errorGlobal } = context;
 
-  const handleCallApi = async (data: IUser) => {
+  const authUserSignUp = async (data: IUser) => {
+    if (!data) {
+      console.error("You must provide valid data");
+      return;
+    }
+
     try {
-        const response = await createAccount(data);
-        if (response) {
-            router.push("/signin-page");
-        } else {
-            console.error("Signup-page Error: Invalid response or no data returned");
-            throw new Error("Invalid response or no data returned"); 
+        const {walletAddress,email} = data
+         // Handle provide ETH for user account 
+        await useProvideEthUser(walletAddress.publicKey);  
+
+        // Handle create User Account
+        await createAccount(data);
+
+        try {
+          await useStoreUserSession(walletAddress,email, "IGNORE", "SIGNUP");
+          // Route to the signin pge
+          router.push("/signin-page");
+        } catch (error) {
+          await revertAccount(data);
         }
     } catch (error) {
-        console.error("Signup-page handleCallApi failed: ", error);
-        throw error; 
+      throw new Error(`AuthUserSignUp failed - ${error}`);
     }
 };
 
@@ -117,22 +128,8 @@ const SignUp = () => {
             privateKey: wallet.privateKey,
           },
         };
-        console.log(data);
-        try{
-        // Cung cấp eth cho tài khoản ví
-        await useProvideEthUser(wallet.publicKey);          
-        // Thêm tài khoản người dùng cào databas e
-        await handleCallApi(data);
-        // Thao tác với contract
-          try {
-            await useStoreUserSession(wallet, valueInput.email, "IGNORE", "SIGNUP");
-          } catch (error) {
-            console.error("Error during useStoreUserSession:", error);
-            await revertAccount(data);
-          }
-        }catch(error){
-          console.error(error);
-        }
+        console.log(data);     
+        await authUserSignUp(data);
       }
     } else alert("You must provide a valid information");
   };

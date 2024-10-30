@@ -54,14 +54,12 @@ export const useGenerateWallet = (): IWalletAddress => {
     };
     return result;
   } catch (error) {
-    console.error("Create wallet error:", error);
-    throw error;
+    throw new Error(`UseGenerateWallet failed: ${error}`);
   }
 };
 
 // Chuyển ether cho người dùng
 export const useProvideEthUser = async (walletAddress: string) => {
-  if (!walletAddress) return;
   try {
     // Thông tin tài khoản của admin
     const signer = new ethers.Wallet(privateKey, provider);
@@ -79,15 +77,12 @@ export const useProvideEthUser = async (walletAddress: string) => {
     const transaction = await signer.sendTransaction(tx);
     await transaction.wait();
   } catch (error) {
-    console.log("Failed transaction!: ", error);
+    throw new Error(`UseProvideEthUser failed: ${error}`);
   }
 };
 
 // Xác thực wallet address CSDL với 1 wallet khởi tạo
-export const useVerifyWallet = async (
-  privateKey: string
-): Promise<boolean | null> => {
-  if (!privateKey) return null;
+export const useVerifyWallet = async ( privateKey: string): Promise<boolean> => {
   try {
     const wallet = new ethers.Wallet(privateKey);
     const message = "Verify account ownership";
@@ -98,8 +93,7 @@ export const useVerifyWallet = async (
     // Kiểm tra xem địa chỉ có khớp với địa chỉ của người dùng hay không
     return recoveredAddress == wallet.address ? true : false;
   } catch (error) {
-    console.log("Failed transaction!: ", error);
-    return null;
+    throw new Error(`UseVerifyWallet failed: ${error}`);
   }
 };
 
@@ -250,7 +244,6 @@ export const useStoreUserSession = async (walletAddress: IWalletAddress, email: 
     };
     return result;
 } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
+  throw new Error(`UseStoreUserSession failed: ${error}`);
 }
 }
