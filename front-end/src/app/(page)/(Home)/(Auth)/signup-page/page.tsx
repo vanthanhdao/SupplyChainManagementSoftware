@@ -134,7 +134,7 @@ const SignUp = () => {
     } else alert("You must provide a valid information");
   };
 
-  return (
+  return ( 
     <SignUpContainer
       direction="column"
       justifyContent="space-between"

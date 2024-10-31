@@ -16,25 +16,17 @@ import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
 import {
   authJwtLogin,
-  getAccountWallet,
-  getAccount,
 } from "@/app/apis/index-api";
 import {
-  useProvideEthUser,
-  useStoreUserSession,
-  useVerifyWallet,
-} from "@/app/hook/useEthereum";
-import {
-  useGetAccessToken,
   useSetAccessToken,
-  useTokenPayload,
 } from "@/app/hook/useAccessToken";
 import useUserStore from "@/app/zustands/userStore";
+
+
 
 const SignIn = () => {
   const router = useRouter();
   const [showButton, setShowButton] = React.useState(true);
-  const { setStateUser } = useUserStore();
 
   // Use context for error variable
   const context = React.useContext(DataContext);
@@ -61,28 +53,20 @@ const authUserSignIn = async (data: IUserSignIn) => {
       useSetAccessToken("refresh_token", refresh_token),
     ]);
 
-    // Handle get Wallet Address
-    const walletAddress = await getAccountWallet(access_token);
-    const { publicKey, privateKey } = walletAddress;
+    // // Handle get Wallet Address
+    // const walletAddress = await getAccountWallet(access_token);
+    // const { publicKey, privateKey } = walletAddress;
 
-    // Handle provide ETH for user account 
-    await useProvideEthUser(publicKey);
+    // // Handle provide ETH for user account 
+    // await useProvideEthUser(publicKey);
 
-    // Sign and verify wallet for additional security
-    const isWalletVerified = await useVerifyWallet(privateKey);
-    if (!isWalletVerified) throw new Error("Wallet verification failed");
+    // // Sign and verify wallet for additional security
+    // const isWalletVerified = await useVerifyWallet(privateKey);
+    // if (!isWalletVerified) throw new Error("Wallet verification failed");
 
-    // Handle save transaction in Blockchain
-    const blockHash = await useStoreUserSession(walletAddress, data.email, "IGNORE", "SIGNIN");
-    console.log("Block hash:", blockHash);
-
-    // Handle get User Account 
-    const user = await getAccount(access_token);
-    if (!user) throw new Error("User retrieval failed");
-    const { userId, email, isActive, role } = user;
-
-    // Save User in state Zustand
-    setStateUser(userId, email, isActive, role);
+    // // Handle save transaction in Blockchain
+    // const blockHash = await useStoreUserSession(walletAddress, data.email, "IGNORE", "SIGNIN");
+    // console.log("Block hash:", blockHash);
 
     // Route to the dashboard
     router.push("/dashboard-page");

@@ -105,20 +105,13 @@ export class UsersService {
     return await this.usersRepository.findOneBy({ email });
   }
 
-  //  // Hàm cập nhật thông tin người dùng
-  //  async update(id: number, updateUserDto: UpdateUserDto): Promise<Users> {
-  //   // Tìm kiếm người dùng theo ID
-  //   const user = await this.usersRepository.findOne({ where: { id } });
-
-  //   // Nếu không tìm thấy người dùng, throw lỗi
-  //   if (!user) {
-  //     throw new NotFoundException(`User with ID ${id} not found`);
-  //   }
-
-  //   // Cập nhật thông tin người dùng với dữ liệu mới
-  //   Object.assign(user, updateUserDto);
-
-  //   // Lưu lại người dùng đã cập nhật vào cơ sở dữ liệu
-  //   return this.usersRepository.save(user);
-  // }
+   async update(payload: IUserAccessToken,isActive:boolean) {
+    const {userId} = payload;
+    const user = await this.usersRepository.findOneBy({ id:userId });
+    const updateDate = new Date();
+    if (!user) throw new Error(`User with ${payload.userId} is not exists`);
+    user.isActive = true;
+    user.updateAt = updateDate.toString();
+    await this.usersRepository.save(user);
+  }
 }

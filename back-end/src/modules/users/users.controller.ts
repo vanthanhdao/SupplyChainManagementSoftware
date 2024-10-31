@@ -40,10 +40,10 @@ export class UsersController {
     return this.usersService.findOneProfile(req.user);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  //   return this.usersService.update(+id, updateUserDto);
-  // }
+  @Patch('update')
+  update(@Request() req,@Body() isActive: boolean) {
+    return this.usersService.update(req.user,isActive);
+  }
 
   @Public()
   @Delete('revert')

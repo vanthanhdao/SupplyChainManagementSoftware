@@ -1,14 +1,17 @@
 "use client";
-import { Box, Stack, Link } from "@mui/material";
+import * as React from "react";
+import { Box, Stack, Link ,Button} from "@mui/material";
 import Header from "../components/Header";
 import SideMenu from "../components/SideMenu";
-import * as React from "react";
 import { PaletteMode, ThemeProvider, createTheme } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import getMPTheme from "../../../theme/getMPTheme";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import axios from "axios";
+import useSWR, { mutate } from "swr";
+import { useGetAccessToken } from "@/app/hook/useAccessToken";
+import {  getAccount} from "@/app/apis/index-api";
 import useUserStore from "@/app/zustands/userStore";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -17,14 +20,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const MPTheme = createTheme(getMPTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
   const [open, setOpen] = React.useState(false);
-  const { isActive } = useUserStore();
+  const {isActive,initializeUser} = useUserStore();
+
 
   React.useEffect(() => {
-    if (!isActive) {
+    initializeUser();
+    console.log(isActive);
+    if (!isActive ) {
       const interval = setInterval(() => setOpen(true), 1000);
       return () => clearInterval(interval);
     }
-  }, [open]);
+  }, [isActive]);
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,
@@ -37,31 +43,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   };
 
   // Call api /users/ with axios when user accept active account
-  const updateIsActive = async (user: any) => {
+  const updateIsActive = async (isActive: boolean) => {
+    const access_token = useGetAccessToken("access_token");
+    if (!access_token) return;
     try {
-      const access_token = sessionStorage.getItem("access_token");
       const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/${user.userId}`,
-        user.isActive,
+        `${process.env.NEXT_PUBLIC_API_URL}/users/update`,
+        isActive,
         { headers: { Authorization: `Bearer ${access_token}` } }
       );
-      // Handle signin page route
-      const dataRespone = response.data;
-      const checkData = Object.values(dataRespone).every((value) => value);
-      if (checkData) {
-        // Save access_token into localStorage
-        sessionStorage.setItem("access_token", dataRespone.access_token);
-        sessionStorage.setItem("refresh_token", dataRespone.refresh_token);
-      }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      throw new Error(`UpdateIsActive failed: ${error}`);
     }
   };
 
   // Handle active a account
-  const handleActiveAccount = () => {
-    // updateIsActive(user);
-  };
+  const handleUpdateData = () =>{
+      updateIsActive(true);
+  }
 
   return (
     <html lang="en">
@@ -77,7 +76,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             severity="warning"
             sx={{ width: "100%" }}
           >
-            <Box onClick={handleActiveAccount}>
+            <Box onClick={handleUpdateData}>
               {` Please activate your account ! `}
               <Link href="#">Active now</Link>
             </Box>

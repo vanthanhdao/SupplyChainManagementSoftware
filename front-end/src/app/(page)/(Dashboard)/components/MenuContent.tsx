@@ -22,11 +22,11 @@ const mainListItems = [
 
 export default function MenuContent() {
   const router = useRouter();
-  const [selectedIndex, setSelectedIndex] = React.useState( () => Number(localStorage.getItem('selectedIndex')) || 0);
+  const [selectedIndex, setSelectedIndex] = React.useState( () => Number(sessionStorage.getItem('selectedIndex')) || 0);
 
   const handleListItemClick = (item:any,index: number) => {
     setSelectedIndex(index);
-    localStorage.setItem('selectedIndex', index.toString());
+    sessionStorage.setItem('selectedIndex', index.toString());
     router.push(`/dashboard-page/${item?.route}`)
   };
 

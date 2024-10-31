@@ -48,7 +48,7 @@ export const getAccount = async (
       `${process.env.NEXT_PUBLIC_API_URL}/users/profile`,
       { headers: { Authorization: `Bearer ${access_token}` } }
     );
-    return response?.data;
+    return response.data;
   } catch (error) {
     throw new Error(`GetAccount failed: ${error}`);
   }
