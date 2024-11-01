@@ -13,6 +13,8 @@ import AddRoundedIcon from "@mui/icons-material/AddRounded";
 import DevicesRoundedIcon from "@mui/icons-material/DevicesRounded";
 import SmartphoneRoundedIcon from "@mui/icons-material/SmartphoneRounded";
 import ConstructionRoundedIcon from "@mui/icons-material/ConstructionRounded";
+import { Box, IconButton, Menu } from "@mui/material";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 const Avatar = styled(MuiAvatar)(({ theme }) => ({
   width: 28,
@@ -28,37 +30,49 @@ const ListItemAvatar = styled(MuiListItemAvatar)({
 });
 
 export default function SelectContent() {
-  const [company, setCompany] = React.useState("");
-
-  const handleChange = (event: SelectChangeEvent) => {
-    setCompany(event.target.value as string);
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
   };
 
   return (
-    <Select
-      labelId="company-select"
+    <div>
+      <IconButton 
+      aria-label="more"
+      id="long-button"
+      aria-controls={open ? 'long-menu' : undefined}
+      aria-expanded={open ? 'true' : undefined}
+      aria-haspopup="true"
+      onClick={handleClick}
+      size="small">
+           <MoreVertIcon />
+      </IconButton>
+
+    <Menu 
       id="company-simple-select"
-      value={company}
-      onChange={handleChange}
-      displayEmpty
-      inputProps={{ "aria-label": "Select company" }}
-      fullWidth
-      sx={{
-        maxHeight: 56,
-        width: 215,
-        "&.MuiList-root": {
-          p: "8px",
-        },
-        [`& .${selectClasses.select}`]: {
-          display: "flex",
-          alignItems: "center",
-          gap: "2px",
-          pl: 1,
-        },
+      anchorEl={anchorEl}
+      MenuListProps={{
+        'aria-labelledby': 'long-button',
       }}
+        open={open}
+        onClose={handleClose}
+        slotProps={{
+          paper: {
+            style: {
+              maxHeight: 300,
+              maxWidth: 500,
+            },
+          },
+        }}
     >
-      <ListSubheader sx={{ pt: 0 }}>Production</ListSubheader>
-      <MenuItem value="">
+        <Box>       
+            <ListSubheader sx={{ pt: 0 }}>Production</ListSubheader>
+        </Box>
+      <MenuItem>
         <ListItemAvatar>
           <Avatar alt="Sitemark web">
             <DevicesRoundedIcon sx={{ fontSize: "1rem" }} />
@@ -66,7 +80,7 @@ export default function SelectContent() {
         </ListItemAvatar>
         <ListItemText primary="Sitemark-web" secondary="Web app" />
       </MenuItem>
-      <MenuItem value={10}>
+      <MenuItem>
         <ListItemAvatar>
           <Avatar alt="Sitemark App">
             <SmartphoneRoundedIcon sx={{ fontSize: "1rem" }} />
@@ -74,7 +88,7 @@ export default function SelectContent() {
         </ListItemAvatar>
         <ListItemText primary="Sitemark-app" secondary="Mobile application" />
       </MenuItem>
-      <MenuItem value={20}>
+      <MenuItem>
         <ListItemAvatar>
           <Avatar alt="Sitemark Store">
             <DevicesRoundedIcon sx={{ fontSize: "1rem" }} />
@@ -82,8 +96,10 @@ export default function SelectContent() {
         </ListItemAvatar>
         <ListItemText primary="Sitemark-Store" secondary="Web app" />
       </MenuItem>
-      <ListSubheader>Development</ListSubheader>
-      <MenuItem value={30}>
+      <Box>      
+          <ListSubheader>Development</ListSubheader>
+      </Box>
+      <MenuItem>
         <ListItemAvatar>
           <Avatar alt="Sitemark Store">
             <ConstructionRoundedIcon sx={{ fontSize: "1rem" }} />
@@ -92,12 +108,13 @@ export default function SelectContent() {
         <ListItemText primary="Sitemark-Admin" secondary="Web app" />
       </MenuItem>
       <Divider sx={{ mx: -1 }} />
-      <MenuItem value={40}>
+      <MenuItem>
         <ListItemIcon>
           <AddRoundedIcon />
         </ListItemIcon>
         <ListItemText primary="Add product" secondary="Web app" />
       </MenuItem>
-    </Select>
+    </Menu>
+    </div>
   );
 }

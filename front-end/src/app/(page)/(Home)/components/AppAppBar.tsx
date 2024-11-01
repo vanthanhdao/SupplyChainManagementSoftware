@@ -15,7 +15,9 @@ import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import ToggleColorMode from "./ToggleColorMode";
 import Sitemark from "./SitemarkIcon";
 import { useRouter } from "next/navigation";
-import { useDeleteEth, useGetAllUserSession,deployContract, useGetBlockByAllEvent, useGetBlockByOneEvent } from "@/app/hook/useEthereum";
+import AppBar_Button from "./AppBar_Button";
+import { useDeleteEth,deployContract, useGetBlockByAllEvent, useGetBlockByOneEvent } from "@/app/hook/useEthereum";
+
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -56,48 +58,12 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
     >
       <Container maxWidth="lg">
         <StyledToolbar variant="dense" disableGutters>
+          
           <Box
             sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}
           >
             <Sitemark />
-            <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              <Button  onClick={deployContract} variant="text" color="info" size="small">
-               Deploy Smart Contract
-              </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                onClick={useDeleteEth}
-              >
-                Delete Eth
-              </Button>
-              <Button variant="text" onClick={()=>useGetBlockByAllEvent()} color="info" size="small">
-               View Blocks All Event
-              </Button>
-              <Button variant="text" color="info" onClick={()=>useGetBlockByOneEvent("StoreUserSignUp")} size="small">
-              View Blocks Users Event
-              </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                sx={{ minWidth: 0 }}
-                // onClick={useGetBlockByHash}
-                onClick={()=>useGetBlockByOneEvent("StoreUserSession")}
-              >
-                 View Blocks UserSession Event
-              </Button>
-              <Button
-                variant="text"
-                color="info"
-                size="small"
-                sx={{ minWidth: 0 }}
-                onClick={() => router.push("/blog-page")}
-              >
-                Blog
-              </Button>
-            </Box>
+            <AppBar_Button/>
           </Box>
           <Box
             sx={{
@@ -134,7 +100,7 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
               <MenuIcon />
             </IconButton>
-            <Drawer anchor="top" open={open} onClose={toggleDrawer(false)}>
+            <Drawer sx={{ display: { sm: "flex", md: "none" } }} anchor="top" open={open} onClose={toggleDrawer(false)}>
               <Box sx={{ p: 2, backgroundColor: "background.default" }}>
                 <Box
                   sx={{
@@ -151,13 +117,39 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                     <CloseRoundedIcon />
                   </IconButton>
                 </Box>
+
                 <Divider sx={{ my: 3 }} />
-                <MenuItem>Features</MenuItem>
-                <MenuItem>Testimonials</MenuItem>
-                <MenuItem>Highlights</MenuItem>
-                <MenuItem>Pricing</MenuItem>
-                <MenuItem>FAQ</MenuItem>
-                <MenuItem>Blog</MenuItem>
+
+                <MenuItem>        
+                  <Button onClick={deployContract}  fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'} }} size="large">
+                      Deploy Smart Contract
+                 </Button>
+               </MenuItem>
+                <MenuItem>
+                <Button onClick={useDeleteEth}  fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'} }} size="large">
+                       Delete Eth
+                </Button>
+                </MenuItem>
+                <MenuItem>
+                <Button onClick={()=>useGetBlockByAllEvent()}  fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'} }} size="large">
+                View Blocks All Event
+                </Button>
+                </MenuItem>
+                <MenuItem>
+                <Button onClick={()=>useGetBlockByOneEvent("StoreUserSignUp")}  fullWidth  variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'} }} size="large">
+                View Blocks Users Event
+                </Button>
+                </MenuItem> 
+                <MenuItem>
+                <Button onClick={()=>useGetBlockByOneEvent("StoreUserSession")} fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'}}} size="large">
+                View Blocks UserSession Event
+                </Button>
+                </MenuItem>
+                <MenuItem>
+                <Button onClick={() => router.push("/blog-page")} fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'}}} size="large">
+                Blog
+                </Button>
+                </MenuItem>
                 <MenuItem>
                   <Button
                     color="primary"
@@ -181,6 +173,7 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
               </Box>
             </Drawer>
           </Box>
+          
         </StyledToolbar>
       </Container>
     </AppBar>

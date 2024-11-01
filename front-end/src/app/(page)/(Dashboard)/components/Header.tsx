@@ -6,15 +6,26 @@ import CustomDatePicker from "./CustomDatePicker";
 import NavbarBreadcrumbs from "./NavbarBreadcrumbs";
 import ToggleColorMode from "./ToggleColorMode";
 import MenuButton from "./MenuButton";
+import MenuIcon from "@mui/icons-material/Menu";
+import MoreVertIcon from '@mui/icons-material/MoreVert';
 
 import Search from "./Search";
+import { Box, Button, Divider, Drawer, IconButton, MenuItem } from "@mui/material";
+import SelectContent from "./SelectContent";
 
-export default function Header(props: any) {
+export default function Header() {
+  const [open, setOpen] = React.useState(false);
+
+  const toggleDrawer = () => {
+    setOpen(!open);
+    console.log(open)
+  };
+
+
   return (
     <Stack
       direction="row"
       sx={{
-        display: { xs: "none", md: "flex" },
         width: "100%",
         alignItems: { xs: "flex-start", md: "center" },
         justifyContent: "space-between",
@@ -28,6 +39,10 @@ export default function Header(props: any) {
         <MenuButton showBadge aria-label="Open notifications">
           <NotificationsRoundedIcon />
         </MenuButton>
+           {/* Menu Reponsive */}
+          <Box sx={{ display: { xs:"flex",sm: "none", md: "none" } }}>
+            <SelectContent/>
+          </Box>
       </Stack>
     </Stack>
   );

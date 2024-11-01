@@ -1,4 +1,4 @@
-import { createAccount, getAccount, getAccountWallet } from "./users-api";
+import { createAccount, getAccount, getAccountWallet,updateIsActive } from "./users-api";
 import { authJwtLogin, authJwtProfile } from "./auth-api";
 
 export {
@@ -7,4 +7,5 @@ export {
   authJwtProfile,
   getAccount,
   getAccountWallet,
+  updateIsActive
 };

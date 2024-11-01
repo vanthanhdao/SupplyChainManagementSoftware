@@ -1,22 +1,11 @@
 
-
 "use client";
 import * as React from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import {
-  Button,
-  Card,
-  Checkbox,
-  FormControlLabel,
-  FormLabel,
-  List,
-  ListItem,
-  ListItemText,
-  OutlinedInput,
-} from "@mui/material";
+import {Card} from "@mui/material";
 import { styled } from "@mui/system";
 import Search from "../components/Search";
 import CustomizedDataGrid from "../components/CustomizedDataGrid";
@@ -81,7 +70,6 @@ const Store = () => {
           <Stack
         direction="row"
         sx={{
-          display: { xs: "none", md: "flex" },
           alignItems: { xs: "flex-start", md: "center" },
           justifyContent: "space-between",
           mb:2

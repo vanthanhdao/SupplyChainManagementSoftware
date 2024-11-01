@@ -53,3 +53,17 @@ export const getAccount = async (
     throw new Error(`GetAccount failed: ${error}`);
   }
 };
+
+
+  // Call api /users/ with axios when user update infimation
+export  const updateIsActive = async (access_token: string) => {
+    try {
+      const response = await axios.patch(
+        `${process.env.NEXT_PUBLIC_API_URL}/users/update`,
+        {isActive:true},
+        { headers: { Authorization: `Bearer ${access_token}` } }
+      );
+    } catch (error) {
+      throw new Error(`UpdateIsActive failed: ${error}`);
+    }
+  };

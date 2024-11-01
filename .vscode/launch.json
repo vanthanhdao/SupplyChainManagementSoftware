@@ -16,6 +16,21 @@
       "port": 9229,
       "autoAttachChildProcesses": true,
       "cwd": "${workspaceFolder}/back-end" // Thư mục chứa package.json
+    },
+    {
+      "name": "Next.js: Client",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "cwd": "${workspaceFolder}/front-end"
+    },
+    {
+      "name": "Next.js: Debug Chorme",
+      "type": "chrome",
+      "request": "launch",
+        "url": "http://localhost:3000",
+       "webRoot": "${workspaceFolder}/front-end"
     }
+
   ]
 }

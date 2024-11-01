@@ -11,7 +11,7 @@ import Alert from "@mui/material/Alert";
 import axios from "axios";
 import useSWR, { mutate } from "swr";
 import { useGetAccessToken } from "@/app/hook/useAccessToken";
-import {  getAccount} from "@/app/apis/index-api";
+import { updateIsActive, getAccount} from "@/app/apis/index-api";
 import useUserStore from "@/app/zustands/userStore";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -25,7 +25,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     initializeUser();
-    console.log(isActive);
     if (!isActive ) {
       const interval = setInterval(() => setOpen(true), 1000);
       return () => clearInterval(interval);
@@ -42,24 +41,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setOpen(false);
   };
 
-  // Call api /users/ with axios when user accept active account
-  const updateIsActive = async (isActive: boolean) => {
-    const access_token = useGetAccessToken("access_token");
-    if (!access_token) return;
-    try {
-      const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/update`,
-        isActive,
-        { headers: { Authorization: `Bearer ${access_token}` } }
-      );
-    } catch (error) {
-      throw new Error(`UpdateIsActive failed: ${error}`);
-    }
-  };
 
   // Handle active a account
   const handleUpdateData = () =>{
-      updateIsActive(true);
+    const access_token = useGetAccessToken("access_token");
+    updateIsActive(access_token);
   }
 
   return (
@@ -91,10 +77,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               component="main"
               sx={(theme) => ({
                 position: { sm: "relative", md: "" },
-                top: { sm: "48px", md: "0" },
+                pt: { xs: "48px",sm:"48px",md:"24px"},
                 height: { sm: "calc(100vh - 48px)", md: "100vh" },
                 flexGrow: 1,
-                pt: 2,
                 backgroundImage:
                   "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
                 backgroundRepeat: "no-repeat",
