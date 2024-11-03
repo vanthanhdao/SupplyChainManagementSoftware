@@ -1,10 +1,10 @@
-"use client"
-import * as React from 'react';
+"use client";
+import * as React from "react";
 import { styled } from "@mui/system";
-import Typography from '@mui/material/Typography';
-import Breadcrumbs, { breadcrumbsClasses } from '@mui/material/Breadcrumbs';
-import NavigateNextRoundedIcon from '@mui/icons-material/NavigateNextRounded';
-import { usePathname } from 'next/navigation'
+import Typography from "@mui/material/Typography";
+import Breadcrumbs, { breadcrumbsClasses } from "@mui/material/Breadcrumbs";
+import NavigateNextRoundedIcon from "@mui/icons-material/NavigateNextRounded";
+import { usePathname } from "next/navigation";
 
 const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
   margin: theme.spacing(1, 0),
@@ -13,16 +13,19 @@ const StyledBreadcrumbs = styled(Breadcrumbs)(({ theme }) => ({
     margin: 1,
   },
   [`& .${breadcrumbsClasses.ol}`]: {
-    alignItems: 'center',
+    alignItems: "center",
   },
 }));
 
 export default function NavbarBreadcrumbs() {
-  const pathname = usePathname()
-  const slicePathName = pathname.substr(11);
-  const arrPathName = slicePathName.split("/");
-  console.log(arrPathName)
-  
+  const pathname = usePathname();
+  const [arrPathName, setArrPathName] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    const subStrPathName = pathname.substr(11);
+    const splitPathName = subStrPathName.split("/");
+    setArrPathName(splitPathName);
+  }, [pathname]);
 
   return (
     <StyledBreadcrumbs
@@ -30,9 +33,17 @@ export default function NavbarBreadcrumbs() {
       separator={<NavigateNextRoundedIcon fontSize="small" />}
     >
       <Typography variant="body1">Dashboard</Typography>
-      <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 600 }}>
-        Home
-      </Typography>
+      {arrPathName.map((pathname, index) => {
+        return (
+          <Typography
+            variant="body1"
+            key={index}
+            sx={{ color: "text.primary", fontWeight: 600 }}
+          >
+            {pathname ? pathname : "store"}
+          </Typography>
+        );
+      })}
     </StyledBreadcrumbs>
   );
 }

@@ -14,15 +14,9 @@ import { DataContext, DataProvider } from "../../../../hook/errorContext";
 import { useRouter } from "next/navigation";
 import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
-import {
-  authJwtLogin,
-} from "@/app/apis/index-api";
-import {
-  useSetAccessToken,
-} from "@/app/hook/useAccessToken";
+import { authJwtLogin } from "@/app/apis/index-api";
+import { useSetAccessToken } from "@/app/hook/useAccessToken";
 import useUserStore from "@/app/zustands/userStore";
-
-
 
 const SignIn = () => {
   const router = useRouter();
@@ -36,45 +30,44 @@ const SignIn = () => {
   const { errorEmail, errorPassword } = context.errorGlobal;
 
   // Handle Sign In
-const authUserSignIn = async (data: IUserSignIn) => {
-  if (!data) {
-    console.error("You must provide valid data");
-    return;
-  }
+  const authUserSignIn = async (data: IUserSignIn) => {
+    if (!data) {
+      console.error("You must provide valid data");
+      return;
+    }
 
-  try {
-    // Handle veryfired email and password
-    const response = await authJwtLogin(data);
-    const { access_token, refresh_token } = response;
+    try {
+      // Handle veryfired email and password
+      const response = await authJwtLogin(data);
+      const { access_token, refresh_token } = response;
 
-    // Save access_token and refresh_token in sessionStorage
-    await Promise.all([
-      useSetAccessToken("access_token", access_token),
-      useSetAccessToken("refresh_token", refresh_token),
-    ]);
+      // Save access_token and refresh_token in sessionStorage
+      await Promise.all([
+        useSetAccessToken("access_token", access_token),
+        useSetAccessToken("refresh_token", refresh_token),
+      ]);
 
-    // // Handle get Wallet Address
-    // const walletAddress = await getAccountWallet(access_token);
-    // const { publicKey, privateKey } = walletAddress;
+      // // Handle get Wallet Address
+      // const walletAddress = await getAccountWallet(access_token);
+      // const { publicKey, privateKey } = walletAddress;
 
-    // // Handle provide ETH for user account 
-    // await useProvideEthUser(publicKey);
+      // // Handle provide ETH for user account
+      // await useProvideEthUser(publicKey);
 
-    // // Sign and verify wallet for additional security
-    // const isWalletVerified = await useVerifyWallet(privateKey);
-    // if (!isWalletVerified) throw new Error("Wallet verification failed");
+      // // Sign and verify wallet for additional security
+      // const isWalletVerified = await useVerifyWallet(privateKey);
+      // if (!isWalletVerified) throw new Error("Wallet verification failed");
 
-    // // Handle save transaction in Blockchain
-    // const blockHash = await useStoreUserSession(walletAddress, data.email, "IGNORE", "SIGNIN");
-    // console.log("Block hash:", blockHash);
+      // // Handle save transaction in Blockchain
+      // const blockHash = await useStoreUserSession(walletAddress, data.email, "IGNORE", "SIGNIN");
+      // console.log("Block hash:", blockHash);
 
-    // Route to the dashboard
-    router.push("/dashboard-page");
-  } catch (error) {
-    throw new Error(`AuthUserSignIn failed - ${error}`);
-  }
-};
-
+      // Route to the dashboard
+      router.push("/dashboard");
+    } catch (error) {
+      throw new Error(`AuthUserSignIn failed - ${error}`);
+    }
+  };
 
   // Handle from Submit
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {

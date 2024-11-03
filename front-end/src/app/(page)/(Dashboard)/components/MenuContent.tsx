@@ -9,25 +9,31 @@ import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
 import AnalyticsRoundedIcon from "@mui/icons-material/AnalyticsRounded";
 import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
-import StoreIcon from '@mui/icons-material/Store';
+import StoreIcon from "@mui/icons-material/Store";
 import { useRouter } from "next/navigation";
 
 const mainListItems = [
-  { text: "Store", icon: <StoreIcon  />, route: "" },
-  { text: "Orders", icon: <AnalyticsRoundedIcon /> ,  route: "order-page"},
+  { text: "Store", icon: <StoreIcon />, route: "" },
+  { text: "Orders", icon: <AnalyticsRoundedIcon />, route: "orders" },
   { text: "Clients", icon: <PeopleRoundedIcon /> },
-  { text: "Demo", icon: <HomeRoundedIcon />, route: "demo-page" },
-  { text: "Tasks", icon: <AssignmentRoundedIcon />, route: "tasks-page" },
+  { text: "Demo", icon: <HomeRoundedIcon />, route: "demo" },
+  { text: "Tasks", icon: <AssignmentRoundedIcon />, route: "tasks" },
 ];
 
 export default function MenuContent() {
   const router = useRouter();
-  const [selectedIndex, setSelectedIndex] = React.useState( () => Number(sessionStorage.getItem('selectedIndex')) || 0);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
-  const handleListItemClick = (item:any,index: number) => {
+  React.useEffect(() => {
+    // Kiểm tra client-side trước khi sử dụng sessionStorage
+    const selectStorage = Number(sessionStorage.getItem("selectedIndex")) || 0;
+    setSelectedIndex(selectStorage);
+  }, []);
+
+  const handleListItemClick = (item: any, index: number) => {
     setSelectedIndex(index);
-    sessionStorage.setItem('selectedIndex', index.toString());
-    router.push(`/dashboard-page/${item?.route}`)
+    sessionStorage.setItem("selectedIndex", index.toString());
+    router.push(`/dashboard/${item?.route}`);
   };
 
   return (
@@ -36,8 +42,8 @@ export default function MenuContent() {
         {mainListItems.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: "block" }}>
             <ListItemButton
-             selected={selectedIndex === index}
-              onClick={() => handleListItemClick(item,index)}
+              selected={selectedIndex === index}
+              onClick={() => handleListItemClick(item, index)}
             >
               <ListItemIcon>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
