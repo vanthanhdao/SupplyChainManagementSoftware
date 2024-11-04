@@ -6,7 +6,7 @@ import { ethers, verifyMessage } from "ethers";
 
 // Địa chỉ của smart contract
 // const contractAddress = "0x86a080b9a473EFce0EB97d59937310C42682523F"; // Địa chỉ contract ở nhà
-const contractAddress = "0x3b9B1Cc8Fc8046F50E71B73021d154F32FDEFfCe"; // SuppyChain
+const contractAddress = "0x01E96c468945a65b3B86E017CDBD5Ba151c73609"; // SuppyChain
 // Các hàm trong smart contract
 const contractABI = contract.abi;
 const contractABISuppyChain = contractSC.abi;
@@ -161,62 +161,153 @@ export const useGetBlockByAllEvent = async () => {
       toBlock: "latest",
     };
     const events = await provider.getLogs(filter);
+    const results = events.map((log: any) => {
+   const decodedLog = contract.interface.parseLog(log);
+  if (decodedLog) {
+    return {
+      eventName: decodedLog.name,
+      args: decodedLog.args,
+      blockHash: log.blockHash,
+      blockNumber: log.blockNumber,
+    };
+  }
+   return null; 
+  }).filter(item => item !== null);
 
-    events.forEach((log: any) => {
-      // Decode tên event và các giá trị từ log
-      const decodedLog = contract.interface.parseLog(log);
-      if (decodedLog) {
-        const result = {
-          eventName: decodedLog.name,
-          agrs: decodedLog.args,
-          blockHash: log.blockHash,
-          blockNumber: log.blockNumber,
-        };
-        console.log(result);
-      }
-    });
+  console.log(results);
+
   } catch (error) {
     console.error("Get Block Failed: ", error);
   }
 };
 
-export const useGetBlockByOneEvent = async (topic: string) => {
+// export const useGetBlockByOneEvent = async (topic: string): Promise<IDataBlockByOneEvent[]> => {
+//   try {
+//     const contract = new ethers.Contract(
+//       contractAddress,
+//       contractABISuppyChain,
+//       provider
+//     );
+//     const eventName = topic;
+//     const filter = contract.filters[eventName]();
+//     const events = await contract.queryFilter(filter, 0, "latest");
+
+//     if(topic == "StoreUserSession"){
+//       const results = events.map((log: any): IDataBlockByOneEvent[] => {
+//       const decodedLog = contract.interface.decodeEventLog(
+//         `${topic}`,
+//         log.data,
+//         log.topics
+//       );
+
+//       if (decodedLog) {
+//         const address = decodedLog[0];
+//         const isActive = decodedLog[1];
+//         const timeStamp = decodedLog[2];
+//         const data = decodedLog[3];
+//         const action = decodedLog[4];
+
+//         return {
+//           eventName: log.eventName || "", // Đảm bảo rằng eventName có giá trị mặc định
+//           decodeLogs: {
+//             action,
+//             address,
+//             data,
+//             isActive,
+//             timeStamp,
+//           },
+//           blockHash: log.blockHash,
+//           blockNumber: log.blockNumber,
+//         };
+//       }   throw new Error(`StoreUserSession null!`);
+//       })
+//       return results;
+
+//     }else{
+//       const results = events.map((log: any) => {
+//         const decodedLog = contract.interface.decodeEventLog(
+//           `${topic}`,
+//           log.data,
+//           log.topics
+//         );
+//       if (decodedLog) {
+//         return {    
+//           decodedLog,
+//           blockHash: log.blockHash,
+//           blockNumber: log.blockNumber,
+//         };
+//       }return null; 
+//       }).filter(item => item !== null);
+//       return results;
+//     }
+//     // var myObj = JSON.parse('{"orderId":1,"status":"confirm"}');
+//     // console.log(myObj);
+//   } catch (error) {
+//     throw new Error(`UseGetBlockByOneEvent failed: ${error}`);
+//   }
+// };
+
+export const useGetBlockByOneEvent = async (topic: string): Promise<IDataBlockByOneEvent[]> => {
   try {
     const contract = new ethers.Contract(
       contractAddress,
       contractABISuppyChain,
       provider
     );
-    const eventName = topic;
-    const filter = contract.filters[eventName]();
+    const filter = contract.filters[topic]();
     const events = await contract.queryFilter(filter, 0, "latest");
-    events.forEach((log) => {
-      const decodedLog = contract.interface.decodeEventLog(
-        `${topic}`,
-        log.data,
-        log.topics
-      );
-      const address = decodedLog[0];
-      const isActive = decodedLog[1];
-      const timestamp = decodedLog[2];
-      const data = decodedLog[3];
-      const action = decodedLog[4];
-      const result = {
-        // decodedLog:{
-        //   address,isActive,timestamp,data,action
-        // },
-        decodedLog,
-        blockHash: log.blockHash,
-        blockNumber: log.blockNumber,
-      };
-      console.log(result);
-    });
-    // var myObj = JSON.parse('{"orderId":1,"status":"confirm"}');
-    // console.log(myObj);
+
+    if (topic === "StoreUserSession") {
+      const results: IDataBlockByOneEvent[] = events.map((log: any) => {
+        const decodedLog = contract.interface.decodeEventLog(topic, log.data, log.topics);
+
+        if (decodedLog) {
+          const address = decodedLog[0];
+          const isLogin = decodedLog[1];
+          const timeStamp = decodedLog[2];
+          const data = decodedLog[3];
+          const action = decodedLog[4];
+
+          return {
+            eventName: topic,
+            action,
+            address,
+            data,
+            isLogin,
+            timeStamp,
+            blockHash: log.blockHash,
+            blockNumber: log.blockNumber,
+          };
+        }
+        throw new Error(`StoreUserSession null!`);
+      });
+      return results;
+    } else {
+      const results = events
+        .map((log: any) => {
+          const decodedLog = contract.interface.decodeEventLog(topic, log.data, log.topics);
+          if (decodedLog) {
+            return {
+              eventName: topic,
+                action: decodedLog[4],
+                address: decodedLog[0],
+                data: decodedLog[3],
+                isLogin: decodedLog[1],
+                timeStamp: decodedLog[2],
+              blockHash: log.blockHash,
+              blockNumber: log.blockNumber,
+            } as IDataBlockByOneEvent;
+          }
+          return null;
+        })
+        .filter((item): item is IDataBlockByOneEvent => item !== null); 
+      return results;
+    }
   } catch (error) {
-    console.error("Get Block Failed! :", error);
+    throw new Error(`UseGetBlockByOneEvent failed: ${error}`);
   }
 };
+
 
 export const useGetAllUserSession = async () => {
   try {

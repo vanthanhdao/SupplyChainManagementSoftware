@@ -14,9 +14,9 @@ import { DataContext, DataProvider } from "../../../../hook/errorContext";
 import { useRouter } from "next/navigation";
 import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
-import { authJwtLogin } from "@/app/apis/index-api";
+import { authJwtLogin, getAccountWallet } from "@/app/apis/index-api";
 import { useSetAccessToken } from "@/app/hook/useAccessToken";
-import useUserStore from "@/app/zustands/userStore";
+import { useProvideEthUser, useStoreUserSession, useVerifyWallet } from "@/app/hook/useEthereum";
 
 const SignIn = () => {
   const router = useRouter();
@@ -47,20 +47,19 @@ const SignIn = () => {
         useSetAccessToken("refresh_token", refresh_token),
       ]);
 
-      // // Handle get Wallet Address
-      // const walletAddress = await getAccountWallet(access_token);
-      // const { publicKey, privateKey } = walletAddress;
+      // Handle get Wallet Address
+      const walletAddress = await getAccountWallet(access_token);
+      const { publicKey, privateKey } = walletAddress;
 
-      // // Handle provide ETH for user account
-      // await useProvideEthUser(publicKey);
+      // Handle provide ETH for user account
+      await useProvideEthUser(publicKey);
 
-      // // Sign and verify wallet for additional security
-      // const isWalletVerified = await useVerifyWallet(privateKey);
-      // if (!isWalletVerified) throw new Error("Wallet verification failed");
+      // Sign and verify wallet for additional security
+      const isWalletVerified = await useVerifyWallet(privateKey);
+      if (!isWalletVerified) throw new Error("Wallet verification failed");
 
-      // // Handle save transaction in Blockchain
-      // const blockHash = await useStoreUserSession(walletAddress, data.email, "IGNORE", "SIGNIN");
-      // console.log("Block hash:", blockHash);
+      // Handle save transaction in Blockchain
+      await useStoreUserSession(walletAddress, data.email, "IGNORE", "SIGNIN");
 
       // Route to the dashboard
       router.push("/dashboard");

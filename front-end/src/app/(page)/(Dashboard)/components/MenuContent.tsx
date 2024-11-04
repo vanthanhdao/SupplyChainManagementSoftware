@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 const mainListItems = [
   { text: "Store", icon: <StoreIcon />, route: "" },
   { text: "Orders", icon: <AnalyticsRoundedIcon />, route: "orders" },
-  { text: "Clients", icon: <PeopleRoundedIcon /> },
+  { text: "Histories", icon: <PeopleRoundedIcon />, route: "histories"  },
   { text: "Demo", icon: <HomeRoundedIcon />, route: "demo" },
   { text: "Tasks", icon: <AssignmentRoundedIcon />, route: "tasks" },
 ];

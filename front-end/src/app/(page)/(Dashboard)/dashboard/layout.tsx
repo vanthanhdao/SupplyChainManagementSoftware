@@ -8,10 +8,8 @@ import CssBaseline from "@mui/material/CssBaseline";
 import getMPTheme from "../../../theme/getMPTheme";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import axios from "axios";
-import useSWR, { mutate } from "swr";
 import { useGetAccessToken } from "@/app/hook/useAccessToken";
-import { updateIsActive, getAccount} from "@/app/apis/index-api";
+import { updateIsActive} from "@/app/apis/index-api";
 import useUserStore from "@/app/zustands/userStore";
 
 export default function Layout({ children }: { children: React.ReactNode }) {

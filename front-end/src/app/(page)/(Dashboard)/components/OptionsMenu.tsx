@@ -12,6 +12,10 @@ import LogoutRoundedIcon from '@mui/icons-material/LogoutRounded';
 import MoreVertRoundedIcon from '@mui/icons-material/MoreVertRounded';
 import MenuButton from './MenuButton';
 import {useRouter} from 'next/navigation';
+import { useGetAccessToken } from '@/app/hook/useAccessToken';
+import { getAccountWallet } from '@/app/apis/index-api';
+import useUserStore from '@/app/zustands/userStore';
+import { useStoreUserSession } from '@/app/hook/useEthereum';
 
 
 const MenuItem = styled(MuiMenuItem)({
@@ -22,6 +26,7 @@ export default function OptionsMenu() {
   const router = useRouter();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
+  const {email} = useUserStore();
 
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
@@ -32,8 +37,20 @@ export default function OptionsMenu() {
     setAnchorEl(null);
   };
 
+  const authUserSignOut = async ()=>{
+          const access_token = useGetAccessToken("access_token");
+          // Handle get Wallet Address
+          const walletAddress = await getAccountWallet(access_token);
+          const { publicKey, privateKey } = walletAddress;
+            // Handle save transaction in Blockchain
+            if(walletAddress && email) {
+        await useStoreUserSession(walletAddress,email, "IGNORE", "SIGNOUT");
+            }
+  };
+
   // Handle logout account
   const handleLogOut = () => {
+    authUserSignOut();
     sessionStorage.clear();
     router.push('/');
   };

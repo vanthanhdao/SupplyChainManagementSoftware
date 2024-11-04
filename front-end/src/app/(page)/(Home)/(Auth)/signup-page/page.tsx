@@ -118,7 +118,7 @@ const SignUp = () => {
       if (!checkValidPass)
         return alert("You must provide RePassword a valid information");
 
-      const wallet = useGenerateWallet();
+      const wallet:IWalletAddress = useGenerateWallet();
       if (wallet) {
         const data: IUser = {
           email: valueInput.email,
