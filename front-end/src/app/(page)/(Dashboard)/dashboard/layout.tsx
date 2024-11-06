@@ -11,8 +11,14 @@ import Alert from "@mui/material/Alert";
 import { useGetAccessToken } from "@/app/hook/useAccessToken";
 import { updateIsActive} from "@/app/apis/index-api";
 import useUserStore from "@/app/zustands/userStore";
+import { useRouter } from "next/navigation";
+
+
+
+
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const router = useRouter();
   const [mode, setMode] = React.useState<PaletteMode>("light");
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const MPTheme = createTheme(getMPTheme(mode));
@@ -23,10 +29,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   React.useEffect(() => {
     initializeUser();
-    if (!isActive ) {
+    if (isActive === "Null" || isActive === false) {
       const interval = setInterval(() => setOpen(true), 1000);
       return () => clearInterval(interval);
-    }
+    }else if(isActive === null){
+      router.push('/');
+    } 
   }, [isActive]);
 
   const handleClose = (

@@ -110,7 +110,7 @@ export class UsersService {
     const user = await this.usersRepository.findOneBy({ id:userId });
     const updateDate = new Date();
     if (!user) throw new Error(`User with ${payload.userId} is not exists`);
-    user.isActive = true;
+    user.isActive = isActive;
     user.updateAt = updateDate.toString();
     await this.usersRepository.save(user);
   }
