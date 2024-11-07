@@ -14,10 +14,11 @@ import { useRouter } from "next/navigation";
 
 const mainListItems = [
   { text: "Store", icon: <StoreIcon />, route: "" },
-  { text: "Orders", icon: <AnalyticsRoundedIcon />, route: "orders" },
-  { text: "Histories", icon: <PeopleRoundedIcon />, route: "histories"  },
-  { text: "Demo", icon: <HomeRoundedIcon />, route: "demo" },
-  { text: "Tasks", icon: <AssignmentRoundedIcon />, route: "tasks" },
+  { text: "Orders", icon: <AnalyticsRoundedIcon />, route: "Orders" },
+  { text: "Histories", icon: <PeopleRoundedIcon />, route: "Histories"  },
+  { text: "Demo", icon: <HomeRoundedIcon />, route: "Demo" },
+  { text: "Tasks", icon: <AssignmentRoundedIcon />, route: "Tasks" },
+  { text: "Products", icon: <AssignmentRoundedIcon />, route: "Products" },
 ];
 
 export default function MenuContent() {

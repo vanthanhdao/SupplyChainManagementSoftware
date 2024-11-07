@@ -10,29 +10,29 @@ import {
 @Entity('tblSCMS_Users')
 export class Users {
   @PrimaryGeneratedColumn()
-  id: number;
+  UserId: number;
   @Column({nullable:true})
-  nameCompany: string;
+  NameCompany: string;
   @Column()
-  email: string;
+  Email: string;
   @Column()
-  password: string;
+  Password: string;
   @Column({nullable:true})
-  taxCode: number;
+  TaxCode: number;
   @Column()
-  publicKey: string;
+  PublicKey: string;
   @Column()
-  privateKey: string;
+  PrivateKey: string;
   @Column({nullable:true})
-  certificates: string;
+  Certificates: string;
   @Column({nullable:true})
-  phoneNumber: number;
+  PhoneNumber: number;
   @Column({ default: false })
-  isActive: boolean;
+  IsActive: boolean;
   @Column({ default: 'USER' })
-  role: string;
+  Role: string;
   @CreateDateColumn()
-  createAt: string;
+  CreateAt: string;
   @UpdateDateColumn()
-  updateAt: string;
+  UpdateAt: string;
 }

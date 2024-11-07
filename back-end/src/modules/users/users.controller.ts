@@ -37,11 +37,11 @@ export class UsersController {
 
   @Get('profile')
   findOneProfile(@Request() req) {
-    return this.usersService.findOneProfile(req.user);
+    return req.user;
   }
 
   @Patch('update')
-  update(@Request() req,@Body() isActive: boolean) {
+  update(@Request() req,@Body('isActive') isActive: boolean) {
     return this.usersService.update(req.user,isActive);
   }
 

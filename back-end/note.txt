@@ -1,0 +1,4 @@
+
+CRUD generator (TypeScript only)
+
+-   nest g resource [name]

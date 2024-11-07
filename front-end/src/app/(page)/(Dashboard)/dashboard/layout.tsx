@@ -32,7 +32,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     if (isActive === "Null" || isActive === false) {
       const interval = setInterval(() => setOpen(true), 1000);
       return () => clearInterval(interval);
-    }else if(isActive === null){
+    }else if(!isActive){
       router.push('/');
     } 
   }, [isActive]);

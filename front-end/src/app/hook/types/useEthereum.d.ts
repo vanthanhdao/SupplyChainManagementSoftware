@@ -10,3 +10,13 @@ interface IDataBlockByOneEvent {
     blockNumber: string,
 }
 
+interface IDataProduct {
+    productName: string,
+    description:string,
+    price:string,
+    images:string,
+    Specification:boolean,
+    categoryName:number,
+}
+
+

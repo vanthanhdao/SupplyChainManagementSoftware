@@ -5,6 +5,8 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
+import { ProductsModule } from './modules/products/products.module';
+import { CategoriesModule } from './modules/categories/categories.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
       inject: [ConfigService],
     }),
     UsersModule,
+    ProductsModule,
+    CategoriesModule,
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
   ],

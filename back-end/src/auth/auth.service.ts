@@ -4,6 +4,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { Users } from 'src/modules/users/entities/user.entity';
 import { UsersService } from 'src/modules/users/users.service';
 import { compareHelper } from 'src/utils/hash';
 import { v4 as uuidv4 } from 'uuid';
@@ -36,7 +37,7 @@ export class AuthService {
   async validateUser(email: string, password: string): Promise<any> {
     try {
       const user = await this.usersService.findByEmail(email);
-      const isValidPassword = await compareHelper(password, user.password);
+      const isValidPassword = await compareHelper(password, user.Password);
       if (!user || !isValidPassword) {
         throw new UnauthorizedException();
       }
@@ -46,13 +47,13 @@ export class AuthService {
     }
   }
 
-  async signIn(user: any) {
+  async signIn(user: Users) {
     try {
       const payload = {
-        id: user.id,
-        email: user.email,
-        isActive: user.isActive,
-        role: user.role,
+        userId: user.UserId,
+        email: user.Email,
+        isActive: user.IsActive,
+        role: user.Role,
       };
       const tokenId = uuidv4();
       return {

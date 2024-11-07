@@ -22,7 +22,7 @@ export class UsersService {
 
   // Check email address is exits
   async isEmailExits(email: string): Promise<Users> {
-    const user = await this.usersRepository.findOne({ where: { email } });
+    const user = await this.usersRepository.findOne({ where: { Email:email } });
     return user;
   }
 
@@ -43,13 +43,13 @@ export class UsersService {
 
   // Find wallet users by id
   async findOneWallet(payload: IUserAccessToken): Promise<IUserWalletAddress> {
-    const user = await this.usersRepository.findOneBy({ id: payload.userId });
+    const user = await this.usersRepository.findOneBy({ UserId: payload.userId });
     const privateKeyDecrypt = await reHashWalletHelper(
-      user.privateKey,
+      user.PrivateKey,
       this.configService.get<string>('JWT_SECRET'),
     );
     const res = {
-      publicKey: user.publicKey,
+      publicKey: user.PublicKey,
       privateKey: privateKeyDecrypt,
     };
     return res;
@@ -57,12 +57,12 @@ export class UsersService {
 
   // Find wallet users by id
   async findOneProfile(payload: IUserAccessToken): Promise<IUserAccessToken> {
-    const user = await this.usersRepository.findOneBy({ id: payload.userId });
+    const user = await this.usersRepository.findOneBy({ UserId: payload.userId });
     const res = {
-      userId: user.id,
-      email: user.email,
-      isActive: user.isActive,
-      role: user.role,
+      userId: user.UserId,
+      email: user.Email,
+      isActive: user.IsActive,
+      role: user.Role,
     };
     return res;
   }
@@ -71,11 +71,11 @@ export class UsersService {
   async remove(deleteUserDto: DeleteUserDto): Promise<void> {
     const { email, walletAddress } = deleteUserDto;
     const user = await this.usersRepository.findOneBy({ 
-      email,
-      publicKey: walletAddress.publicKey,
+      Email:email,
+      PublicKey: walletAddress.publicKey,
     });
     if(!user) throw new Error(`User with ${email} is not exists`);
-    await this.usersRepository.delete(user.id);
+    await this.usersRepository.delete(user.UserId);
   }
 
   // Add a new user to the database
@@ -90,10 +90,10 @@ export class UsersService {
         secretKey,
       );
       const user = this.usersRepository.create({
-        email,
-        password: hashedPassword,
-        publicKey: walletAddress.publicKey,
-        privateKey: hashedWallet,
+        Email:email,
+        Password: hashedPassword,
+        PublicKey: walletAddress.publicKey,
+        PrivateKey: hashedWallet,
       });
       await this.usersRepository.save(user);
       return user;
@@ -102,16 +102,28 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return await this.usersRepository.findOneBy({ email });
+    return await this.usersRepository.findOneBy({ Email:email });
   }
 
    async update(payload: IUserAccessToken,isActive:boolean) {
     const {userId} = payload;
-    const user = await this.usersRepository.findOneBy({ id:userId });
+    const user = await this.usersRepository.findOneBy({ UserId:userId });
     const updateDate = new Date();
     if (!user) throw new Error(`User with ${payload.userId} is not exists`);
-    user.isActive = isActive;
-    user.updateAt = updateDate.toString();
+    user.IsActive = isActive;
+    user.UpdateAt = updateDate.toString();
     await this.usersRepository.save(user);
   }
+
+  // async bulkUpdate(usersData: { userId: number; fieldsToUpdate: Partial<User> }[]) {
+  //   const updatePromises = usersData.map(({ userId, fieldsToUpdate }) =>
+  //     this.usersRepository.update(userId, { 
+  //       ...fieldsToUpdate,
+  //       updateAt: new Date().toISOString(),
+  //     }),
+  //   );
+    
+  //   await Promise.all(updatePromises); // Thực thi tất cả các cập nhật đồng thời
+  // }
+  
 }
