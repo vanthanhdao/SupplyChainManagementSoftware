@@ -72,19 +72,19 @@ const SignUp = () => {
     }
 
     try {
-        // const {walletAddress,email} = data
-        //  // Handle provide ETH for user account 
-        // await useProvideEthUser(walletAddress.publicKey);  
+        const {walletAddress,email} = data
+         // Handle provide ETH for user account 
+        await useProvideEthUser(walletAddress.publicKey);  
 
         // Handle create User Account
         await createAccount(data);
 
         try {
-          // await useStoreUserSession(walletAddress,email, "IGNORE", "SIGNUP");
+          await useStoreUserSession(walletAddress,email, "IGNORE", "SIGNUP");
           // Route to the signin pge
           router.push("/signin-page");
         } catch (error) {
-          // await revertAccount(data);
+          await revertAccount(data);
         }
     } catch (error) {
       throw new Error(`AuthUserSignUp failed - ${error}`);

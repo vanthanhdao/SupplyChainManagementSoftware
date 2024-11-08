@@ -6,7 +6,7 @@ import { ethers, verifyMessage } from "ethers";
 
 // Địa chỉ của smart contract
 // const contractAddress = "0x86a080b9a473EFce0EB97d59937310C42682523F"; // Địa chỉ contract ở nhà
-const contractAddress = "0x01E96c468945a65b3B86E017CDBD5Ba151c73609"; // SuppyChain
+const contractAddress = "0x4d419A0ecf7ACEB43c8E06afB9731660Ab7894f3"; // SuppyChain
 // Các hàm trong smart contract
 const contractABI = contract.abi;
 const contractABISuppyChain = contractSC.abi;

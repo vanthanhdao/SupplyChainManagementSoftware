@@ -122,7 +122,7 @@ const ListRecord = (props: IProps) => {
                 timeStamp:ConvertTimeStamp(item.timeStamp),
               }));
               setRows(dataRows);
-       },[]);
+       },[dataSession]);
 
 
   return (

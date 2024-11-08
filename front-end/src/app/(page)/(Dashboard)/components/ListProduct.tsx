@@ -24,32 +24,12 @@ import {
   GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
 import { Card, Stack } from '@mui/material';
+import { mutate } from 'swr';
+import { useGetAccessToken } from '@/app/hook/useAccessToken';
+import { getAllProduct } from '@/app/apis/products-api';
 
 
 
-const initialRows: GridRowsProp = [
-  {
-    id: 1,
-    name: "a",
-    age: 25,
-    joinDate: "a",
-    role: "a",
-  },
-  {
-    id: 2,
-    name: "b",
-    age: 25,
-    joinDate: "b",
-    role: "b",
-  },
-  {
-    id: 3,
-    name: "c",
-    age: 25,
-    joinDate: "c",
-    role: "c",
-  },
-];
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -59,19 +39,42 @@ interface EditToolbarProps {
 }
 
 function EditToolbar(props: EditToolbarProps) {
-  const { setRows, setRowModesModel } = props;
+  const { setRows, setRowModesModel} = props;
 
-  const handleClick = () => {
-    const id = initialRows.length+1;
-    setRows((oldRows) => [
-      ...oldRows,
-      { id, name: '', age: '', role: '', isNew: true },
-    ]);
-    setRowModesModel((oldModel) => ({
-      ...oldModel,
-      [id]: { mode: GridRowModes.Edit, fieldToFocus: 'name' },
-    }));
+  const handleClickAddRow = () => {
+    setRows((oldRows) => {
+      const newId = oldRows.length + 1;
+      const updatedRows = [
+        ...oldRows,
+        {    
+          id:newId,
+          productId: "",
+          productName: "",
+          description:"",
+          price: "",
+          specifications: "",
+          categoryId:"",
+          categoryName: "",
+          images:"",
+        },
+      ];
+  
+      // Đặt `setRowModesModel` bên trong để truy cập `newId`
+      setRowModesModel((oldModel) => ({
+        ...oldModel,
+        [newId]: { mode: GridRowModes.Edit, fieldToFocus: 'productName' },
+      }));
+  
+      return updatedRows;
+    });
   };
+
+
+  const handleClickRefresh = async () => {
+    const newRows = await getAllProduct();
+    
+  };
+
 
   return (
     <GridToolbarContainer>
@@ -80,13 +83,13 @@ function EditToolbar(props: EditToolbarProps) {
             <Box >
         <GridToolbar /> 
             </Box>
-        <Button color="primary"sx={{mt:0.5,mr:2}} size='small' startIcon={<AddIcon />} onClick={handleClick}>
+        <Button color="primary"sx={{mt:0.5,mr:2}} size='small' startIcon={<AddIcon />} onClick={handleClickAddRow}>
         Add
       </Button>
-      <Button color="primary" sx={{mt:0.5,mr:2}} size='small' startIcon={<SaveIcon />} onClick={handleClick}>
+      <Button color="primary" sx={{mt:0.5,mr:2}} size='small' startIcon={<SaveIcon />} >
         Save
       </Button>
-      <Button color="primary" sx={{mt:0.5}} size='small' startIcon={<RefreshIcon />} onClick={handleClick}>
+      <Button color="primary" sx={{mt:0.5}} size='small' startIcon={<RefreshIcon />} onClick={handleClickRefresh}>
         Refresh
       </Button>
         </Stack>
@@ -97,12 +100,28 @@ function EditToolbar(props: EditToolbarProps) {
 }
 
 interface IProps {
-    dataProducts: IDataBlockByOneEvent[];
+    dataProducts: IDataProduct[];
   }
 
-export default function ListProduct() {
-  const [rows, setRows] = React.useState(initialRows);
+export default function ListProduct(props: IProps) {
+  const [rows,setRows] = React.useState<GridRowsProp>([])
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+  const {dataProducts} =props;
+
+  React.useEffect(() =>{
+  const dataRows: GridRowsProp = dataProducts.map((item, index) => ({
+    id: index+1,
+    productId: item.ProductId,
+    productName: item.ProductName,
+    description: item.Description,
+    price: item.Price,
+    specifications: item.Specifications,
+    categoryId:item.CategoryId,
+    categoryName: item.CategoryName,
+    images: item.Images,
+  }));
+  setRows(dataRows);
+},[dataProducts]);
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -119,7 +138,11 @@ export default function ListProduct() {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
-    setRows(rows.filter((row) => row.id !== id));
+    const newRows = rows.filter((row) => row.id !== id).map((row,index) =>({
+      ...row,
+      id: index+1
+    }))
+    setRows(newRows);
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -145,41 +168,43 @@ export default function ListProduct() {
   };
 
   const columns: GridColDef[] = [
-    { field: 'productName', headerName: 'Product Name',  type: 'string', width: 180, editable: true },
+    { field: 'id', headerName: 'NO.',  type: 'number', width: 100,  align: 'left',
+      headerAlign: 'left',},
+    { field: 'productName', headerName: 'Product Name',  type: 'string', width: 100, editable: true },
     {
       field: 'description',
       headerName: 'Description',
       type: 'string',
-      width: 80,
-      align: 'left',
-      headerAlign: 'left',
+      width: 180,
       editable: true,
     },
     {
       field: 'price',
       headerName: 'Price',
       type: 'number',
-      width: 180,
+      width: 100,
+      align: 'left',
+      headerAlign: 'left',
       editable: true,
     },
     {
       field: 'images',
       headerName: 'Images',
-      width: 220,
+      width: 100,
       editable: true,
-      type: 'string',
+      type: 'custom',
     },
     {
       field: 'specifications',
       headerName: 'Specifications',
-      width: 220,
+      width: 180,
       editable: true,
       type: 'string',
     },
     {
       field: 'categoryName',
       headerName: 'Category Name',
-      width: 220,
+      width: 100,
       editable: true,
       type: 'string',
     },

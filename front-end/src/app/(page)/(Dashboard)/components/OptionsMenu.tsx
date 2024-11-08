@@ -41,7 +41,6 @@ export default function OptionsMenu() {
           const access_token = useGetAccessToken("access_token");
           // Handle get Wallet Address
           const walletAddress = await getAccountWallet(access_token);
-          const { publicKey, privateKey } = walletAddress;
             // Handle save transaction in Blockchain
             if(walletAddress && email) {
         await useStoreUserSession(walletAddress,email, "IGNORE", "SIGNOUT");
