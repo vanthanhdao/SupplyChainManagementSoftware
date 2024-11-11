@@ -24,10 +24,8 @@ import {
   GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
 import { Card, Stack } from '@mui/material';
-import { mutate } from 'swr';
-import { useGetAccessToken } from '@/app/hook/useAccessToken';
-import { getAllProduct } from '@/app/apis/products-api';
-
+import useSWR, { mutate } from 'swr';
+import { getAllCategory } from '@/app/apis/categories-api';
 
 
 
@@ -38,7 +36,38 @@ interface EditToolbarProps {
   ) => void;
 }
 
-function EditToolbar(props: EditToolbarProps) {
+interface IProps {
+    dataProducts: IDataProduct[];
+  }
+
+export default function ListProduct(props: IProps) {
+  const [rows,setRows] = React.useState<GridRowsProp>([])
+  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
+  const {dataProducts} =props;
+
+
+  const fetcher = async () => await getAllCategory();
+  const { data, error, isLoading } = useSWR(
+      `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+      fetcher,
+  );
+
+  React.useEffect(() =>{
+  const dataRows: GridRowsProp = dataProducts.map((item, index) => ({
+    id: index+1,
+    productId: item.ProductId,
+    productName: item.ProductName,
+    description: item.Description,
+    price: item.Price,
+    specifications: item.Specifications,
+    categoryId:item.CategoryId,
+    categoryName: item.CategoryName,
+    images: item.Images,
+  }));
+  setRows(dataRows);
+},[dataProducts]);
+
+const EditToolbar = (props: EditToolbarProps)=> {
   const { setRows, setRowModesModel} = props;
 
   const handleClickAddRow = () => {
@@ -69,12 +98,13 @@ function EditToolbar(props: EditToolbarProps) {
     });
   };
 
-
   const handleClickRefresh = async () => {
-    const newRows = await getAllProduct();
-    
+    await mutate(`${process.env.NEXT_PUBLIC_API_URL}/products`,false)     
   };
 
+  const handleClickSave =  () => {
+       console.table(rows)
+  };
 
   return (
     <GridToolbarContainer>
@@ -86,7 +116,7 @@ function EditToolbar(props: EditToolbarProps) {
         <Button color="primary"sx={{mt:0.5,mr:2}} size='small' startIcon={<AddIcon />} onClick={handleClickAddRow}>
         Add
       </Button>
-      <Button color="primary" sx={{mt:0.5,mr:2}} size='small' startIcon={<SaveIcon />} >
+      <Button color="primary" sx={{mt:0.5,mr:2}} size='small' startIcon={<SaveIcon />} onClick={handleClickSave}>
         Save
       </Button>
       <Button color="primary" sx={{mt:0.5}} size='small' startIcon={<RefreshIcon />} onClick={handleClickRefresh}>
@@ -98,30 +128,6 @@ function EditToolbar(props: EditToolbarProps) {
     </GridToolbarContainer>
   );
 }
-
-interface IProps {
-    dataProducts: IDataProduct[];
-  }
-
-export default function ListProduct(props: IProps) {
-  const [rows,setRows] = React.useState<GridRowsProp>([])
-  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
-  const {dataProducts} =props;
-
-  React.useEffect(() =>{
-  const dataRows: GridRowsProp = dataProducts.map((item, index) => ({
-    id: index+1,
-    productId: item.ProductId,
-    productName: item.ProductName,
-    description: item.Description,
-    price: item.Price,
-    specifications: item.Specifications,
-    categoryId:item.CategoryId,
-    categoryName: item.CategoryName,
-    images: item.Images,
-  }));
-  setRows(dataRows);
-},[dataProducts]);
 
   const handleRowEditStop: GridEventListener<'rowEditStop'> = (params, event) => {
     if (params.reason === GridRowEditStopReasons.rowFocusOut) {
@@ -158,9 +164,10 @@ export default function ListProduct(props: IProps) {
   };
 
   const processRowUpdate = (newRow: GridRowModel) => {
-    const updatedRow = { ...newRow, isNew: false };
+    const findCategoryId = data?.find(item => item.CategoryName === newRow.categoryName)
+    const updatedRow = { ...newRow,categoryId:findCategoryId?.CategoryId };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    return updatedRow;
+    return updatedRow;  
   };
 
   const handleRowModesModelChange = (newRowModesModel: GridRowModesModel) => {
@@ -206,7 +213,8 @@ export default function ListProduct(props: IProps) {
       headerName: 'Category Name',
       width: 100,
       editable: true,
-      type: 'string',
+      type: 'singleSelect',
+      valueOptions: data?.map((item) => item.CategoryName ),
     },
     {
       field: 'actions',

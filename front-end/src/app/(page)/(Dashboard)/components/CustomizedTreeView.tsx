@@ -8,33 +8,14 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
-import { RichTreeView } from '@mui/x-tree-view/RichTreeView';
-import {
-  unstable_useTreeItem2 as useTreeItem2,
-  UseTreeItem2Parameters,
-} from '@mui/x-tree-view/useTreeItem2';
-import {
-  TreeItem2Content,
-  TreeItem2IconContainer,
-  TreeItem2Label,
-  TreeItem2Root,
-} from '@mui/x-tree-view/TreeItem2';
-import { TreeItem2Icon } from '@mui/x-tree-view/TreeItem2Icon';
-import { TreeItem2Provider } from '@mui/x-tree-view/TreeItem2Provider';
-import { TreeViewBaseItem } from '@mui/x-tree-view/models';
-import { useTheme } from '@mui/material/styles';
+import useDetailOrderStore from '@/app/zustands/useDetailOrderStore';
 
-type Color = 'blue' | 'green';
-
-type ExtendedTreeItemProps = {
-  color?: Color;
-  id: string;
-  label: string;
-};
 
 
 
 export default function CustomizedTreeView() {
+  const {selectedRows} = useDetailOrderStore();
+
   return (
     <Card
       variant="outlined"
@@ -44,7 +25,14 @@ export default function CustomizedTreeView() {
         <Typography component="h2" variant="subtitle2">
           Details Order
         </Typography>
-
+          {selectedRows?.map((item,index)=>(
+            <div key={index}>
+      <h1>Product Name: {item.productName}</h1>
+      <h2>Category Name: {item.categoryName}</h2>
+      <h2>Price: {item.price}</h2>
+      <h2>Quantity: </h2>
+            </div>
+          ))}
       </CardContent>
     </Card>
   );

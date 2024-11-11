@@ -8,3 +8,11 @@ interface IDataProduct {
     CategoryId:number;
     CategoryName:string,
 }
+
+interface DetailOrder{
+    productId: number;
+    productName: string ;
+    price:number ;
+    categoryId:number;
+    categoryName: string;
+}

@@ -27,8 +27,17 @@ export class CategoriesService {
     }
   }
 
-  findAll() {
-    return `This action returns all categories`;
+  async findAll(query: any) {
+    const { page, limit } = query;
+    if (page && limit) {
+      const [result, total] = await this.categoriesRepository.findAndCount({
+        skip: (page - 1) * limit,
+        take: limit,
+        // order: { id: 'DESC' },
+      });
+      return { data: result, total };
+    }
+    return await this.categoriesRepository.find();
   }
 
   findOne(id: number) {
