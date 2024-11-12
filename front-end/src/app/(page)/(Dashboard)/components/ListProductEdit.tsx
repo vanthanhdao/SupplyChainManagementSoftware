@@ -42,6 +42,7 @@ interface IProps {
 
 export default function ListProduct(props: IProps) {
   const [rows,setRows] = React.useState<GridRowsProp>([])
+  const [tempRows,setTempRows] = React.useState<GridRowsProp>([])
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>({});
   const {dataProducts} =props;
 
@@ -63,6 +64,7 @@ export default function ListProduct(props: IProps) {
     categoryId:item.CategoryId,
     categoryName: item.CategoryName,
     images: item.Images,
+    isNew: false,
   }));
   setRows(dataRows);
 },[dataProducts]);
@@ -85,6 +87,7 @@ const EditToolbar = (props: EditToolbarProps)=> {
           categoryId:"",
           categoryName: "",
           images:"",
+          isNew:true,
         },
       ];
   
@@ -103,7 +106,7 @@ const EditToolbar = (props: EditToolbarProps)=> {
   };
 
   const handleClickSave =  () => {
-       console.table(rows)
+    console.table(rows)
   };
 
   return (
@@ -144,11 +147,14 @@ const EditToolbar = (props: EditToolbarProps)=> {
   };
 
   const handleDeleteClick = (id: GridRowId) => () => {
+    const findOneRowById = rows.filter(item => item.id === id)
+    setTempRows(oldArray => [...oldArray, findOneRowById]);
     const newRows = rows.filter((row) => row.id !== id).map((row,index) =>({
       ...row,
       id: index+1
     }))
     setRows(newRows);
+
   };
 
   const handleCancelClick = (id: GridRowId) => () => {
@@ -167,6 +173,13 @@ const EditToolbar = (props: EditToolbarProps)=> {
     const findCategoryId = data?.find(item => item.CategoryName === newRow.categoryName)
     const updatedRow = { ...newRow,categoryId:findCategoryId?.CategoryId };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
+    const findRow = tempRows.find(row=> row.productId === newRow.productId)
+      if(tempRows.length >= 0 && findRow) {
+        const newTempRows = tempRows.filter(row => row.productId !== newRow.productId);
+        newTempRows.push(updatedRow);
+        setTempRows(newTempRows);
+      } else setTempRows(oldArray => [...oldArray, updatedRow]);
+
     return updatedRow;  
   };
 
