@@ -72,25 +72,24 @@ const SignUp = () => {
     }
 
     try {
-        // const {walletAddress,email} = data
-        //  // Handle provide ETH for user account 
-        // await useProvideEthUser(walletAddress.publicKey);  
+      // const { walletAddress, email } = data;
+      // // Handle provide ETH for user account
+      // await useProvideEthUser(walletAddress.publicKey);
 
-        // // Handle create User Account
-        await createAccount(data);
+      // // Handle create User Account
+      await createAccount(data);
 
-        try {
-          // await useStoreUserSession(walletAddress,email, "IGNORE", "SIGNUP");
-          // Route to the signin pge
-          router.push("/signin-page");
-        } catch (error) {
-          // await revertAccount(data);
-        }
+      try {
+        // await useStoreUserSession(walletAddress, email, "IGNORE", "SIGNUP");
+        // Route to the signin pge
+        router.push("/signin-page");
+      } catch (error) {
+        // await revertAccount(data);
+      }
     } catch (error) {
       throw new Error(`AuthUserSignUp failed - ${error}`);
     }
-};
-
+  };
 
   // Handle Sunmit Sign Up From
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -118,7 +117,7 @@ const SignUp = () => {
       if (!checkValidPass)
         return alert("You must provide RePassword a valid information");
 
-      const wallet:IWalletAddress = useGenerateWallet();
+      const wallet: IWalletAddress = useGenerateWallet();
       if (wallet) {
         const data: IUser = {
           email: valueInput.email,
@@ -128,13 +127,13 @@ const SignUp = () => {
             privateKey: wallet.privateKey,
           },
         };
-        console.log(data);     
+        console.log(data);
         await authUserSignUp(data);
       }
     } else alert("You must provide a valid information");
   };
 
-  return ( 
+  return (
     <SignUpContainer
       direction="column"
       justifyContent="space-between"

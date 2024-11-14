@@ -5,8 +5,8 @@ import { ethers, verifyMessage } from "ethers";
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
-// const contractAddress = "0x86a080b9a473EFce0EB97d59937310C42682523F"; // Địa chỉ contract ở nhà
-const contractAddress = "0x4d419A0ecf7ACEB43c8E06afB9731660Ab7894f3"; // SuppyChain
+const contractAddress = "0x237a00FEbC817379FF0AA13888A0d99964437b30"; // Địa chỉ contract ở nhà
+// const contractAddress = "0x4d419A0ecf7ACEB43c8E06afB9731660Ab7894f3"; // SuppyChain
 // Các hàm trong smart contract
 const contractABI = contract.abi;
 const contractABISuppyChain = contractSC.abi;
@@ -14,8 +14,8 @@ const contractABISuppyChain = contractSC.abi;
 const provider = new ethers.JsonRpcProvider("http://localhost:8545");
 // Pivate key của tài khoản admin
 const privateKey =
-  // "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
-  "0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
+  "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
+// "0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
 
 export const deployContract = async () => {
   const signer = new ethers.Wallet(privateKey, provider);
@@ -161,21 +161,22 @@ export const useGetBlockByAllEvent = async () => {
       toBlock: "latest",
     };
     const events = await provider.getLogs(filter);
-    const results = events.map((log: any) => {
-   const decodedLog = contract.interface.parseLog(log);
-  if (decodedLog) {
-    return {
-      eventName: decodedLog.name,
-      args: decodedLog.args,
-      blockHash: log.blockHash,
-      blockNumber: log.blockNumber,
-    };
-  }
-   return null; 
-  }).filter(item => item !== null);
+    const results = events
+      .map((log: any) => {
+        const decodedLog = contract.interface.parseLog(log);
+        if (decodedLog) {
+          return {
+            eventName: decodedLog.name,
+            args: decodedLog.args,
+            blockHash: log.blockHash,
+            blockNumber: log.blockNumber,
+          };
+        }
+        return null;
+      })
+      .filter((item) => item !== null);
 
-  console.log(results);
-
+    console.log(results);
   } catch (error) {
     console.error("Get Block Failed: ", error);
   }
@@ -231,12 +232,12 @@ export const useGetBlockByAllEvent = async () => {
 //           log.topics
 //         );
 //       if (decodedLog) {
-//         return {    
+//         return {
 //           decodedLog,
 //           blockHash: log.blockHash,
 //           blockNumber: log.blockNumber,
 //         };
-//       }return null; 
+//       }return null;
 //       }).filter(item => item !== null);
 //       return results;
 //     }
@@ -247,7 +248,9 @@ export const useGetBlockByAllEvent = async () => {
 //   }
 // };
 
-export const useGetBlockByOneEvent = async (topic: string): Promise<IDataBlockByOneEvent[]> => {
+export const useGetBlockByOneEvent = async (
+  topic: string
+): Promise<IDataBlockByOneEvent[]> => {
   try {
     const contract = new ethers.Contract(
       contractAddress,
@@ -259,7 +262,11 @@ export const useGetBlockByOneEvent = async (topic: string): Promise<IDataBlockBy
 
     if (topic === "StoreUserSession") {
       const results: IDataBlockByOneEvent[] = events.map((log: any) => {
-        const decodedLog = contract.interface.decodeEventLog(topic, log.data, log.topics);
+        const decodedLog = contract.interface.decodeEventLog(
+          topic,
+          log.data,
+          log.topics
+        );
 
         if (decodedLog) {
           const address = decodedLog[0];
@@ -285,29 +292,32 @@ export const useGetBlockByOneEvent = async (topic: string): Promise<IDataBlockBy
     } else {
       const results = events
         .map((log: any) => {
-          const decodedLog = contract.interface.decodeEventLog(topic, log.data, log.topics);
+          const decodedLog = contract.interface.decodeEventLog(
+            topic,
+            log.data,
+            log.topics
+          );
           if (decodedLog) {
             return {
               eventName: topic,
-                action: decodedLog[4],
-                address: decodedLog[0],
-                data: decodedLog[3],
-                isLogin: decodedLog[1],
-                timeStamp: decodedLog[2],
+              action: decodedLog[4],
+              address: decodedLog[0],
+              data: decodedLog[3],
+              isLogin: decodedLog[1],
+              timeStamp: decodedLog[2],
               blockHash: log.blockHash,
               blockNumber: log.blockNumber,
             } as IDataBlockByOneEvent;
           }
           return null;
         })
-        .filter((item): item is IDataBlockByOneEvent => item !== null); 
+        .filter((item): item is IDataBlockByOneEvent => item !== null);
       return results;
     }
   } catch (error) {
     throw new Error(`UseGetBlockByOneEvent failed: ${error}`);
   }
 };
-
 
 export const useGetAllUserSession = async () => {
   try {

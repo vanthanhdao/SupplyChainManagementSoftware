@@ -1,4 +1,3 @@
-
 "use client";
 import * as React from "react";
 import Grid from "@mui/material/Grid2";
@@ -12,12 +11,11 @@ import { getAllProduct } from "@/app/apis/products-api";
 import useSWR from "swr";
 import ListProductSelect from "../components/ListProductSelect";
 
-
 const Store = () => {
   const fetcher = async () => await getAllProduct();
   const { data, error, isLoading } = useSWR(
-      `${process.env.NEXT_PUBLIC_API_URL}/products`,
-      fetcher,
+    `${process.env.NEXT_PUBLIC_API_URL}/products`,
+    fetcher,
     {
       revalidateIfStale: false,
       revalidateOnFocus: false,
@@ -27,7 +25,6 @@ const Store = () => {
   if (error) return <div>Failed to load</div>;
   if (isLoading) return <div>Loading...</div>;
 
-  
   return (
     // <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
     //   {/* cards */}
@@ -46,7 +43,7 @@ const Store = () => {
     //     <Typography component="h2" variant="h6" >
     //      Store
     //     </Typography>
-    //     <Search />    
+    //     <Search />
     //   </Stack>
     //         <CustomizedDataGrid />
     //       </Grid>
@@ -65,25 +62,22 @@ const Store = () => {
     // </Box>
 
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
-    {/* cards */}
-    <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
-      Overview
-    </Typography>
-        <Grid container spacing={2} columns={12}>
-          <Grid size={{ md: 12, lg: 7 }}>
-             {data ? <ListProductSelect dataProducts={data} /> : null}
-          </Grid>
-          <Grid size={{ xs: 12, lg: 5 }}>
-            <Stack
-              gap={2}
-              direction={{ xs: "column", sm: "row", lg: "column" }}
-            >
-              <ChartUserByCountry />
-              <CustomizedTreeView />
-            </Stack>
-          </Grid>
+      {/* cards */}
+      <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+        Overview
+      </Typography>
+      <Grid container spacing={2} columns={12}>
+        <Grid size={{ md: 12, lg: 7 }}>
+          {data ? <ListProductSelect dataProducts={data} /> : null}
         </Grid>
-  </Box>
+        <Grid size={{ xs: 12, lg: 5 }}>
+          <Stack gap={2} direction={{ xs: "column", sm: "row", lg: "column" }}>
+            <ChartUserByCountry />
+            <CustomizedTreeView />
+          </Stack>
+        </Grid>
+      </Grid>
+    </Box>
   );
 };
 

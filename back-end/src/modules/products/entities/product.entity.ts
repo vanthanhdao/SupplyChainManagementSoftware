@@ -22,7 +22,7 @@ export class Products {
   @Column()
   Specifications: string;
   @Column()
-  CategoryId:number;
+  CategoryId: number;
   @CreateDateColumn()
   CreateAt: string;
   @UpdateDateColumn()
