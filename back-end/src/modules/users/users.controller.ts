@@ -30,6 +30,11 @@ export class UsersController {
     return this.usersService.findAll(query);
   }
 
+  @Post('getByBlock')
+  getUserByBlock(@Body() data: any) {
+    return this.usersService.getUserByBlock(data);
+  }
+
   @Get('profileWallet')
   findOne(@Request() req) {
     return this.usersService.findOneWallet(req.user);

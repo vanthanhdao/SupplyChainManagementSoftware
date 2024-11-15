@@ -2,8 +2,9 @@
 import * as React from "react";
 import {  Card, Stack } from "@mui/material";
 import { DataGrid, GridColDef, GridRowsProp, GridToolbar, GridToolbarContainer, GridToolbarQuickFilter } from "@mui/x-data-grid";
-
-
+import useSWR from "swr";
+import { getListAccount } from "@/app/apis/index-api";
+import { useGetUserInfo } from "@/app/hook/useEthereum";
 
 
   const columns: GridColDef[] = [
@@ -39,11 +40,17 @@ import { DataGrid, GridColDef, GridRowsProp, GridToolbar, GridToolbarContainer, 
         width: 200,
     },
     {
-        field: 'address',
-        headerName: 'Address User',
-        type: 'string',
-        width: 200,
-    },
+      field: 'email',
+      headerName: 'Email',
+      type: 'string',
+      width: 200,
+  },
+  {
+    field: 'nameCompany',
+    headerName: 'Name Company',
+    type: 'string',
+    width: 200,
+},
     {
         field: 'eventName',
         headerName: 'Event Block Name',
@@ -73,28 +80,14 @@ import { DataGrid, GridColDef, GridRowsProp, GridToolbar, GridToolbarContainer, 
     // },
   ];
 
-  const CustomToolbar =()=> {
-    return (
-      <GridToolbarContainer>
-        <Stack direction="row" sx={{alignItems:'center',justifyContent:'space-between',width: "100%"}}>
-        <GridToolbar /> 
-        {/* <GridToolbarColumnsButton/>
-        <GridToolbarFilterButton/>
-        <GridToolbarDensitySelector/>
-        <GridToolbarExport/>    */}
-        <GridToolbarQuickFilter/>
-        </Stack>
-      </GridToolbarContainer>
-    );
-  }
-
   interface IProps {
     dataSession: IDataBlockByOneEvent[];
   }
 
-const ListRecord = (props: IProps) => {  
+const ListRecord =  (props: IProps) => {  
     const [rows,setRows] = React.useState<GridRowsProp>([])
     const {dataSession} =props;
+
 
     const ConvertTimeStamp = (timeStamp:number)=>{
         const date = new Date(Number(timeStamp) * 1000);
@@ -108,7 +101,32 @@ const ListRecord = (props: IProps) => {
         });
         return formattedDate
        }
+       
+       const dataUserAddress:IUserAddress[] = dataSession.map(item => ({
+        address:item.address,
+       }))
+       const fetcher = async () => await useGetUserInfo(dataUserAddress);
+       const { data, error, isLoading } = useSWR(
+           `${process.env.NEXT_PUBLIC_API_URL}/users/getByBlock`,
+           fetcher,
+       );
+
+      const CustomToolbar =()=> {
+        return (
+          <GridToolbarContainer>
+            <Stack direction="row" sx={{alignItems:'center',justifyContent:'space-between',width: "100%"}}>
+            <GridToolbar /> 
+            {/* <GridToolbarColumnsButton/>
+            <GridToolbarFilterButton/>
+            <GridToolbarDensitySelector/>
+            <GridToolbarExport/>    */}
+            <GridToolbarQuickFilter/>
+            </Stack>
+          </GridToolbarContainer>
+        );
+      }
     
+
       React.useEffect(() =>{
             const dataRows: GridRowsProp = dataSession.map((item, index) => ({
                 id: index+1, 
@@ -116,13 +134,14 @@ const ListRecord = (props: IProps) => {
                 blockHash: item.blockHash,
                 action: item.action,
                 data: item.data,
-                address:item.address,
                 eventName:item.eventName,
                 isLogin:item.isLogin,
+                email: data ? data[index].email : "",
+                nameCompany: data ? data[index].name : "",
                 timeStamp:ConvertTimeStamp(item.timeStamp),
               }));
               setRows(dataRows);
-       },[dataSession]);
+       },[dataSession,data]);
 
 
   return (

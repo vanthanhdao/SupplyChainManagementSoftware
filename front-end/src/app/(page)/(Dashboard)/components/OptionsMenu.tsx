@@ -47,7 +47,7 @@ export default function OptionsMenu() {
 
   // Handle logout account
   const handleLogOut = () => {
-    // authUserSignOut();
+    authUserSignOut();
     sessionStorage.clear();
     router.push("/");
   };

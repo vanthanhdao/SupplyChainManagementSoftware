@@ -28,6 +28,8 @@ import useSWR, { mutate } from "swr";
 import { getAllCategory } from "@/app/apis/categories-api";
 import { v4 as uuidv4 } from "uuid";
 import { updateRecordProduct } from "@/app/apis/products-api";
+import { useStoreUserSession } from "@/app/hook/useEthereum";
+import { getAccountWallet } from "@/app/apis/index-api";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -109,7 +111,17 @@ export default function ListProduct(props: IProps) {
     };
 
     const handleClickSave = async () => {
+      // Handle save transaction in Blockchain
+      try{
+      // Handle get Wallet Address
+      const walletAddress = await getAccountWallet();
+      const data = JSON.stringify(tempRows);
+      await useStoreUserSession(walletAddress,"", data, "INTERACT PRODUT TABLE");
       await updateRecordProduct(tempRows);
+      }catch(error){
+        throw new Error(`HandleClickSave failed - ${error}`);
+      }
+      
     };
 
     return (

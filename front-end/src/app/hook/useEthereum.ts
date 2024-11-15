@@ -5,8 +5,9 @@ import { ethers, verifyMessage } from "ethers";
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
-const contractAddress = "0x237a00FEbC817379FF0AA13888A0d99964437b30"; // Địa chỉ contract ở nhà
-// const contractAddress = "0x4d419A0ecf7ACEB43c8E06afB9731660Ab7894f3"; // SuppyChain
+// const contractAddress = "0x237a00FEbC817379FF0AA13888A0d99964437b30"; // Địa chỉ contract ở nhà
+// const contractAddress = "0xdd7B6DbEE63c282eAFa32FF7DD45f2858cB16B7a"; // SuppyChain
+const contractAddress = "0x3b9B1Cc8Fc8046F50E71B73021d154F32FDEFfCe"; // SuppyChain
 // Các hàm trong smart contract
 const contractABI = contract.abi;
 const contractABISuppyChain = contractSC.abi;
@@ -14,8 +15,8 @@ const contractABISuppyChain = contractSC.abi;
 const provider = new ethers.JsonRpcProvider("http://localhost:8545");
 // Pivate key của tài khoản admin
 const privateKey =
-  "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
-// "0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
+  // "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
+"0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
 
 export const deployContract = async () => {
   const signer = new ethers.Wallet(privateKey, provider);
@@ -389,3 +390,32 @@ export const useStoreUserSession = async (
     throw new Error(`UseStoreUserSession failed: ${error}`);
   }
 };
+
+
+export const useGetUserInfo = async(data: IUserAddress[])=>{
+  try{
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABISuppyChain,
+      provider
+    );
+    const txResponse = await contract.getAllUserInfo();
+    const formattedUsers = txResponse.map((user: any) => ({
+        address: user[0],
+        name: user[1],
+        email: user[2],
+        isActive: user[3],
+        role: user[4],
+        phone: user[5],
+        certificates: user[6]
+    }));
+
+    const matchedUsers = data.map(item => 
+      formattedUsers.filter((user:any) => item.address === user.address)
+    ).flat(); 
+    return matchedUsers;
+  } catch (error) {
+    throw new Error(`UseGetUserInfo failed: ${error}`);
+  }
+
+}

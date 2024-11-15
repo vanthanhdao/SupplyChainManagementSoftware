@@ -1,4 +1,9 @@
 import axios from "axios";
+import { useGetAccessToken } from "../hook/useAccessToken";
+import { GridRowsProp } from "@mui/x-data-grid";
+
+
+
 
 // Call api for create a new account
 export const createAccount = async (data: IUser) => {
@@ -26,9 +31,9 @@ export const revertAccount = async (data: IUser) => {
 
 // Call api for create a new account
 export const getAccountWallet = async (
-  access_token: string
 ): Promise<IUserWallet> => {
   try {
+    const access_token = await useGetAccessToken("access_token")
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/users/profileWallet`,
       { headers: { Authorization: `Bearer ${access_token}` } }
@@ -53,6 +58,25 @@ export const getAccount = async (
     throw new Error(`GetAccount failed: ${error}`);
   }
 };
+
+
+
+// // Call api for get list account
+// export const getListAccount = async (data: IUserAddress[]
+// ) => {
+//   try {
+//     const access_token = useGetAccessToken("access_token");
+//     const response = await axios.post(
+//       `${process.env.NEXT_PUBLIC_API_URL}/users/getByBlock`,
+//       data,
+//       { headers: { Authorization: `Bearer ${access_token}` } }
+//     );
+//     return response.data;
+//   } catch (error) {
+//     throw new Error(`GetListAccount failed: ${error}`);
+//   }
+// };
+
 
 
   // Call api /users/ with axios when user update infimation

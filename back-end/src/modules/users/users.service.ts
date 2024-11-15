@@ -41,6 +41,18 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
+  async getUserByBlock(data: any): Promise<Users[]> {
+ 
+    const result = await Promise.all(
+      data.map(async item => {
+        return await this.usersRepository.findOneBy({ 
+          PublicKey: item.address,
+        });
+      })
+    );
+    return result;
+  }
+
   // Find wallet users by id
   async findOneWallet(payload: IUserAccessToken): Promise<IUserWalletAddress> {
     const user = await this.usersRepository.findOneBy({ UserId: payload.userId });

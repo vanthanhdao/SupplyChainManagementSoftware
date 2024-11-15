@@ -29,3 +29,7 @@ interface IUserToken{
   refresh_token:string,
 }
 
+interface IUserAddress{
+  address:string;
+}
+

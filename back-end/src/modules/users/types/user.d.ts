@@ -9,3 +9,9 @@ interface IUserWalletAddress {
   publicKey: string;
   privateKey: string;
 }
+
+interface IUser {
+  email:string;
+  companyName:string;
+}
+
