@@ -17,12 +17,13 @@ export class UsersService {
     @InjectRepository(Users)
     private usersRepository: Repository<Users>,
     private configService: ConfigService,
-    
   ) {}
 
   // Check email address is exits
   async isEmailExits(email: string): Promise<Users> {
-    const user = await this.usersRepository.findOne({ where: { Email:email } });
+    const user = await this.usersRepository.findOne({
+      where: { Email: email },
+    });
     return user;
   }
 
@@ -42,20 +43,21 @@ export class UsersService {
   }
 
   async getUserByBlock(data: any): Promise<Users[]> {
- 
     const result = await Promise.all(
-      data.map(async item => {
-        return await this.usersRepository.findOneBy({ 
+      data.map(async (item) => {
+        return await this.usersRepository.findOneBy({
           PublicKey: item.address,
         });
-      })
+      }),
     );
     return result;
   }
 
   // Find wallet users by id
   async findOneWallet(payload: IUserAccessToken): Promise<IUserWalletAddress> {
-    const user = await this.usersRepository.findOneBy({ UserId: payload.userId });
+    const user = await this.usersRepository.findOneBy({
+      UserId: payload.userId,
+    });
     const privateKeyDecrypt = await reHashWalletHelper(
       user.PrivateKey,
       this.configService.get<string>('JWT_SECRET'),
@@ -69,7 +71,9 @@ export class UsersService {
 
   // Find wallet users by id
   async findOneProfile(payload: IUserAccessToken): Promise<IUserAccessToken> {
-    const user = await this.usersRepository.findOneBy({ UserId: payload.userId });
+    const user = await this.usersRepository.findOneBy({
+      UserId: payload.userId,
+    });
     const res = {
       userId: user.UserId,
       email: user.Email,
@@ -82,17 +86,18 @@ export class UsersService {
   // Delete users by id
   async remove(deleteUserDto: DeleteUserDto): Promise<void> {
     const { email, walletAddress } = deleteUserDto;
-    const user = await this.usersRepository.findOneBy({ 
-      Email:email,
+    const user = await this.usersRepository.findOneBy({
+      Email: email,
       PublicKey: walletAddress.publicKey,
     });
-    if(!user) throw new Error(`User with ${email} is not exists`);
+    if (!user) throw new Error(`User with ${email} is not exists`);
     await this.usersRepository.delete(user.UserId);
   }
 
   // Add a new user to the database
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    const { email, password, walletAddress } = createUserDto;
+    const { email, password, walletAddress, fullName, taxCode, phoneNumber } =
+      createUserDto;
     const checkEmail = (await this.isEmailExits(email)) ? true : false;
     const secretKey = this.configService.get<string>('JWT_SECRET');
     if (!checkEmail) {
@@ -102,10 +107,13 @@ export class UsersService {
         secretKey,
       );
       const user = this.usersRepository.create({
-        Email:email,
+        Email: email,
         Password: hashedPassword,
+        NameCompany: fullName,
         PublicKey: walletAddress.publicKey,
         PrivateKey: hashedWallet,
+        TaxCode: taxCode,
+        PhoneNumber: phoneNumber,
       });
       await this.usersRepository.save(user);
       return user;
@@ -114,12 +122,12 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return await this.usersRepository.findOneBy({ Email:email });
+    return await this.usersRepository.findOneBy({ Email: email });
   }
 
-   async update(payload: IUserAccessToken,isActive:boolean) {
-    const {userId} = payload;
-    const user = await this.usersRepository.findOneBy({ UserId:userId });
+  async update(payload: IUserAccessToken, isActive: boolean) {
+    const { userId } = payload;
+    const user = await this.usersRepository.findOneBy({ UserId: userId });
     const updateDate = new Date();
     if (!user) throw new Error(`User with ${payload.userId} is not exists`);
     user.IsActive = isActive;
@@ -129,13 +137,12 @@ export class UsersService {
 
   // async bulkUpdate(usersData: { userId: number; fieldsToUpdate: Partial<User> }[]) {
   //   const updatePromises = usersData.map(({ userId, fieldsToUpdate }) =>
-  //     this.usersRepository.update(userId, { 
+  //     this.usersRepository.update(userId, {
   //       ...fieldsToUpdate,
   //       updateAt: new Date().toISOString(),
   //     }),
   //   );
-    
+
   //   await Promise.all(updatePromises); // Thực thi tất cả các cập nhật đồng thời
   // }
-  
 }

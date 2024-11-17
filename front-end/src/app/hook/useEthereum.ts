@@ -5,18 +5,18 @@ import { ethers, verifyMessage } from "ethers";
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
-// const contractAddress = "0x237a00FEbC817379FF0AA13888A0d99964437b30"; // Địa chỉ contract ở nhà
+const contractAddress = "0xEa33Ab0b1F096FA88C2415e000fFDcEF2af412A6"; // Địa chỉ contract ở nhà
 // const contractAddress = "0xdd7B6DbEE63c282eAFa32FF7DD45f2858cB16B7a"; // SuppyChain
-const contractAddress = "0x3b9B1Cc8Fc8046F50E71B73021d154F32FDEFfCe"; // SuppyChain
+// const contractAddress = "0x3b9B1Cc8Fc8046F50E71B73021d154F32FDEFfCe"; // SuppyChain
 // Các hàm trong smart contract
-const contractABI = contract.abi;
-const contractABISuppyChain = contractSC.abi;
+const contractABISuppyChain = contract.abi;
+const contractABI = contractSC.abi;
 // Kết nối tới mạng Ethereum qua JSON-RPC
 const provider = new ethers.JsonRpcProvider("http://localhost:8545");
 // Pivate key của tài khoản admin
 const privateKey =
-  // "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
-"0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
+  "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
+// "0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
 
 export const deployContract = async () => {
   const signer = new ethers.Wallet(privateKey, provider);
@@ -354,7 +354,6 @@ export const useGetAllUserSession = async () => {
 
 export const useStoreUserSession = async (
   walletAddress: IWalletAddress,
-  email: string,
   data: string,
   type: string
 ): Promise<IBlockHash> => {
@@ -366,12 +365,7 @@ export const useStoreUserSession = async (
       contractABISuppyChain,
       signer
     );
-    const txResponse = await contract.storeUserSession(
-      publicKey,
-      email,
-      data,
-      type
-    );
+    const txResponse = await contract.storeUserSession(publicKey, data, type);
     // Đợi cho giao dịch được xác nhận
     const txReceipt = await txResponse.wait();
     // Lấy thông tin từ txReceipt
@@ -391,9 +385,49 @@ export const useStoreUserSession = async (
   }
 };
 
+export const useAddUser = async (
+  walletAddress: IWalletAddress,
+  email: string,
+  phoneNumber: string,
+  fullName: string,
+  taxCode: string
+): Promise<IBlockHash> => {
+  try {
+    const { publicKey, privateKey } = walletAddress;
+    const signer = new ethers.Wallet(privateKey, provider);
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABISuppyChain,
+      signer
+    );
+    const txResponse = await contract.addUser(
+      publicKey,
+      email,
+      phoneNumber,
+      fullName,
+      taxCode
+    );
+    // Đợi cho giao dịch được xác nhận
+    const txReceipt = await txResponse.wait();
+    // Lấy thông tin từ txReceipt
+    const transactionHash = txResponse.hash;
+    const blockHash = txReceipt.blockHash;
+    const blockNumber = txReceipt.blockNumber;
+    const from = txReceipt.from;
+    const result: IBlockHash = {
+      blockHash,
+      blockNumber,
+      transactionHash,
+      userAddress: from,
+    };
+    return result;
+  } catch (error) {
+    throw new Error(`useAddUser failed: ${error}`);
+  }
+};
 
-export const useGetUserInfo = async(data: IUserAddress[])=>{
-  try{
+export const useGetUserInfo = async (data: IUserAddress[]) => {
+  try {
     const contract = new ethers.Contract(
       contractAddress,
       contractABISuppyChain,
@@ -401,21 +435,64 @@ export const useGetUserInfo = async(data: IUserAddress[])=>{
     );
     const txResponse = await contract.getAllUserInfo();
     const formattedUsers = txResponse.map((user: any) => ({
-        address: user[0],
-        name: user[1],
-        email: user[2],
-        isActive: user[3],
-        role: user[4],
-        phone: user[5],
-        certificates: user[6]
+      address: user[0],
+      taxCode: user[1],
+      nameCompany: user[2],
+      email: user[3],
+      isActive: user[4],
+      role: user[5],
+      phoneNumber: user[6],
     }));
 
-    const matchedUsers = data.map(item => 
-      formattedUsers.filter((user:any) => item.address === user.address)
-    ).flat(); 
+    const matchedUsers = data
+      .map((item) =>
+        formattedUsers.filter((user: any) => item.address === user.address)
+      )
+      .flat();
     return matchedUsers;
   } catch (error) {
     throw new Error(`UseGetUserInfo failed: ${error}`);
   }
+};
 
-}
+export const useGetAllCategoryInfo = async (): Promise<IDataCategory[]> => {
+  try {
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABISuppyChain,
+      provider
+    );
+    const allCategories = await contract.getAllCategories();
+    const formatted = allCategories.map((category: any) => ({
+      CategoryId: category[0],
+      CategoryName: category[1],
+      Description: category[2],
+    }));
+    return formatted;
+  } catch (error) {
+    throw new Error(`UseGetUserInfo failed: ${error}`);
+  }
+};
+
+export const useGetAllProductInfo = async (): Promise<IDataProduct[]> => {
+  try {
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABISuppyChain,
+      provider
+    );
+    const allProducts = await contract.getAllProducts();
+    const formatted = allProducts.map((product: any) => ({
+      ProductId: product[0],
+      ProductName: product[1],
+      Description: product[2],
+      Price: product[3],
+      Images: product[4],
+      Specifications: product[5],
+      CategoryId: product[6],
+    }));
+    return formatted;
+  } catch (error) {
+    throw new Error(`UseGetUserInfo failed: ${error}`);
+  }
+};

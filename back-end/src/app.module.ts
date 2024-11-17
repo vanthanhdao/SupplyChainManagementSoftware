@@ -20,6 +20,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
         password: configService.get<string>('DATABASE_PASS'),
         database: configService.get<string>('DATABASE_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
+        dropSchema: true,
         synchronize: true,
         options: {
           encrypt: false, // MSSQL-specific option

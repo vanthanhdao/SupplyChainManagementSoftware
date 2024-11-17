@@ -6,7 +6,6 @@ interface IDataProduct {
   Images: string;
   Specifications: boolean;
   CategoryId: number;
-  CategoryName: string;
 }
 
 interface DetailOrder {

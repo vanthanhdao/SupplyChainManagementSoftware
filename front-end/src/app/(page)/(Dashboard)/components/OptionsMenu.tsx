@@ -36,12 +36,11 @@ export default function OptionsMenu() {
   };
 
   const authUserSignOut = async () => {
-    const access_token = useGetAccessToken("access_token");
     // Handle get Wallet Address
-    const walletAddress = await getAccountWallet(access_token);
+    const walletAddress = await getAccountWallet();
     // Handle save transaction in Blockchain
-    if (walletAddress && email) {
-      await useStoreUserSession(walletAddress, email, "IGNORE", "SIGNOUT");
+    if (walletAddress) {
+      await useStoreUserSession(walletAddress, "IGNORE", "SIGNOUT");
     }
   };
 

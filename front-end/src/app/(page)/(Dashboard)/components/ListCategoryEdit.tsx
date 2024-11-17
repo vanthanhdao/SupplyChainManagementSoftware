@@ -24,16 +24,12 @@ import {
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import { Card, Stack } from "@mui/material";
-import useSWR, { mutate, useSWRConfig } from "swr";
+import useSWR, { mutate } from "swr";
 import { getAllCategory } from "@/app/apis/categories-api";
 import { v4 as uuidv4 } from "uuid";
 import { updateRecordProduct } from "@/app/apis/products-api";
-import {
-  useGetAllCategoryInfo,
-  useStoreUserSession,
-} from "@/app/hook/useEthereum";
+import { useStoreUserSession } from "@/app/hook/useEthereum";
 import { getAccountWallet } from "@/app/apis/index-api";
-import Categories from "../dashboard/(Categories)/Categories/page";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -43,45 +39,28 @@ interface EditToolbarProps {
 }
 
 interface IProps {
-  dataProducts: IDataProduct[];
+  dataCategories: IDataCategory[];
 }
 
-export default function ListProductEdit(props: IProps) {
+export default function ListCategoryEdit(props: IProps) {
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const [tempRows, setTempRows] = React.useState<GridRowsProp>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
-  const { dataProducts } = props;
-
-  const fetcher = async () => await useGetAllCategoryInfo();
-  const { data } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/useGetAllCategoryInfo`,
-    fetcher
-  );
+  const { dataCategories } = props;
 
   React.useEffect(() => {
-    const dataRows: GridRowsProp = dataProducts.map((item, index) => ({
+    const dataRows: GridRowsProp = dataCategories.map((item, index) => ({
       id: index + 1,
-      productId: item.ProductId,
-      productName: item.ProductName,
-      description: item.Description,
-      price: item.Price,
-      specifications: item.Specifications,
       categoryId: item.CategoryId,
-      categoryName:
-        data && data.length > 0
-          ? data.find(
-              (category) =>
-                Number(category.CategoryId) === Number(item.CategoryId)
-            )?.CategoryName || null
-          : null,
-      images: item.Images,
+      categoryName: item.CategoryName,
+      description: item.Description,
       isNew: false,
       active: null,
     }));
     setRows(dataRows);
-  }, [dataProducts, data]);
+  }, [dataCategories]);
 
   const EditToolbar = (props: EditToolbarProps) => {
     const { setRows, setRowModesModel } = props;
@@ -93,14 +72,9 @@ export default function ListProductEdit(props: IProps) {
           ...oldRows,
           {
             id: newId,
-            productId: uuidv4(),
-            productName: "",
-            description: "",
-            price: "",
-            specifications: "",
-            categoryId: "",
+            categoryId: uuidv4(),
             categoryName: "",
-            images: "",
+            description: "",
             isNew: true,
             active: null,
           },
@@ -116,10 +90,6 @@ export default function ListProductEdit(props: IProps) {
     };
 
     const handleClickRefresh = async () => {
-      await mutate(
-        `${process.env.NEXT_PUBLIC_API_URL}/useGetAllProductInfo`,
-        false
-      );
       await mutate(
         `${process.env.NEXT_PUBLIC_API_URL}/useGetAllCategoryInfo`,
         false
@@ -248,12 +218,8 @@ export default function ListProductEdit(props: IProps) {
   };
 
   const processRowUpdate = (newRow: GridRowModel) => {
-    const findCategoryId = data?.find(
-      (item) => item.CategoryName === newRow.categoryName
-    );
     const updatedRow = {
       ...newRow,
-      categoryId: findCategoryId?.CategoryId,
     };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     const findRow = tempRows.find((row) => row.productId === newRow.productId);
@@ -277,62 +243,29 @@ export default function ListProductEdit(props: IProps) {
       field: "id",
       headerName: "NO.",
       type: "number",
-      width: 100,
+      width: 200,
       align: "left",
       headerAlign: "left",
     },
     {
-      field: "productName",
-      headerName: "Product Name",
+      field: "categoryName",
+      headerName: "Category Name",
       type: "string",
-      width: 180,
+      width: 280,
       editable: true,
     },
     {
       field: "description",
       headerName: "Description",
       type: "string",
-      width: 180,
+      width: 280,
       editable: true,
-    },
-    {
-      field: "price",
-      headerName: "Price",
-      type: "number",
-      width: 100,
-      align: "left",
-      headerAlign: "left",
-      editable: true,
-    },
-    {
-      field: "images",
-      headerName: "Images",
-      width: 100,
-      editable: true,
-      type: "custom",
-    },
-    {
-      field: "specifications",
-      headerName: "Specifications",
-      width: 180,
-      editable: true,
-      type: "string",
-    },
-    {
-      field: "categoryName",
-      headerName: "Category Name",
-      width: 180,
-      editable: true,
-      type: "singleSelect",
-      valueOptions: Array.isArray(data)
-        ? data.map((item) => item.CategoryName || "Unknown")
-        : [],
     },
     {
       field: "actions",
       type: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 200,
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;

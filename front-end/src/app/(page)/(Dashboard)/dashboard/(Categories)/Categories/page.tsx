@@ -4,14 +4,13 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 
 import useSWR from "swr";
-import { getAllProduct } from "@/app/apis/products-api";
-import ListProductEdit from "../../../components/ListProductEdit";
-import { useGetAllProductInfo } from "@/app/hook/useEthereum";
+import ListCategoryEdit from "../../../components/ListCategoryEdit";
+import { useGetAllCategoryInfo } from "@/app/hook/useEthereum";
 
-const Products = () => {
-  const fetcher = async () => await useGetAllProductInfo();
+const Categories = () => {
+  const fetcher = async () => await useGetAllCategoryInfo();
   const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/useGetAllProductInfo`,
+    `${process.env.NEXT_PUBLIC_API_URL}/useGetAllCategoryInfo`,
     fetcher,
     {
       revalidateIfStale: false,
@@ -19,7 +18,7 @@ const Products = () => {
       revalidateOnReconnect: false,
     }
   );
-  if (error) return <div>Failed to load</div>;
+  if (error) return <div>Failed to load: </div>;
   if (isLoading) return <div>Loading...</div>;
 
   return (
@@ -28,9 +27,9 @@ const Products = () => {
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Overview
       </Typography>
-      {data ? <ListProductEdit dataProducts={data} /> : null}
+      {data ? <ListCategoryEdit dataCategories={data} /> : null}
     </Box>
   );
 };
 
-export default Products;
+export default Categories;

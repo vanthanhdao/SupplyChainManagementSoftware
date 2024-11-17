@@ -55,15 +55,15 @@ const SignIn = () => {
       const walletAddress = await getAccountWallet();
       const { publicKey, privateKey } = walletAddress;
 
-      // Handle provide ETH for user account
-      await useProvideEthUser(publicKey);
+      // // Handle provide ETH for user account
+      // await useProvideEthUser(publicKey);
 
-      // Sign and verify wallet for additional security
-      const isWalletVerified = await useVerifyWallet(privateKey);
-      if (!isWalletVerified) throw new Error("Wallet verification failed");
+      // // Sign and verify wallet for additional security
+      // const isWalletVerified = await useVerifyWallet(privateKey);
+      // if (!isWalletVerified) throw new Error("Wallet verification failed");
 
       // Handle save transaction in Blockchain
-      await useStoreUserSession(walletAddress, data.email, "IGNORE", "SIGNIN");
+      await useStoreUserSession(walletAddress, "IGNORE", "SIGNIN");
 
       // Route to the dashboard
       router.push("/dashboard");

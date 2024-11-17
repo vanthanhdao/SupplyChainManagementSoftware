@@ -11,25 +11,44 @@ import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
 import StoreIcon from "@mui/icons-material/Store";
 import { useRouter } from "next/navigation";
+import useUserStore from "@/app/zustands/userStore";
 
-const mainListItems = [
+type MenuItem = {
+  text: string;
+  icon: React.ReactElement;
+  route: string;
+};
+
+const mainListItems: MenuItem[] = [
   { text: "Store", icon: <StoreIcon />, route: "" },
   { text: "Orders", icon: <AnalyticsRoundedIcon />, route: "Orders" },
-  { text: "Histories", icon: <PeopleRoundedIcon />, route: "Histories"  },
+  { text: "Histories", icon: <PeopleRoundedIcon />, route: "Histories" },
   { text: "Demo", icon: <HomeRoundedIcon />, route: "Demo" },
   { text: "Tasks", icon: <AssignmentRoundedIcon />, route: "Tasks" },
   { text: "Products", icon: <AssignmentRoundedIcon />, route: "Products" },
+  { text: "Categories", icon: <AssignmentRoundedIcon />, route: "Categories" },
+];
+
+const userListItems: MenuItem[] = [
+  { text: "Store", icon: <StoreIcon />, route: "" },
+  { text: "Orders", icon: <AnalyticsRoundedIcon />, route: "Orders" },
+  { text: "Products", icon: <AssignmentRoundedIcon />, route: "Products" },
+  { text: "Categories", icon: <AssignmentRoundedIcon />, route: "Categories" },
 ];
 
 export default function MenuContent() {
   const router = useRouter();
   const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [menuContent, setMenuContent] = React.useState<MenuItem[]>([]);
+  const { role } = useUserStore();
 
   React.useEffect(() => {
+    if (role === "ADMIN") setMenuContent(mainListItems);
+    else setMenuContent(userListItems);
     // Kiểm tra client-side trước khi sử dụng sessionStorage
     const selectStorage = Number(sessionStorage.getItem("selectedIndex")) || 0;
     setSelectedIndex(selectStorage);
-  }, []);
+  }, [role]);
 
   const handleListItemClick = (item: any, index: number) => {
     setSelectedIndex(index);
@@ -40,7 +59,7 @@ export default function MenuContent() {
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
       <List dense>
-        {mainListItems.map((item, index) => (
+        {menuContent.map((item, index) => (
           <ListItem key={index} disablePadding sx={{ display: "block" }}>
             <ListItemButton
               selected={selectedIndex === index}

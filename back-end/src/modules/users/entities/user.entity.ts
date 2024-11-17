@@ -11,22 +11,22 @@ import {
 export class Users {
   @PrimaryGeneratedColumn()
   UserId: number;
-  @Column({nullable:true})
+  @Column()
   NameCompany: string;
   @Column()
   Email: string;
   @Column()
   Password: string;
-  @Column({nullable:true})
-  TaxCode: number;
+  @Column()
+  TaxCode: string;
   @Column()
   PublicKey: string;
   @Column()
   PrivateKey: string;
-  @Column({nullable:true})
+  @Column({ nullable: true })
   Certificates: string;
-  @Column({nullable:true})
-  PhoneNumber: number;
+  @Column()
+  PhoneNumber: string;
   @Column({ default: false })
   IsActive: boolean;
   @Column({ default: 'USER' })

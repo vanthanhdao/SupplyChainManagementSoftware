@@ -33,8 +33,15 @@ export class CreateUserDto {
   // @IsNotEmpty({ message: 'Certificates is required' })
   // certificates: string;
 
-  // @IsNotEmpty({ message: 'Phone Number is required' })
-  // @IsInt()
-  // // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
-  // phoneNumber: number;
+  @IsNotEmpty({ message: 'Phone Number is required' })
+  // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
+  phoneNumber: string;
+
+  @IsNotEmpty({ message: 'Full Name is required' })
+  // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
+  fullName: string;
+
+  @IsNotEmpty({ message: 'Tax Code is required' })
+  // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
+  taxCode: string;
 }

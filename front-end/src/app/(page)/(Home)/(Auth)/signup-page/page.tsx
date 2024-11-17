@@ -16,6 +16,7 @@ import { DataContext, DataProvider } from "@/app/hook/errorContext";
 import SitemarkIcon from "../../components/SitemarkIcon";
 import { createAccount } from "@/app/apis/index-api";
 import {
+  useAddUser,
   useGenerateWallet,
   useProvideEthUser,
   useStoreUserSession,
@@ -72,15 +73,16 @@ const SignUp = () => {
     }
 
     try {
-      const { walletAddress, email } = data;
+      const { walletAddress, email, phoneNumber, taxCode, fullName } = data;
       // Handle provide ETH for user account
       await useProvideEthUser(walletAddress.publicKey);
 
-      // // Handle create User Account
+      // // // Handle create User Account
       await createAccount(data);
 
       try {
-        await useStoreUserSession(walletAddress, email, "IGNORE", "SIGNUP");
+        await useAddUser(walletAddress, email, phoneNumber, fullName, taxCode);
+        await useStoreUserSession(walletAddress, "IGNORE", "SIGNUP");
         // Route to the signin pge
         router.push("/signin-page");
       } catch (error) {
@@ -97,11 +99,19 @@ const SignUp = () => {
 
     const password = document.getElementById("password") as HTMLFormElement;
     const email = document.getElementById("email") as HTMLFormElement;
+    const fullName = document.getElementById("fullName") as HTMLFormElement;
+    const phoneNumber = document.getElementById(
+      "phoneNumber"
+    ) as HTMLFormElement;
     const repassword = document.getElementById("repassword") as HTMLFormElement;
+    const taxCode = document.getElementById("taxCode") as HTMLFormElement;
     const valueInput = {
+      fullName: fullName.value,
       email: email.value,
+      phoneNumber: phoneNumber.value,
       password: password.value,
       repassword: repassword.value,
+      taxCode: taxCode.value,
     };
     // ***Add fuction check errorGlobal (check trước khi gọi api)
     const checkErrorGlobal = Object.values(errorGlobal).every(
@@ -122,6 +132,9 @@ const SignUp = () => {
         const data: IUser = {
           email: valueInput.email,
           password: valueInput.password,
+          phoneNumber: valueInput.phoneNumber,
+          fullName: valueInput.fullName,
+          taxCode: valueInput.taxCode,
           walletAddress: {
             publicKey: wallet.publicKey,
             privateKey: wallet.privateKey,
@@ -174,9 +187,27 @@ const SignUp = () => {
                 type="text"
               /> */}
               <InputValidate
+                nameLable="Company Name"
+                idLable="fullName"
+                placeholder="Nguyen Van A"
+                type="text"
+              />
+              <InputValidate
+                nameLable="Phone Number"
+                idLable="phoneNumber"
+                placeholder="0929342783"
+                type="text"
+              />
+              <InputValidate
                 nameLable="Email"
                 idLable="email"
                 placeholder="your@email.com"
+                type="text"
+              />
+              <InputValidate
+                nameLable="TaxCode"
+                idLable="taxCode"
+                placeholder="0000000001"
                 type="text"
               />
               <InputValidate
