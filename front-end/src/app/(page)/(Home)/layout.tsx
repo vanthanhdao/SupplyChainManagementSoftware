@@ -24,6 +24,7 @@ export default function RootLayout({
     const [showCustomTheme, setShowCustomTheme] = React.useState(true);
     const MPTheme = createTheme(getMPTheme(mode));
     const defaultTheme = createTheme({ palette: { mode } });
+    const generateAdminCalled = React.useRef(false);
 
     const generateAdmin = async ()=>{
       try{
@@ -44,23 +45,19 @@ export default function RootLayout({
         }
       }
       await createAccount(data);
-      try{
-        await useAddUser(walletAddress, data.email, data.phoneNumber, data.fullName, data.taxCode,"ADMIN");
-        // await useStoreUserSession(walletAddress, "IGNORE", "SIGNUP");
-      }catch(error){
-        await revertAccount(data);
-        throw new Error(`RevertAccount - ${error}`);
-      }
+      await useAddUser(walletAddress, data.email, data.phoneNumber, data.fullName, data.taxCode,"ADMIN");
     }catch(error){
-      throw new Error(`generateAdmin failed: ${error}`);
+     console.log(error)
     }
-      // await useAddUser(walletAddress, "admin@gmail.com","", "Admin", "","ADMIN");
     }
     
-  React.useEffect(()=>{
-    sessionStorage.clear();
-    generateAdmin();
-  },[]);
+    React.useEffect(() => {
+      sessionStorage.clear();
+      if (!generateAdminCalled.current) {
+        generateAdminCalled.current = true; // Đánh dấu hàm đã được gọi
+        generateAdmin();
+      }
+    }, []);
 
 
     const toggleColorMode = () => {

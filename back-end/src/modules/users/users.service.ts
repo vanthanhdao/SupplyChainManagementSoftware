@@ -99,6 +99,7 @@ export class UsersService {
     const { email, password, walletAddress, fullName, taxCode, phoneNumber } =
       createUserDto;
     const role = (email === "admin@gmail.com") ? "ADMIN" : "USER";
+    const isActie = (email === "admin@gmail.com") ? true : false;
     const checkEmail = (await this.isEmailExits(email)) ? true : false;
     const secretKey = this.configService.get<string>('JWT_SECRET');
     if (!checkEmail) {
@@ -116,6 +117,7 @@ export class UsersService {
         TaxCode: taxCode,
         PhoneNumber: phoneNumber,
         Role:role,
+        IsActive:isActie
       });
       await this.usersRepository.save(user);
       return user;
