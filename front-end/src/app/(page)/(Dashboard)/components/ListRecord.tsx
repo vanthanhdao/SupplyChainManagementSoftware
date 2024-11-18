@@ -26,12 +26,12 @@ const columns: GridColDef[] = [
     type: "string",
     width: 100,
   },
-  {
-    field: "blockNumber",
-    headerName: "Block Number",
-    type: "string",
-    width: 100,
-  },
+  // {
+  //   field: "blockNumber",
+  //   headerName: "Block Number",
+  //   type: "string",
+  //   width: 100,
+  // },
   {
     field: "blockHash",
     headerName: "Block Hash",
@@ -59,7 +59,7 @@ const columns: GridColDef[] = [
   },
   {
     field: "nameCompany",
-    headerName: "Name Company",
+    headerName: "Full Name",
     type: "string",
     width: 200,
   },
@@ -71,16 +71,16 @@ const columns: GridColDef[] = [
   },
   {
     field: "taxCode",
-    headerName: "Tax Code",
+    headerName: "ID Card",
     type: "string",
     width: 150,
   },
-  {
-    field: "isLogin",
-    headerName: "IsLogin",
-    type: "string",
-    width: 100,
-  },
+  // {
+  //   field: "isLogin",
+  //   headerName: "IsLogin",
+  //   type: "string",
+  //   width: 100,
+  // },
   {
     field: "timeStamp",
     headerName: "TimeStamp",

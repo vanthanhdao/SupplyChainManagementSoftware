@@ -24,16 +24,14 @@ import {
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import { Card, Stack } from "@mui/material";
-import useSWR, { mutate, useSWRConfig } from "swr";
-import { getAllCategory } from "@/app/apis/categories-api";
+import useSWR, { mutate } from "swr";
 import { v4 as uuidv4 } from "uuid";
-import { updateRecordProduct } from "@/app/apis/products-api";
 import {
   useGetAllCategoryInfo,
-  useStoreUserSession,
+  useRecordProduct,
 } from "@/app/hook/useEthereum";
 import { getAccountWallet } from "@/app/apis/index-api";
-import Categories from "../dashboard/(Categories)/Categories/page";
+
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -66,7 +64,7 @@ export default function ListProductEdit(props: IProps) {
       productId: item.ProductId,
       productName: item.ProductName,
       description: item.Description,
-      price: item.Price,
+      price: Number(item.Price),
       specifications: item.Specifications,
       categoryId: item.CategoryId,
       categoryName:
@@ -83,7 +81,7 @@ export default function ListProductEdit(props: IProps) {
     setRows(dataRows);
   }, [dataProducts, data]);
 
-  const EditToolbar = (props: EditToolbarProps) => {
+  const EditToolbar =  (props: EditToolbarProps) => {
     const { setRows, setRowModesModel } = props;
 
     const handleClickAddRow = () => {
@@ -130,15 +128,11 @@ export default function ListProductEdit(props: IProps) {
     const handleClickSave = async () => {
       // Handle save transaction in Blockchain
       try {
-        // Handle get Wallet Address
         const walletAddress = await getAccountWallet();
-        const data = JSON.stringify(tempRows);
-        await useStoreUserSession(
-          walletAddress,
-          data,
-          "INTERACT PRODUCT TABLE"
-        );
-        await updateRecordProduct(tempRows);
+        // Handle get Wallet Address
+        console.table(tempRows)
+        if(!tempRows && !walletAddress) return;
+        await useRecordProduct(walletAddress,tempRows);
       } catch (error) {
         throw new Error(`HandleClickSave failed - ${error}`);
       }

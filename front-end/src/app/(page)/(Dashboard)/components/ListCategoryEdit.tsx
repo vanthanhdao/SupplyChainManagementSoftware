@@ -28,7 +28,7 @@ import useSWR, { mutate } from "swr";
 import { getAllCategory } from "@/app/apis/categories-api";
 import { v4 as uuidv4 } from "uuid";
 import { updateRecordProduct } from "@/app/apis/products-api";
-import { useStoreUserSession } from "@/app/hook/useEthereum";
+import { useRecordCategory, useStoreUserSession } from "@/app/hook/useEthereum";
 import { getAccountWallet } from "@/app/apis/index-api";
 
 interface EditToolbarProps {
@@ -102,15 +102,11 @@ export default function ListCategoryEdit(props: IProps) {
       try {
         // Handle get Wallet Address
         const walletAddress = await getAccountWallet();
-        const data = JSON.stringify(tempRows);
-        await useStoreUserSession(
-          walletAddress,
-          data,
-          "INTERACT PRODUCT TABLE"
-        );
-        await updateRecordProduct(tempRows);
+        console.table(tempRows)
+        if(!tempRows && !walletAddress) return;
+        await useRecordCategory(walletAddress,tempRows);
       } catch (error) {
-        throw new Error(`HandleClickSave failed - ${error}`);
+        throw new Error(`HandleClickSave failed - ${error}`); 
       }
     };
 
@@ -187,7 +183,7 @@ export default function ListCategoryEdit(props: IProps) {
       setTempRows(findRowDiverseId);
     } else {
       const newTempRows = tempRows.filter(
-        (row) => row.productId !== findRowById?.productId
+        (row) => row.categoryId !== findRowById?.categoryId
       );
       const rowDelete = {
         ...findRowById,
@@ -222,10 +218,10 @@ export default function ListCategoryEdit(props: IProps) {
       ...newRow,
     };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    const findRow = tempRows.find((row) => row.productId === newRow.productId);
+    const findRow = tempRows.find((row) => row.categoryId === newRow.categoryId);
     if (tempRows.length > 0 && findRow) {
       const newTempRows = tempRows.filter(
-        (row) => row.productId !== newRow.productId
+        (row) => row.categoryId !== newRow.categoryId
       );
       newTempRows.push(updatedRow);
       setTempRows(newTempRows);

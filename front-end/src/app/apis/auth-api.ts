@@ -27,3 +27,4 @@ export const authJwtProfile = async (access_token: string | null) => {
     console.error("Auth-api AuthJwtProfile: ", error);
   }
 };
+

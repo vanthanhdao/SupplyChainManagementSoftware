@@ -5,9 +5,8 @@ import { ethers, verifyMessage } from "ethers";
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
-const contractAddress = "0xEa33Ab0b1F096FA88C2415e000fFDcEF2af412A6"; // Địa chỉ contract ở nhà
-// const contractAddress = "0xdd7B6DbEE63c282eAFa32FF7DD45f2858cB16B7a"; // SuppyChain
-// const contractAddress = "0x3b9B1Cc8Fc8046F50E71B73021d154F32FDEFfCe"; // SuppyChain
+// const contractAddress = "0xEa33Ab0b1F096FA88C2415e000fFDcEF2af412A6"; // Địa chỉ contract ở nhà
+const contractAddress = "0xE72fd7e73c64a4023Bb985aBC408E82F60120b0f"; // SuppyChain
 // Các hàm trong smart contract
 const contractABISuppyChain = contract.abi;
 const contractABI = contractSC.abi;
@@ -15,8 +14,8 @@ const contractABI = contractSC.abi;
 const provider = new ethers.JsonRpcProvider("http://localhost:8545");
 // Pivate key của tài khoản admin
 const privateKey =
-  "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
-// "0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
+  // "0x34455e7b71db7eb7117a0adf35154cbc223c52f31f354f95d4d18fa4a61a23f7"; // Địa chỉ contract ở nhà
+"0x1fe238ae4a021c604e1fb34807ad6fe03c993cde474a63a00bc0ee9c7586f80c";
 
 export const deployContract = async () => {
   const signer = new ethers.Wallet(privateKey, provider);
@@ -390,7 +389,8 @@ export const useAddUser = async (
   email: string,
   phoneNumber: string,
   fullName: string,
-  taxCode: string
+  taxCode: string,
+  role: string
 ): Promise<IBlockHash> => {
   try {
     const { publicKey, privateKey } = walletAddress;
@@ -405,7 +405,8 @@ export const useAddUser = async (
       email,
       phoneNumber,
       fullName,
-      taxCode
+      taxCode,
+      role
     );
     // Đợi cho giao dịch được xác nhận
     const txReceipt = await txResponse.wait();
@@ -424,6 +425,206 @@ export const useAddUser = async (
   } catch (error) {
     throw new Error(`useAddUser failed: ${error}`);
   }
+};
+
+export const useCreateCategory = async (  walletAddress: IWalletAddress,dataCategory:any) =>{
+  if(!dataCategory) throw new Error(`UseCreateCategory failed`);
+  try {
+    const { publicKey, privateKey } = walletAddress;
+    const signer = new ethers.Wallet(privateKey, provider);
+    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, signer);
+    const {categoryName,description} = dataCategory;
+    const txCategory = await contract.addCategory(categoryName,description);
+    await txCategory.wait();
+
+    const category = {
+      CategoryName: categoryName,
+      Description: description,
+    };
+
+    await useStoreUserSession(walletAddress, JSON.stringify(category), "CREATE A NEW CATEGORY");
+  } catch (error) {
+    throw new Error(`Create failed: ${error}`);
+  }
+}
+
+export const useRecordCategory = async (
+  walletAddress: IWalletAddress,
+  data:any,
+) => {
+  try {
+    const { publicKey, privateKey } = walletAddress;
+    const signer = new ethers.Wallet(privateKey, provider);
+    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, signer);
+  
+    // Tách từng loại danh mục từ dữ liệu đầu vào
+    const filterCreate = data?.filter((item: any) => item.isNew && !item.active);
+    const filterUpdate = data?.filter((item: any) => !item.isNew && !item.active);
+    const filterDelete = data?.filter((item: any) => item.active === "delete");
+  
+    // Xử lý tạo mới danh mục
+    if (filterCreate && filterCreate.length > 0) {
+      for (const item of filterCreate) {
+        try {
+          const txCategory = await contract.addCategory(item.categoryName, item.description);
+          await txCategory.wait();
+  
+          const category = {
+            CategoryName: item.categoryName,
+            Description: item.description,
+          };
+  
+          await useStoreUserSession(walletAddress, JSON.stringify(category), "CREATE A NEW CATEGORY");
+        } catch (error) {
+          throw new Error(`Create failed: ${error}`);
+        }
+      }
+    }
+  
+    // Xử lý cập nhật danh mục
+    if (filterUpdate && filterUpdate.length > 0) {
+      for (const item of filterUpdate) {
+        try {
+          const txCategory = await contract.updateCategory(item.categoryId, item.categoryName, item.description);
+          await txCategory.wait();
+  
+          const category = {
+            CategoryId: Number(item.categoryId),
+            CategoryName: item.categoryName,
+            Description: item.description,
+          };
+  
+          await useStoreUserSession(walletAddress, JSON.stringify(category), "UPDATE CATEGORY");
+        } catch (error) {
+          throw new Error(`Update failed: ${error}`);
+        }
+      }
+    }
+  
+    // Xử lý xóa danh mục
+    if (filterDelete && filterDelete.length > 0) {
+      for (const item of filterDelete) {
+        try {
+          const txCategory = await contract.deleteCategory(item.categoryId);
+          await txCategory.wait();
+          const category = {
+            CategoryId: Number(item.categoryId),
+            CategoryName: item.categoryName,
+            Description: item.description,
+          };
+          await useStoreUserSession(walletAddress, JSON.stringify(category), "DELETE CATEGORY");
+        } catch (error) {
+          throw new Error(`Delete failed: ${error}`);
+        }
+      }
+    }
+  } catch (error) {
+    throw new Error(`UseRecordCategory failed: ${error}`);
+  }
+  
+};
+
+export const useRecordProduct = async (
+  walletAddress: IWalletAddress,
+  data:any,
+) => {
+  try {
+    const { publicKey, privateKey } = walletAddress;
+    const signer = new ethers.Wallet(privateKey, provider);
+    const contract = new ethers.Contract(contractAddress, contractABISuppyChain, signer);
+  
+    // Tách từng loại danh mục từ dữ liệu đầu vào
+    const filterCreate = data?.filter((item: any) => item.isNew && !item.active);
+    const filterUpdate = data?.filter((item: any) => !item.isNew && !item.active);
+    const filterDelete = data?.filter((item: any) => item.active === "delete");
+  
+    // Xử lý tạo mới sản phẩm
+    if (filterCreate && filterCreate.length > 0) {
+      for (const item of filterCreate) {
+        try {
+          const txProduct = await contract.addProduct(
+            item.productName, 
+            item.description,
+            item.price.toString(),
+            item.images,
+            item.specifications,
+            item.categoryId     
+          );
+          await txProduct.wait();
+  
+          const product = {
+            ProductName: item.productName,
+            Description: item.description,
+            Price:  item.price.toString(),
+            Images:item.images,
+            specifications:item.specifications,
+            categoryId:Number(item.categoryId) 
+          };
+  
+          await useStoreUserSession(walletAddress, JSON.stringify(product), "CREATE A NEW PRODUCT");
+        } catch (error) {
+          throw new Error(`Create failed: ${error}`);
+        }
+      }
+    }
+  
+    // Xử lý cập nhật sản phẩm
+    if (filterUpdate && filterUpdate.length > 0) {
+      for (const item of filterUpdate) {
+        try {
+          const txProduct= await contract.updateProduct(
+            item.productId,
+            item.productName, 
+            item.description,
+            item.price.toString(),
+            item.images,
+            item.specifications,
+            item.categoryId   
+          );
+          await txProduct.wait();
+  
+          const product = {
+            ProductId:Number(item.productId),
+            ProductName:item.productName,
+            Description: item.description,
+            Price:  item.price.toString(),
+            Images:item.images,
+            specifications:item.specifications,
+            categoryId:Number(item.categoryId) 
+          };
+  
+          await useStoreUserSession(walletAddress, JSON.stringify(product), "UPDATE PRODUCT");
+        } catch (error) {
+          throw new Error(`Update failed: ${error}`);
+        }
+      }
+    }
+  
+    // Xử lý xóa sản phẩm
+    if (filterDelete && filterDelete.length > 0) {
+      for (const item of filterDelete) {
+        try {
+          const txCategory = await contract.deleteProduct(item.productId);
+          await txCategory.wait();
+          const product = {
+            ProductId:Number(item.productId),
+            ProductName:item.productName,
+            Description: item.description,
+            Price:  item.price.toString(),
+            Images:item.images,
+            specifications:item.specifications,
+            categoryId:Number(item.categoryId) 
+          };
+          await useStoreUserSession(walletAddress, JSON.stringify(product), "DELETE PRODUCT");
+        } catch (error) {
+          throw new Error(`Delete failed: ${error}`);
+        }
+      }
+    }
+  } catch (error) {
+    throw new Error(`UseRecordProduct failed: ${error}`);
+  }
+  
 };
 
 export const useGetUserInfo = async (data: IUserAddress[]) => {
@@ -496,3 +697,5 @@ export const useGetAllProductInfo = async (): Promise<IDataProduct[]> => {
     throw new Error(`UseGetUserInfo failed: ${error}`);
   }
 };
+
+

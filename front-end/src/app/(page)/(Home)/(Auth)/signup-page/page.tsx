@@ -77,16 +77,17 @@ const SignUp = () => {
       // Handle provide ETH for user account
       await useProvideEthUser(walletAddress.publicKey);
 
-      // // // Handle create User Account
+      // Handle create User Account
       await createAccount(data);
 
       try {
-        await useAddUser(walletAddress, email, phoneNumber, fullName, taxCode);
+        await useAddUser(walletAddress, email, phoneNumber, fullName, taxCode,"USER");
         await useStoreUserSession(walletAddress, "IGNORE", "SIGNUP");
         // Route to the signin pge
         router.push("/signin-page");
       } catch (error) {
         await revertAccount(data);
+        throw new Error(`RevertAccount - ${error}`);
       }
     } catch (error) {
       throw new Error(`AuthUserSignUp failed - ${error}`);
@@ -141,7 +142,7 @@ const SignUp = () => {
           },
         };
         console.log(data);
-        await authUserSignUp(data);
+        authUserSignUp(data);
       }
     } else alert("You must provide a valid information");
   };
@@ -187,7 +188,7 @@ const SignUp = () => {
                 type="text"
               /> */}
               <InputValidate
-                nameLable="Company Name"
+                nameLable="Full Name"
                 idLable="fullName"
                 placeholder="Nguyen Van A"
                 type="text"
@@ -205,9 +206,9 @@ const SignUp = () => {
                 type="text"
               />
               <InputValidate
-                nameLable="TaxCode"
+                nameLable="ID card"
                 idLable="taxCode"
-                placeholder="0000000001"
+                placeholder="000000000001"
                 type="text"
               />
               <InputValidate

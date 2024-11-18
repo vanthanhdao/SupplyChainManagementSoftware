@@ -98,6 +98,7 @@ export class UsersService {
   async create(createUserDto: CreateUserDto): Promise<Users> {
     const { email, password, walletAddress, fullName, taxCode, phoneNumber } =
       createUserDto;
+    const role = (email === "admin@gmail.com") ? "ADMIN" : "USER";
     const checkEmail = (await this.isEmailExits(email)) ? true : false;
     const secretKey = this.configService.get<string>('JWT_SECRET');
     if (!checkEmail) {
@@ -114,6 +115,7 @@ export class UsersService {
         PrivateKey: hashedWallet,
         TaxCode: taxCode,
         PhoneNumber: phoneNumber,
+        Role:role,
       });
       await this.usersRepository.save(user);
       return user;

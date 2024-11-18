@@ -43,7 +43,7 @@ const SignIn = () => {
     try {
       // Handle veryfired email and password
       const response = await authJwtLogin(data);
-      const { access_token, refresh_token } = response;
+      const { access_token, refresh_token } = response; 
 
       // Save access_token and refresh_token in sessionStorage
       await Promise.all([
