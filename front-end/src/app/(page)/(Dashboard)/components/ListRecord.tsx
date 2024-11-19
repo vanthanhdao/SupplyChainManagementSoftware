@@ -175,10 +175,10 @@ const ListRecord = (props: IProps) => {
       data: item.data,
       eventName: item.eventName,
       isLogin: item.isLogin,
-      email: data ? data[index].email : "",
-      nameCompany: data ? data[index].nameCompany : "",
-      phoneNumber: data ? data[index].phoneNumber : "",
-      taxCode: data ? data[index].taxCode : "",
+      email: data && data.length >0 ? data[index].email : "",
+      nameCompany: data && data.length >0 ? data[index].nameCompany : "",
+      phoneNumber: data && data.length >0 ? data[index].phoneNumber : "",
+      taxCode: data && data.length >0 ? data[index].taxCode : "",
       timeStamp: ConvertTimeStamp(item.timeStamp),
     }));
     setRows(dataRows);

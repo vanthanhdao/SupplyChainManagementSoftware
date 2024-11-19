@@ -54,7 +54,7 @@ export default function RootLayout({
     React.useEffect(() => {
       sessionStorage.clear();
       if (!generateAdminCalled.current) {
-        generateAdminCalled.current = true; // Đánh dấu hàm đã được gọi
+        generateAdminCalled.current = true; 
         generateAdmin();
       }
     }, []);
