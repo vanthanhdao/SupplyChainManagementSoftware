@@ -36,15 +36,6 @@ const AppBar_Button = () => {
        >
           View Blocks UserSession Event
        </Button>
-       <Button
-         variant="text"
-         color="info"
-         size="small"
-         sx={{ minWidth: 0 }}
-         onClick={() => router.push("/blog-page")}
-       >
-         Blog
-       </Button>
        </Box>
     )
   };
