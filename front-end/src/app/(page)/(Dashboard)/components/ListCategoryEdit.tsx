@@ -25,7 +25,10 @@ import {
 } from "@mui/x-data-grid";
 import { Card, Stack } from "@mui/material";
 import useSWR, { mutate } from "swr";
-import { getAllCategory } from "@/app/apis/categories-api";
+import {
+  getAllCategory,
+  updateRecordCategory,
+} from "@/app/apis/categories-api";
 import { v4 as uuidv4 } from "uuid";
 import { updateRecordProduct } from "@/app/apis/products-api";
 import { useRecordCategory, useStoreUserSession } from "@/app/hook/useEthereum";
@@ -82,7 +85,7 @@ export default function ListCategoryEdit(props: IProps) {
 
         setRowModesModel((oldModel) => ({
           ...oldModel,
-          [newId]: { mode: GridRowModes.Edit, fieldToFocus: "productName" },
+          [newId]: { mode: GridRowModes.Edit, fieldToFocus: "categoryName" },
         }));
 
         return updatedRows;
@@ -90,23 +93,17 @@ export default function ListCategoryEdit(props: IProps) {
     };
 
     const handleClickRefresh = async () => {
-      await mutate(
-        `${process.env.NEXT_PUBLIC_API_URL}/useGetAllCategoryInfo`,
-        false
-      );
+      await mutate(`${process.env.NEXT_PUBLIC_API_URL}/categories`, false);
       setTempRows([]);
     };
 
     const handleClickSave = async () => {
       // Handle save transaction in Blockchain
       try {
-        // Handle get Wallet Address
-        const walletAddress = await getAccountWallet();
-        console.table(tempRows)
-        if(!tempRows && !walletAddress) return;
-        await useRecordCategory(walletAddress,tempRows);
+        // Handle create new category
+        await updateRecordCategory(tempRows);
       } catch (error) {
-        throw new Error(`HandleClickSave failed - ${error}`); 
+        throw new Error(`HandleClickSave failed - ${error}`);
       }
     };
 
@@ -218,7 +215,9 @@ export default function ListCategoryEdit(props: IProps) {
       ...newRow,
     };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    const findRow = tempRows.find((row) => row.categoryId === newRow.categoryId);
+    const findRow = tempRows.find(
+      (row) => row.categoryId === newRow.categoryId
+    );
     if (tempRows.length > 0 && findRow) {
       const newTempRows = tempRows.filter(
         (row) => row.categoryId !== newRow.categoryId

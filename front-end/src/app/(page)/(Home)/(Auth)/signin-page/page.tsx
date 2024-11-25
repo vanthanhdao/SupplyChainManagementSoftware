@@ -17,9 +17,9 @@ import SitemarkIcon from "../../components/SitemarkIcon";
 import { authJwtLogin, getAccountWallet } from "@/app/apis/index-api";
 import { useSetAccessToken } from "@/app/hook/useAccessToken";
 import {
+  useConnectMetaMask,
+  useGetWalletAddress,
   useProvideEthUser,
-  useStoreUserSession,
-  useVerifyWallet,
 } from "@/app/hook/useEthereum";
 
 const SignIn = () => {
@@ -43,7 +43,7 @@ const SignIn = () => {
     try {
       // Handle veryfired email and password
       const response = await authJwtLogin(data);
-      const { access_token, refresh_token } = response; 
+      const { access_token, refresh_token } = response;
 
       // Save access_token and refresh_token in sessionStorage
       await Promise.all([
@@ -51,19 +51,14 @@ const SignIn = () => {
         useSetAccessToken("refresh_token", refresh_token),
       ]);
 
-      // Handle get Wallet Address
-      const walletAddress = await getAccountWallet();
-      const { publicKey, privateKey } = walletAddress;
+      const publicKey = await useGetWalletAddress();
+      if (!publicKey) throw new Error(`Don't looking for publickey !`);
+
+      // // Connect MetaMask
+      // await useConnectMetaMask();
 
       // // Handle provide ETH for user account
       // await useProvideEthUser(publicKey);
-
-      // // Sign and verify wallet for additional security
-      // const isWalletVerified = await useVerifyWallet(privateKey);
-      // if (!isWalletVerified) throw new Error("Wallet verification failed");
-
-      // Handle save transaction in Blockchain
-      await useStoreUserSession(walletAddress, "IGNORE", "SIGNIN");
 
       // Route to the dashboard
       router.push("/dashboard");

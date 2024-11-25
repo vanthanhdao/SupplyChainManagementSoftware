@@ -29,6 +29,7 @@
     "zustand": "^5.0.0"
   },
   "devDependencies": {
+    "@metamask/providers": "^18.1.1",
     "@types/node": "^20",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18",

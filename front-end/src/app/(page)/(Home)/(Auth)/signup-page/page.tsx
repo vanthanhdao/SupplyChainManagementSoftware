@@ -14,14 +14,12 @@ import InputValidate from "../components/InputValidate";
 import { useRouter } from "next/navigation";
 import { DataContext, DataProvider } from "@/app/hook/errorContext";
 import SitemarkIcon from "../../components/SitemarkIcon";
-import { createAccount } from "@/app/apis/index-api";
 import {
-  useAddUser,
-  useGenerateWallet,
+  useConnectMetaMask,
+  useGetWalletAddress,
   useProvideEthUser,
-  useStoreUserSession,
 } from "@/app/hook/useEthereum";
-import { revertAccount } from "@/app/apis/users-api";
+import { createAccount } from "@/app/apis/index-api";
 require("dotenv").config();
 
 const CardCustom = styled(Card)(({ theme }) => ({
@@ -73,22 +71,12 @@ const SignUp = () => {
     }
 
     try {
-      const { walletAddress, email, phoneNumber, taxCode, fullName } = data;
-      // Handle provide ETH for user account
-      await useProvideEthUser(walletAddress.publicKey);
+      // // Handle provide ETH for user account
+      // useProvideEthUser(publickey);
 
       // Handle create User Account
       await createAccount(data);
-
-      try {
-        await useAddUser(walletAddress, email, phoneNumber, fullName, taxCode,"USER");
-        await useStoreUserSession(walletAddress, "IGNORE", "SIGNUP");
-        // Route to the signin pge
-        router.push("/signin-page");
-      } catch (error) {
-        await revertAccount(data);
-        throw new Error(`RevertAccount - ${error}`);
-      }
+      router.push("/signin-page");
     } catch (error) {
       throw new Error(`AuthUserSignUp failed - ${error}`);
     }
@@ -100,19 +88,11 @@ const SignUp = () => {
 
     const password = document.getElementById("password") as HTMLFormElement;
     const email = document.getElementById("email") as HTMLFormElement;
-    const fullName = document.getElementById("fullName") as HTMLFormElement;
-    const phoneNumber = document.getElementById(
-      "phoneNumber"
-    ) as HTMLFormElement;
     const repassword = document.getElementById("repassword") as HTMLFormElement;
-    const taxCode = document.getElementById("taxCode") as HTMLFormElement;
     const valueInput = {
-      fullName: fullName.value,
       email: email.value,
-      phoneNumber: phoneNumber.value,
       password: password.value,
       repassword: repassword.value,
-      taxCode: taxCode.value,
     };
     // ***Add fuction check errorGlobal (check trước khi gọi api)
     const checkErrorGlobal = Object.values(errorGlobal).every(
@@ -128,22 +108,18 @@ const SignUp = () => {
       if (!checkValidPass)
         return alert("You must provide RePassword a valid information");
 
-      const wallet: IWalletAddress = useGenerateWallet();
-      if (wallet) {
-        const data: IUser = {
-          email: valueInput.email,
-          password: valueInput.password,
-          phoneNumber: valueInput.phoneNumber,
-          fullName: valueInput.fullName,
-          taxCode: valueInput.taxCode,
-          walletAddress: {
-            publicKey: wallet.publicKey,
-            privateKey: wallet.privateKey,
-          },
-        };
-        console.log(data);
-        authUserSignUp(data);
-      }
+      // Connect MetaMask
+      await useConnectMetaMask();
+
+      const publicKey = await useGetWalletAddress();
+      if (!publicKey) throw new Error(`Don't looking for publickey !`);
+
+      const data: IUser = {
+        email: valueInput.email,
+        password: valueInput.password,
+      };
+
+      authUserSignUp(data);
     } else alert("You must provide a valid information");
   };
 
@@ -180,35 +156,10 @@ const SignUp = () => {
               onClick={() => setShowButton(false)}
               sx={{ display: "flex", flexDirection: "column", gap: 2 }}
             >
-              {/* Input Custom Component */}
-              {/* <InputValidate
-                nameLable="Company Name"
-                idLable="name"
-                placeholder="Jon Snow"
-                type="text"
-              /> */}
-              <InputValidate
-                nameLable="Full Name"
-                idLable="fullName"
-                placeholder="Nguyen Van A"
-                type="text"
-              />
-              <InputValidate
-                nameLable="Phone Number"
-                idLable="phoneNumber"
-                placeholder="0929342783"
-                type="text"
-              />
               <InputValidate
                 nameLable="Email"
                 idLable="email"
                 placeholder="your@email.com"
-                type="text"
-              />
-              <InputValidate
-                nameLable="ID card"
-                idLable="taxCode"
-                placeholder="000000000001"
                 type="text"
               />
               <InputValidate
@@ -223,20 +174,6 @@ const SignUp = () => {
                 placeholder="••••••"
                 type="password"
               />
-              {/* <InputValidate
-                nameLable="Tax Code"
-                idLable="taxcode"
-                placeholder="0000000001"
-                type="text"
-              />
-              <InputValidate
-                nameLable="Certificates"
-                idLable="certificate"
-                placeholder="Certificate.png"
-                type="file"
-                multiple={true}
-                onSendData={handleDataFromChild}
-              /> */}
             </Box>
             <FormControlLabel
               control={

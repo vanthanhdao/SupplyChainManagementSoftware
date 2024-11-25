@@ -4,7 +4,6 @@ import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import CustomizedDataGrid from "../components/CustomizedDataGrid";
 import ChartUserByCountry from "../components/ChartUserByCountry";
 import CustomizedTreeView from "../components/CustomizedTreeView";
 import { getAllProduct } from "@/app/apis/products-api";
@@ -67,14 +66,14 @@ const Store = () => {
         Overview
       </Typography>
       <Grid container spacing={2} columns={12}>
-        <Grid size={{ md: 12, lg: 7 }}>
+        <Grid size={{ md: 12, lg: 12 }}>
           {data ? <ListProductSelect dataProducts={data} /> : null}
         </Grid>
-        <Grid size={{ xs: 12, lg: 5 }}>
-          <Stack gap={2} direction={{ xs: "column", sm: "row", lg: "column" }}>
-            <ChartUserByCountry />
-            <CustomizedTreeView />
-          </Stack>
+        <Grid size={{ sm: 12, md: 4, lg: 4 }}>
+          <ChartUserByCountry />
+        </Grid>
+        <Grid size={{ sm: 12, md: 8, lg: 8 }}>
+          <CustomizedTreeView />
         </Grid>
       </Grid>
     </Box>

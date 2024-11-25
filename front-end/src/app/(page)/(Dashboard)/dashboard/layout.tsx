@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { Box, Stack, Link ,Button} from "@mui/material";
+import { Box, Stack, Link, Button } from "@mui/material";
 import Header from "../components/Header";
 import SideMenu from "../components/SideMenu";
 import { PaletteMode, ThemeProvider, createTheme } from "@mui/material/styles";
@@ -9,13 +9,9 @@ import getMPTheme from "../../../theme/getMPTheme";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
 import { useGetAccessToken } from "@/app/hook/useAccessToken";
-import { updateIsActive} from "@/app/apis/index-api";
+import { updateIsActive } from "@/app/apis/index-api";
 import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
-
-
-
-
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -24,17 +20,16 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const MPTheme = createTheme(getMPTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
   const [open, setOpen] = React.useState(false);
-  const {isActive,initializeUser} = useUserStore();
-
+  const { isActive, initializeUser } = useUserStore();
 
   React.useEffect(() => {
     initializeUser();
     if (isActive === "Null" || isActive === false) {
       const interval = setInterval(() => setOpen(true), 1000);
       return () => clearInterval(interval);
-    }else if(!isActive){
-      router.push('/');
-    } 
+    } else if (!isActive) {
+      router.push("/");
+    }
   }, [isActive]);
 
   const handleClose = (
@@ -47,12 +42,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     setOpen(false);
   };
 
-
   // Handle active a account
-  const handleUpdateData = () =>{
+  const handleUpdateData = async () => {
     const access_token = useGetAccessToken("access_token");
     updateIsActive(access_token);
-  }
+  };
 
   return (
     <html lang="en">
@@ -83,7 +77,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               component="main"
               sx={(theme) => ({
                 position: { sm: "relative", md: "" },
-                pt: { xs: "48px",sm:"48px",md:"24px"},
+                pt: { xs: "48px", sm: "48px", md: "24px" },
                 height: { sm: "calc(100vh - 48px)", md: "100vh" },
                 flexGrow: 1,
                 backgroundImage:

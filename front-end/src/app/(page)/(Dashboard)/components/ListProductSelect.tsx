@@ -28,7 +28,7 @@ const columns: GridColDef[] = [
     field: "id",
     headerName: "NO.",
     type: "number",
-    width: 50,
+    width: 200,
     align: "left",
     headerAlign: "left",
   },
@@ -36,21 +36,21 @@ const columns: GridColDef[] = [
     field: "productName",
     headerName: "Product Name",
     type: "string",
-    width: 100,
+    width: 200,
     editable: true,
   },
   {
     field: "description",
     headerName: "Description",
     type: "string",
-    width: 150,
+    width: 300,
     editable: true,
   },
   {
     field: "price",
     headerName: "Price",
     type: "number",
-    width: 100,
+    width: 200,
     align: "left",
     headerAlign: "left",
     editable: true,
@@ -58,7 +58,7 @@ const columns: GridColDef[] = [
   {
     field: "categoryName",
     headerName: "Category Name",
-    width: 150,
+    width: 200,
     editable: true,
     type: "string",
   },
@@ -130,6 +130,8 @@ export default function ListProductSelect(props: IProps) {
       price: item.price,
       categoryId: item.categoryId,
       categoryName: item.categoryName,
+      quantity: 1,
+      money: item.price,
     }));
     setSelectedRowState(newSelectesRow);
   };

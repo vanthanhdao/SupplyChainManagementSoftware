@@ -5,12 +5,12 @@ import Typography from "@mui/material/Typography";
 
 import useSWR from "swr";
 import ListCategoryEdit from "../../../components/ListCategoryEdit";
-import { useGetAllCategoryInfo } from "@/app/hook/useEthereum";
+import { getAllCategory } from "@/app/apis/categories-api";
 
 const Categories = () => {
-  const fetcher = async () => await useGetAllCategoryInfo();
+  const fetcher = async () => await getAllCategory();
   const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/useGetAllCategoryInfo`,
+    `${process.env.NEXT_PUBLIC_API_URL}/categories`,
     fetcher,
     {
       revalidateIfStale: false,

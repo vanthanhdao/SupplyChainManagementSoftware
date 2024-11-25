@@ -31,7 +31,8 @@ import {
   useRecordProduct,
 } from "@/app/hook/useEthereum";
 import { getAccountWallet } from "@/app/apis/index-api";
-
+import { getAllCategory } from "@/app/apis/categories-api";
+import { updateRecordProduct } from "@/app/apis/products-api";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -52,9 +53,9 @@ export default function ListProductEdit(props: IProps) {
   );
   const { dataProducts } = props;
 
-  const fetcher = async () => await useGetAllCategoryInfo();
+  const fetcher = async () => await getAllCategory();
   const { data } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/useGetAllCategoryInfo`,
+    `${process.env.NEXT_PUBLIC_API_URL}/categories`,
     fetcher
   );
 
@@ -67,13 +68,13 @@ export default function ListProductEdit(props: IProps) {
       price: Number(item.Price),
       specifications: item.Specifications,
       categoryId: item.CategoryId,
-      categoryName:
-        data && data.length > 0
-          ? data.find(
-              (category) =>
-                Number(category.CategoryId) === Number(item.CategoryId)
-            )?.CategoryName || null
-          : null,
+      categoryName: item.CategoryName,
+      // data && data.length > 0
+      //   ? data.find(
+      //       (category) =>
+      //         Number(category.CategoryId) === Number(item.CategoryId)
+      //     )?.CategoryName || null
+      //   : null,
       images: item.Images,
       isNew: false,
       active: null,
@@ -81,7 +82,7 @@ export default function ListProductEdit(props: IProps) {
     setRows(dataRows);
   }, [dataProducts, data]);
 
-  const EditToolbar =  (props: EditToolbarProps) => {
+  const EditToolbar = (props: EditToolbarProps) => {
     const { setRows, setRowModesModel } = props;
 
     const handleClickAddRow = () => {
@@ -114,25 +115,16 @@ export default function ListProductEdit(props: IProps) {
     };
 
     const handleClickRefresh = async () => {
-      await mutate(
-        `${process.env.NEXT_PUBLIC_API_URL}/useGetAllProductInfo`,
-        false
-      );
-      await mutate(
-        `${process.env.NEXT_PUBLIC_API_URL}/useGetAllCategoryInfo`,
-        false
-      );
+      await mutate(`${process.env.NEXT_PUBLIC_API_URL}/products`, false);
+      await mutate(`${process.env.NEXT_PUBLIC_API_URL}/categories`, false);
       setTempRows([]);
     };
 
     const handleClickSave = async () => {
-      // Handle save transaction in Blockchain
       try {
-        const walletAddress = await getAccountWallet();
         // Handle get Wallet Address
-        console.table(tempRows)
-        if(!tempRows && !walletAddress) return;
-        await useRecordProduct(walletAddress,tempRows);
+        console.table(tempRows);
+        await updateRecordProduct(tempRows);
       } catch (error) {
         throw new Error(`HandleClickSave failed - ${error}`);
       }

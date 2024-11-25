@@ -11,25 +11,21 @@ import {
 export class Users {
   @PrimaryGeneratedColumn()
   UserId: number;
-  @Column()
+  @Column({ default: null })
   NameCompany: string;
   @Column()
   Email: string;
   @Column()
   Password: string;
-  @Column()
+  @Column({ default: null })
   TaxCode: string;
-  @Column()
-  PublicKey: string;
-  @Column()
-  PrivateKey: string;
-  @Column({ nullable: true })
+  @Column({ default: null })
   Certificates: string;
-  @Column()
+  @Column({ default: null })
   PhoneNumber: string;
   @Column({ default: false })
   IsActive: boolean;
-  @Column({ default: 'USER' })
+  @Column({ default: null })
   Role: string;
   @CreateDateColumn()
   CreateAt: string;

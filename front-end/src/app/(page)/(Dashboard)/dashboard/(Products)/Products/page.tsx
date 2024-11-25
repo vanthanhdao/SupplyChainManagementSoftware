@@ -6,12 +6,11 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 import { getAllProduct } from "@/app/apis/products-api";
 import ListProductEdit from "../../../components/ListProductEdit";
-import { useGetAllProductInfo } from "@/app/hook/useEthereum";
 
 const Products = () => {
-  const fetcher = async () => await useGetAllProductInfo();
+  const fetcher = async () => await getAllProduct();
   const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/useGetAllProductInfo`,
+    `${process.env.NEXT_PUBLIC_API_URL}/products`,
     fetcher,
     {
       revalidateIfStale: false,

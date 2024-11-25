@@ -104,7 +104,7 @@ export class ProductsService {
   async findAll(query: any) {
     const { page, limit } = query;
     const resultProcedure = await this.productsRepository.query(
-      'EXEC pro_ViewAllProducts',
+      'EXEC pro_GetAllProductsHaveCategory',
     );
     if (page && limit) {
       // const [result, total] = await this.productsRepository.findAndCount({

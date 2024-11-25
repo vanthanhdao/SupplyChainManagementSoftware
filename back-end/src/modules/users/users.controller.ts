@@ -25,21 +25,20 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-
   @Get()
   findAll(@Query() query: string) {
     return this.usersService.findAll(query);
   }
 
-  @Post('getByBlock')
-  getUserByBlock(@Body() data: any) {
-    return this.usersService.getUserByBlock(data);
-  }
+  // @Post('getByBlock')
+  // getUserByBlock(@Body() data: any) {
+  //   return this.usersService.getUserByBlock(data);
+  // }
 
-  @Get('profileWallet')
-  findOne(@Request() req) {
-    return this.usersService.findOneWallet(req.user);
-  }
+  // @Get('profileWallet')
+  // findOne(@Request() req) {
+  //   return this.usersService.findOneWallet(req.user);
+  // }
 
   @Get('profile')
   findOneProfile(@Request() req) {
@@ -47,8 +46,8 @@ export class UsersController {
   }
 
   @Patch('update')
-  update(@Request() req,@Body('isActive') isActive: boolean) {
-    return this.usersService.update(req.user,isActive);
+  update(@Request() req, @Body('isActive') isActive: boolean) {
+    return this.usersService.update(req.user, isActive);
   }
 
   @Public()

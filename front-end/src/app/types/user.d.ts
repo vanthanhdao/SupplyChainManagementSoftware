@@ -1,10 +1,6 @@
 interface IUser {
   email: string;
   password: string;
-  phoneNumber: string;
-  fullName: string;
-  taxCode: string;
-  walletAddress: IUserWallet;
 }
 
 interface IUserWallet {

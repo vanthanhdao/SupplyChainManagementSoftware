@@ -42,32 +42,32 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  async getUserByBlock(data: any): Promise<Users[]> {
-    const result = await Promise.all(
-      data.map(async (item) => {
-        return await this.usersRepository.findOneBy({
-          PublicKey: item.address,
-        });
-      }),
-    );
-    return result;
-  }
+  // async getUserByBlock(data: any): Promise<Users[]> {
+  //   const result = await Promise.all(
+  //     data.map(async (item) => {
+  //       return await this.usersRepository.findOneBy({
+  //         PublicKey: item.address,
+  //       });
+  //     }),
+  //   );
+  //   return result;
+  // }
 
-  // Find wallet users by id
-  async findOneWallet(payload: IUserAccessToken): Promise<IUserWalletAddress> {
-    const user = await this.usersRepository.findOneBy({
-      UserId: payload.userId,
-    });
-    const privateKeyDecrypt = await reHashWalletHelper(
-      user.PrivateKey,
-      this.configService.get<string>('JWT_SECRET'),
-    );
-    const res = {
-      publicKey: user.PublicKey,
-      privateKey: privateKeyDecrypt,
-    };
-    return res;
-  }
+  // // Find wallet users by id
+  // async findOneWallet(payload: IUserAccessToken): Promise<IUserWalletAddress> {
+  //   const user = await this.usersRepository.findOneBy({
+  //     UserId: payload.userId,
+  //   });
+  //   const privateKeyDecrypt = await reHashWalletHelper(
+  //     user.PrivateKey,
+  //     this.configService.get<string>('JWT_SECRET'),
+  //   );
+  //   const res = {
+  //     publicKey: user.PublicKey,
+  //     privateKey: privateKeyDecrypt,
+  //   };
+  //   return res;
+  // }
 
   // Find wallet users by id
   async findOneProfile(payload: IUserAccessToken): Promise<IUserAccessToken> {
@@ -88,7 +88,6 @@ export class UsersService {
     const { email, walletAddress } = deleteUserDto;
     const user = await this.usersRepository.findOneBy({
       Email: email,
-      PublicKey: walletAddress.publicKey,
     });
     if (!user) throw new Error(`User with ${email} is not exists`);
     await this.usersRepository.delete(user.UserId);
@@ -96,28 +95,17 @@ export class UsersService {
 
   // Add a new user to the database
   async create(createUserDto: CreateUserDto): Promise<Users> {
-    const { email, password, walletAddress, fullName, taxCode, phoneNumber } =
-      createUserDto;
-    const role = (email === "admin@gmail.com") ? "ADMIN" : "USER";
-    const isActie = (email === "admin@gmail.com") ? true : false;
+    const { email, password } = createUserDto;
     const checkEmail = (await this.isEmailExits(email)) ? true : false;
-    const secretKey = this.configService.get<string>('JWT_SECRET');
+    const role = email === 'admin@gmail.com' ? 'ADMIN' : 'USER';
+    const isActie = email === 'admin@gmail.com' ? true : false;
     if (!checkEmail) {
       const hashedPassword = await hashPassHelper(password);
-      const hashedWallet = await hashWalletHelper(
-        walletAddress.privateKey,
-        secretKey,
-      );
       const user = this.usersRepository.create({
         Email: email,
         Password: hashedPassword,
-        NameCompany: fullName,
-        PublicKey: walletAddress.publicKey,
-        PrivateKey: hashedWallet,
-        TaxCode: taxCode,
-        PhoneNumber: phoneNumber,
-        Role:role,
-        IsActive:isActie
+        Role: role,
+        IsActive: isActie,
       });
       await this.usersRepository.save(user);
       return user;

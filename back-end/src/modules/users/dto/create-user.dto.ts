@@ -20,28 +20,25 @@ export class CreateUserDto {
   @MinLength(6, { message: 'Password must be at least 6 character' })
   password: string;
 
+  // // @IsNotEmpty({ message: 'Tax Code is required' })
+  // // @IsInt()
+  // // taxCode: number;
+
+  // @IsNotEmpty({ message: 'PublicKey is required' })
+  // publicKey: string;
+
+  // // @IsNotEmpty({ message: 'Certificates is required' })
+  // // certificates: string;
+
+  // @IsNotEmpty({ message: 'Phone Number is required' })
+  // // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
+  // phoneNumber: string;
+
+  // @IsNotEmpty({ message: 'Full Name is required' })
+  // // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
+  // fullName: string;
+
   // @IsNotEmpty({ message: 'Tax Code is required' })
-  // @IsInt()
-  // taxCode: number;
-
-  @IsNotEmpty({ message: 'Wallet Address is required' })
-  walletAddress: {
-    publicKey: string;
-    privateKey: string;
-  };
-
-  // @IsNotEmpty({ message: 'Certificates is required' })
-  // certificates: string;
-
-  @IsNotEmpty({ message: 'Phone Number is required' })
-  // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
-  phoneNumber: string;
-
-  @IsNotEmpty({ message: 'Full Name is required' })
-  // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
-  fullName: string;
-
-  @IsNotEmpty({ message: 'Tax Code is required' })
-  // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
-  taxCode: string;
+  // // @IsPhoneNumber('VN', { message: 'Phone Number is invalid' })
+  // taxCode: string;
 }
