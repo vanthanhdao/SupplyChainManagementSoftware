@@ -5,10 +5,11 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import ChartUserByCountry from "../components/ChartUserByCountry";
-import CustomizedTreeView from "../components/CustomizedTreeView";
 import { getAllProduct } from "@/app/apis/products-api";
 import useSWR from "swr";
 import ListProductSelect from "../components/ListProductSelect";
+import PurchaseOrderForm from "../components/PurchaseOrderForm";
+import InputPurchaseOrder from "../components/InputPurchaseOrder";
 
 const Store = () => {
   const fetcher = async () => await getAllProduct();
@@ -66,14 +67,17 @@ const Store = () => {
         Overview
       </Typography>
       <Grid container spacing={2} columns={12}>
-        <Grid size={{ md: 12, lg: 12 }}>
+        <Grid size={{ sm: 12, md: 8, lg: 8 }}>
           {data ? <ListProductSelect dataProducts={data} /> : null}
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
           <ChartUserByCountry />
         </Grid>
+        <Grid size={{ sm: 12, md: 4, lg: 4 }}>
+          <InputPurchaseOrder />
+        </Grid>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
-          <CustomizedTreeView />
+          <PurchaseOrderForm />
         </Grid>
       </Grid>
     </Box>

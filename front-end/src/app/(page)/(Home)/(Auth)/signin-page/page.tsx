@@ -51,8 +51,8 @@ const SignIn = () => {
         useSetAccessToken("refresh_token", refresh_token),
       ]);
 
-      const publicKey = await useGetWalletAddress();
-      if (!publicKey) throw new Error(`Don't looking for publickey !`);
+      // const publicKey = await useGetWalletAddress();
+      // if (!publicKey) throw new Error(`Don't looking for publickey !`);
 
       // // Connect MetaMask
       // await useConnectMetaMask();
