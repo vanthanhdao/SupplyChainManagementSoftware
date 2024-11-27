@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common';
 import { ShippingMethodsService } from './shipping-methods.service';
 import { CreateShippingMethodDto } from './dto/create-shipping-method.dto';
@@ -23,25 +24,12 @@ export class ShippingMethodsController {
   }
 
   @Get()
-  findAll() {
-    return this.shippingMethodsService.findAll();
+  findAll(@Query() query: string) {
+    return this.shippingMethodsService.findAll(query);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.shippingMethodsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateShippingMethodDto: UpdateShippingMethodDto,
-  ) {
-    return this.shippingMethodsService.update(+id, updateShippingMethodDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.shippingMethodsService.remove(+id);
+  @Post('updateRecords')
+  updateRecord(@Body() data: any) {
+    return this.shippingMethodsService.updateRecord(data);
   }
 }

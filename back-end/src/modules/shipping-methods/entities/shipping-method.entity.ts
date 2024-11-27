@@ -36,8 +36,8 @@ export class ShippingMethod {
   Active: boolean;
 
   @CreateDateColumn()
-  CreatedAt: Date;
+  CreatedAt: string;
 
   @UpdateDateColumn()
-  UpdatedAt: Date;
+  UpdatedAt: string;
 }
