@@ -2,26 +2,28 @@
 import * as React from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import ChartUserByCountry from "../components/ChartUserByCountry";
 import { getAllProduct } from "@/app/apis/products-api";
 import useSWR from "swr";
 import ListProductSelect from "../components/ListProductSelect";
 import PurchaseOrderForm from "../components/PurchaseOrderForm";
 import InputPurchaseOrder from "../components/InputPurchaseOrder";
+import { getAllShipping } from "@/app/apis/shipping-api";
+import TechnicalSpecification from "../components/TechnicalSpecification";
 
 const Store = () => {
-  const fetcher = async () => await getAllProduct();
+  const fetcher = async () => {
+    const [products, shippings] = await Promise.all([
+      getAllProduct(),
+      getAllShipping(),
+    ]);
+    return { products, shippings };
+  };
   const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/products`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
+    `${process.env.NEXT_PUBLIC_API_URL}/products-shippings`,
+    fetcher
   );
+
   if (error) return <div>Failed to load</div>;
   if (isLoading) return <div>Loading...</div>;
 
@@ -68,13 +70,13 @@ const Store = () => {
       </Typography>
       <Grid container spacing={2} columns={12}>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
-          {data ? <ListProductSelect dataProducts={data} /> : null}
+          {data ? <ListProductSelect dataProducts={data.products} /> : null}
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
-          <ChartUserByCountry />
+          <TechnicalSpecification />
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
-          <InputPurchaseOrder />
+          {data ? <InputPurchaseOrder dataShippings={data.shippings} /> : null}
         </Grid>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
           <PurchaseOrderForm />

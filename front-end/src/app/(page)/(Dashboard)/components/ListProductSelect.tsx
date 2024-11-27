@@ -69,7 +69,7 @@ export default function ListProductSelect(props: IProps) {
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const { dataProducts } = props;
   const { setTechProductState } = useTechProductStore();
-  const { setSelectedRowState } = useDetailOrderStore();
+  const { setSelectedRowState, setSubTotalRows } = useDetailOrderStore();
 
   React.useEffect(() => {
     const dataRows: GridRowsProp = dataProducts.map((item, index) => ({
@@ -134,10 +134,14 @@ export default function ListProductSelect(props: IProps) {
       money: item.price,
     }));
     setSelectedRowState(newSelectesRow);
+    setSubTotalRows(newSelectesRow);
   };
 
   return (
-    <Card variant="outlined" sx={{ width: "100%" }}>
+    <Card
+      variant="outlined"
+      sx={{ width: "100%", maxHeight: 500, overflow: "auto" }}
+    >
       <DataGrid
         rows={rows}
         columns={columns}

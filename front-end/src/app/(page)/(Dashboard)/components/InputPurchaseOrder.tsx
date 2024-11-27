@@ -9,13 +9,19 @@ import {
   FormControl,
   FormLabel,
   Grid,
+  MenuItem,
   OutlinedInput,
   TextField,
 } from "@mui/material";
 import useInputPOStore from "@/app/zustands/useInputPOStore";
 
-export default function InputPurchaseOrder() {
-  const { setInputPO } = useInputPOStore();
+interface IProps {
+  dataShippings: IDataShipping[];
+}
+
+export default function InputPurchaseOrder(props: IProps) {
+  const { setInputPO, setShippingCost } = useInputPOStore();
+  const { dataShippings } = props;
 
   return (
     <Card
@@ -92,13 +98,30 @@ export default function InputPurchaseOrder() {
               <TextField
                 id="shippingVia"
                 name="shippingVia"
-                type="text"
-                placeholder="Shipping Via"
-                autoComplete="shipping-via"
-                size="small"
-                fullWidth
-                onChange={(e) => setInputPO({ shippingVia: e.target.value })}
-              />
+                select
+                onChange={(e) => {
+                  const selectedKey = e.target.value;
+
+                  const findShippingCost = dataShippings.find(
+                    (item) => item.ShippingMethodID === Number(selectedKey)
+                  );
+                  if (findShippingCost) {
+                    setInputPO({
+                      shippingVia: findShippingCost.ShippingMethodName,
+                    });
+                    setShippingCost(findShippingCost.ShippingCost);
+                  }
+                }}
+              >
+                {dataShippings.map((option) => (
+                  <MenuItem
+                    key={option.ShippingMethodID}
+                    value={option.ShippingMethodID}
+                  >
+                    {option.ShippingMethodName}
+                  </MenuItem>
+                ))}
+              </TextField>
             </FormControl>
           </Grid>
 

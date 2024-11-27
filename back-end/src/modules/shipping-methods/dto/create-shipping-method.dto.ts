@@ -35,7 +35,6 @@ export class CreateShippingMethodDto {
   @IsNotEmpty({ message: 'PaymentMethod is required' })
   paymentMethod: string;
 
-  @IsBoolean({ message: 'Active must be a boolean value' })
-  @IsOptional()
-  active: boolean;
+  @IsNotEmpty({ message: 'Active is required' })
+  active: string;
 }

@@ -14,7 +14,7 @@ export class ShippingMethod {
   @Column()
   ShippingMethodName: string;
 
-  @Column()
+  @Column({ type: 'nvarchar', length: 4000 })
   Description: string;
 
   @Column('decimal', { precision: 10, scale: 2 })
@@ -32,8 +32,8 @@ export class ShippingMethod {
   @Column()
   PaymentMethod: string;
 
-  @Column({ default: true })
-  Active: boolean;
+  @Column({ default: 'True' })
+  Active: string;
 
   @CreateDateColumn()
   CreatedAt: string;

@@ -255,14 +255,15 @@ const columns: GridColDef[] = [
 ];
 
 const Invoice = () => {
-  const { selectedRows, setSelectedRowState } = useDetailOrderStore();
+  const { selectedRows, subTotalRows, setSelectedRowState } =
+    useDetailOrderStore();
+  const { inputs, selectShippingCost } = useInputPOStore();
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({
     contentRef,
   });
   const date = new Date();
-  const { inputs } = useInputPOStore();
 
   React.useEffect(() => {
     if (selectedRows) {
@@ -377,22 +378,34 @@ const Invoice = () => {
           <Grid item xs={6}>
             <Typography align="right">
               Subtotal: $
-              {rows
-                .reduce((acc, row) => acc + row.money, 0)
-                .toLocaleString("en-US", {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
+              {subTotalRows.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </Typography>
             {/* <Typography align="right">Discount (%): -</Typography> */}
             {/* <Typography align="right">
               Subtotal Less Discount: $435.00
             </Typography> */}
-            <Typography align="right">Shipping and Handling: $15.00</Typography>
+            <Typography align="right">
+              Shipping and Handling: $
+              {selectShippingCost.toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
+            </Typography>
             <Typography align="right">Tax Rate: 8.60%</Typography>
             {/* <Typography align="right">Sales Tax: $37.41</Typography> */}
             <Typography align="right" sx={{ fontWeight: "bold" }}>
-              Total: $487.41
+              Total: $
+              {(
+                subTotalRows +
+                selectShippingCost +
+                (subTotalRows + selectShippingCost) * (86 / 100)
+              ).toLocaleString("en-US", {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2,
+              })}
             </Typography>
           </Grid>
         </Grid>

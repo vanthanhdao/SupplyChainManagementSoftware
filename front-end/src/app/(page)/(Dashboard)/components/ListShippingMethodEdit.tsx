@@ -28,6 +28,7 @@ import useSWR, { mutate } from "swr";
 import { v4 as uuidv4 } from "uuid";
 import { getAllCategory } from "@/app/apis/categories-api";
 import { updateRecordProduct } from "@/app/apis/products-api";
+import { updateRecordShipping } from "@/app/apis/shipping-api";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -37,45 +38,40 @@ interface EditToolbarProps {
 }
 
 interface IProps {
-  dataProducts: IDataProduct[];
+  dataShippings: IDataShipping[];
 }
 
-export default function ListProductEdit(props: IProps) {
+export default function ListShippingMethodEdit(props: IProps) {
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const [tempRows, setTempRows] = React.useState<GridRowsProp>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
-  const { dataProducts } = props;
+  const { dataShippings } = props;
 
-  const fetcher = async () => await getAllCategory();
-  const { data } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/categories`,
-    fetcher
-  );
+  //   const fetcher = async () => await getAllCategory();
+  //   const { data } = useSWR(
+  //     `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+  //     fetcher
+  //   );
 
   React.useEffect(() => {
-    const dataRows: GridRowsProp = dataProducts.map((item, index) => ({
+    const dataRows: GridRowsProp = dataShippings.map((item, index) => ({
       id: index + 1,
-      productId: item.ProductId,
-      productName: item.ProductName,
+      shippingMethodID: item.ShippingMethodID,
+      shippingMethodName: item.ShippingMethodName,
       description: item.Description,
-      price: Number(item.Price),
-      specifications: item.Specifications,
-      categoryId: item.CategoryId,
-      categoryName: item.CategoryName,
-      // data && data.length > 0
-      //   ? data.find(
-      //       (category) =>
-      //         Number(category.CategoryId) === Number(item.CategoryId)
-      //     )?.CategoryName || null
-      //   : null,
-      images: item.Images,
+      shippingCost: item.ShippingCost,
+      deliveryTimeEstimate: item.DeliveryTimeEstimate,
+      maxWeight: item.MaxWeight,
+      applicableRegion: item.ApplicableRegion,
+      paymentMethod: item.PaymentMethod,
+      active: item.Active,
       isNew: false,
-      active: null,
+      activeRow: null,
     }));
     setRows(dataRows);
-  }, [dataProducts, data]);
+  }, [dataShippings]);
 
   const EditToolbar = (props: EditToolbarProps) => {
     const { setRows, setRowModesModel } = props;
@@ -87,22 +83,23 @@ export default function ListProductEdit(props: IProps) {
           ...oldRows,
           {
             id: newId,
-            productId: uuidv4(),
-            productName: "",
+            shippingMethodID: uuidv4(),
+            shippingMethodName: "",
             description: "",
-            price: "",
-            specifications: "",
-            categoryId: "",
-            categoryName: "",
-            images: "",
+            shippingCost: "",
+            deliveryTimeEstimate: "",
+            maxWeight: "",
+            applicableRegion: "",
+            paymentMethod: "",
+            active: "True",
             isNew: true,
-            active: null,
+            activeRow: null,
           },
         ];
 
         setRowModesModel((oldModel) => ({
           ...oldModel,
-          [newId]: { mode: GridRowModes.Edit, fieldToFocus: "productName" },
+          [newId]: { mode: GridRowModes.Edit, fieldToFocus: "shippingName" },
         }));
 
         return updatedRows;
@@ -110,15 +107,17 @@ export default function ListProductEdit(props: IProps) {
     };
 
     const handleClickRefresh = async () => {
-      await mutate(`${process.env.NEXT_PUBLIC_API_URL}/products`, false);
-      await mutate(`${process.env.NEXT_PUBLIC_API_URL}/categories`, false);
+      await mutate(
+        `${process.env.NEXT_PUBLIC_API_URL}/shipping-methods`,
+        false
+      );
       setTempRows([]);
     };
 
     const handleClickSave = async () => {
       try {
-        // Handle updateRecordProduct
-        await updateRecordProduct(tempRows);
+        // Handle updateRecordShipping
+        await updateRecordShipping(tempRows);
       } catch (error) {
         throw new Error(`HandleClickSave failed - ${error}`);
       }
@@ -197,11 +196,11 @@ export default function ListProductEdit(props: IProps) {
       setTempRows(findRowDiverseId);
     } else {
       const newTempRows = tempRows.filter(
-        (row) => row.productId !== findRowById?.productId
+        (row) => row.shippingMethodID !== findRowById?.shippingMethodID
       );
       const rowDelete = {
         ...findRowById,
-        active: "delete",
+        activeRow: "delete",
       };
       setTempRows(() => [...newTempRows, rowDelete]);
     }
@@ -228,18 +227,16 @@ export default function ListProductEdit(props: IProps) {
   };
 
   const processRowUpdate = (newRow: GridRowModel) => {
-    const findCategoryId = data?.find(
-      (item) => item.CategoryName === newRow.categoryName
-    );
     const updatedRow = {
       ...newRow,
-      categoryId: findCategoryId?.CategoryId,
     };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
-    const findRow = tempRows.find((row) => row.productId === newRow.productId);
+    const findRow = tempRows.find(
+      (row) => row.shippingMethodID === newRow.shippingMethodID
+    );
     if (tempRows.length > 0 && findRow) {
       const newTempRows = tempRows.filter(
-        (row) => row.productId !== newRow.productId
+        (row) => row.shippingMethodID !== newRow.shippingMethodID
       );
       newTempRows.push(updatedRow);
       setTempRows(newTempRows);
@@ -262,8 +259,8 @@ export default function ListProductEdit(props: IProps) {
       headerAlign: "left",
     },
     {
-      field: "productName",
-      headerName: "Product Name",
+      field: "shippingMethodName",
+      headerName: "Shipping Name",
       type: "string",
       width: 180,
       editable: true,
@@ -276,37 +273,51 @@ export default function ListProductEdit(props: IProps) {
       editable: true,
     },
     {
-      field: "price",
-      headerName: "Price",
+      field: "shippingCost",
+      headerName: "Shipping Cost",
       type: "number",
-      width: 100,
+      width: 180,
       align: "left",
       headerAlign: "left",
       editable: true,
     },
     {
-      field: "images",
-      headerName: "Images",
-      width: 100,
+      field: "deliveryTimeEstimate",
+      headerName: "Delivery Time Estimate",
+      width: 180,
       editable: true,
       type: "custom",
     },
     {
-      field: "specifications",
-      headerName: "Specifications",
+      field: "maxWeight",
+      headerName: "Max Weight",
+      width: 180,
+      editable: true,
+      type: "string",
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "applicableRegion",
+      headerName: "Applicable Region",
       width: 180,
       editable: true,
       type: "string",
     },
     {
-      field: "categoryName",
-      headerName: "Category Name",
+      field: "paymentMethod",
+      headerName: "Payment Method",
       width: 180,
       editable: true,
+      type: "string",
+    },
+    {
+      field: "active",
+      headerName: "Active Status",
+      width: 100,
+      editable: true,
       type: "singleSelect",
-      valueOptions: Array.isArray(data)
-        ? data.map((item) => item.CategoryName || "Unknown")
-        : [],
+      valueOptions: ["True", "False"],
     },
     {
       field: "actions",

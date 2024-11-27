@@ -13,7 +13,7 @@ export class Categories {
   CategoryId: number;
   @Column()
   CategoryName: string;
-  @Column()
+  @Column({ type: 'nvarchar', length: 4000 })
   Description: string;
   @CreateDateColumn()
   CreateAt: string;

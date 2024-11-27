@@ -3,7 +3,9 @@ import { create } from "zustand";
 // Define the store type
 interface InputPurchaseOrderState {
   inputs: IInputPurchaseOrder;
+  selectShippingCost: number;
   setInputPO: (newInputs: Partial<IInputPurchaseOrder>) => void;
+  setShippingCost: (newShippingCost: number) => void;
 }
 
 const date = new Date();
@@ -22,10 +24,14 @@ const initialState: IInputPurchaseOrder = {
 // Create the store
 const useInputPOStore = create<InputPurchaseOrderState>((set, get) => ({
   inputs: initialState,
+  selectShippingCost: 0,
   setInputPO: (newInputs) => {
     set({
       inputs: { ...get().inputs, ...newInputs },
     });
+  },
+  setShippingCost: (newShippingCost) => {
+    set({ selectShippingCost: newShippingCost });
   },
 }));
 

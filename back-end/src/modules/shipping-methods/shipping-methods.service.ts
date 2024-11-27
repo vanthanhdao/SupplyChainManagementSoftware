@@ -107,13 +107,13 @@ export class ShippingMethodsService {
 
   updateRecord(data: any) {
     const createshipping = data.filter(
-      (item) => item.isNew && item.active === null,
+      (item) => item.isNew && item.activeRow === null,
     );
     const updateshipping = data.filter(
-      (item) => !item.isNew && item.active === null,
+      (item) => !item.isNew && item.activeRow === null,
     );
     const deleteshipping = data.filter(
-      (item) => !item.isNew && item.active === 'delete',
+      (item) => !item.isNew && item.activeRow === 'delete',
     );
     if (createshipping && createshipping.length > 0)
       this.createListShippingMethod(createshipping);
