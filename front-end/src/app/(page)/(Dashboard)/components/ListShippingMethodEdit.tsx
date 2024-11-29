@@ -235,10 +235,22 @@ export default function ListShippingMethodEdit(props: IProps) {
       (row) => row.shippingMethodID === newRow.shippingMethodID
     );
     if (tempRows.length > 0 && findRow) {
-      const newTempRows = tempRows.filter(
-        (row) => row.shippingMethodID !== newRow.shippingMethodID
-      );
-      newTempRows.push(updatedRow);
+      const newTempRows = tempRows.map((row) => {
+        if (row.shippingMethodID === newRow.shippingMethodID) {
+          return {
+            ...row,
+            shippingMethodName: newRow.shippingMethodName,
+            description: newRow.description,
+            shippingCost: newRow.shippingCost,
+            deliveryTimeEstimate: newRow.deliveryTimeEstimate,
+            maxWeight: newRow.maxWeight,
+            applicableRegion: newRow.applicableRegion,
+            paymentMethod: newRow.paymentMethod,
+            active: newRow.active,
+          };
+        }
+        return row;
+      });
       setTempRows(newTempRows);
     } else setTempRows((oldArray) => [...oldArray, updatedRow]);
 

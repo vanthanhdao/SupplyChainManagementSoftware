@@ -138,20 +138,15 @@ export default function ListProductSelect(props: IProps) {
   };
 
   return (
-    <Card
-      variant="outlined"
-      sx={{ width: "100%", maxHeight: 500, overflow: "auto" }}
-    >
-      <DataGrid
-        rows={rows}
-        columns={columns}
-        checkboxSelection={checkboxSelection}
-        slots={{
-          toolbar: CustomToolbar,
-        }}
-        onRowClick={handleRowClick}
-        onRowSelectionModelChange={handleSelectionChange}
-      />
-    </Card>
+    <DataGrid
+      rows={rows}
+      columns={columns}
+      checkboxSelection={checkboxSelection}
+      slots={{
+        toolbar: CustomToolbar,
+      }}
+      onRowClick={handleRowClick}
+      onRowSelectionModelChange={handleSelectionChange}
+    />
   );
 }

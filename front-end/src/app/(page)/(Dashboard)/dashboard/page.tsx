@@ -10,6 +10,7 @@ import PurchaseOrderForm from "../components/PurchaseOrderForm";
 import InputPurchaseOrder from "../components/InputPurchaseOrder";
 import { getAllShipping } from "@/app/apis/shipping-api";
 import TechnicalSpecification from "../components/TechnicalSpecification";
+import { Card } from "@mui/material";
 
 const Store = () => {
   const fetcher = async () => {
@@ -70,13 +71,44 @@ const Store = () => {
       </Typography>
       <Grid container spacing={2} columns={12}>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
-          {data ? <ListProductSelect dataProducts={data.products} /> : null}
+          <Card
+            variant="outlined"
+            sx={{ width: "100%", height: 500, overflow: "auto" }}
+          >
+            {data ? <ListProductSelect dataProducts={data.products} /> : null}
+          </Card>
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
-          <TechnicalSpecification />
+          <Card
+            variant="outlined"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              flexGrow: 1,
+              height: 500,
+              overflow: "auto",
+            }}
+          >
+            <TechnicalSpecification />
+          </Card>
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
-          {data ? <InputPurchaseOrder dataShippings={data.shippings} /> : null}
+          <Card
+            variant="outlined"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              flexGrow: 1,
+              height: 1000,
+              overflow: "auto",
+            }}
+          >
+            {data ? (
+              <InputPurchaseOrder dataShippings={data.shippings} />
+            ) : null}
+          </Card>
         </Grid>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
           <PurchaseOrderForm />

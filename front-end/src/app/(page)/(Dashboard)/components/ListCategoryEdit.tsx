@@ -101,6 +101,7 @@ export default function ListCategoryEdit(props: IProps) {
       // Handle save transaction in Blockchain
       try {
         // Handle create new category
+        console.table(tempRows);
         await updateRecordCategory(tempRows);
       } catch (error) {
         throw new Error(`HandleClickSave failed - ${error}`);
@@ -219,10 +220,16 @@ export default function ListCategoryEdit(props: IProps) {
       (row) => row.categoryId === newRow.categoryId
     );
     if (tempRows.length > 0 && findRow) {
-      const newTempRows = tempRows.filter(
-        (row) => row.categoryId !== newRow.categoryId
-      );
-      newTempRows.push(updatedRow);
+      const newTempRows = tempRows.map((row) => {
+        if (row.categoryId === newRow.categoryId) {
+          return {
+            ...row,
+            categoryName: newRow.categoryName,
+            description: newRow.description,
+          };
+        }
+        return row;
+      });
       setTempRows(newTempRows);
     } else setTempRows((oldArray) => [...oldArray, updatedRow]);
 

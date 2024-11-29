@@ -309,8 +309,25 @@ const Invoice = () => {
   return (
     <Card
       variant="outlined"
-      sx={{ display: "flex", flexDirection: "column", gap: "8px", flexGrow: 1 }}
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "8px",
+        flexGrow: 1,
+        height: 1000,
+        overflow: "auto",
+      }}
     >
+      {/* Submit Button */}
+      <Box sx={{ textAlign: "right", marginTop: 4 }}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => reactToPrintFn()}
+        >
+          Print
+        </Button>
+      </Box>
       <Box sx={{ padding: 4 }} ref={contentRef}>
         {/* Header Section */}
         <Grid container spacing={2}>
@@ -409,16 +426,6 @@ const Invoice = () => {
             </Typography>
           </Grid>
         </Grid>
-      </Box>
-      {/* Submit Button */}
-      <Box sx={{ textAlign: "center", marginTop: 4 }}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => reactToPrintFn()}
-        >
-          Print
-        </Button>
       </Box>
     </Card>
   );
