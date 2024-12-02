@@ -8,6 +8,8 @@ import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
 import { ShippingMethodsModule } from './modules/shipping-methods/shipping-methods.module';
+import { FirebaseStorageModule } from './modules/firebase-storage/firebase-storage.module';
+import { initializeFirebase } from './firebase.config';
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { ShippingMethodsModule } from './modules/shipping-methods/shipping-metho
     ShippingMethodsModule,
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
+    FirebaseStorageModule,
   ],
   providers: [
     {
@@ -43,4 +46,8 @@ import { ShippingMethodsModule } from './modules/shipping-methods/shipping-metho
     },
   ],
 })
-export class AppModule {}
+export class AppModule {
+  constructor() {
+    initializeFirebase();
+  }
+}
