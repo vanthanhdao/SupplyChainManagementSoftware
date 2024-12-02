@@ -31,6 +31,8 @@ import { getAllCategory } from "@/app/apis/categories-api";
 import { updateRecordProduct } from "@/app/apis/products-api";
 import ExpandableCell from "./ExpandableCell";
 import ExpandableCellImages from "./ExpandableCellImages";
+import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
+import { uploadImages } from "@/app/apis/uploads-api";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -46,10 +48,12 @@ interface IProps {
 export default function ListProductEdit(props: IProps) {
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const [tempRows, setTempRows] = React.useState<GridRowsProp>([]);
+  const [newTempRow, setNewTempRow] = React.useState<any>();
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
   const { dataProducts } = props;
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const fetcher = async () => await getAllCategory();
   const { data } = useSWR(
@@ -115,7 +119,7 @@ export default function ListProductEdit(props: IProps) {
     const handleClickSave = async () => {
       try {
         // Handle updateRecordProduct
-        console.table(tempRows);
+        console.log(tempRows);
         await updateRecordProduct(tempRows);
       } catch (error) {
         throw new Error(`HandleClickSave failed - ${error}`);
@@ -179,7 +183,8 @@ export default function ListProductEdit(props: IProps) {
     }
   };
 
-  const handleEditClick = (id: GridRowId) => () => {
+  const handleEditClick = (id: GridRowId, row: GridRowModel) => () => {
+    console.table(row);
     setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
@@ -226,13 +231,13 @@ export default function ListProductEdit(props: IProps) {
   };
 
   const processRowUpdate = (newRow: GridRowModel) => {
-    const findCategoryNameById = data?.find(
-      (item) => item.CategoryId === newRow.categoryName
+    const findCategoryIdByName = data?.find(
+      (item) => item.CategoryName === newRow.categoryName
     );
     const updatedRow = {
       ...newRow,
-      categoryId: newRow.categoryName,
-      categoryName: findCategoryNameById?.CategoryName,
+      categoryId: findCategoryIdByName?.CategoryId,
+      categoryName: newRow.categoryName,
     };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     const findRow = tempRows.find((row) => row.productId === newRow.productId);
@@ -244,17 +249,15 @@ export default function ListProductEdit(props: IProps) {
             productName: newRow.productName,
             description: newRow.description,
             price: newRow.price,
-            images: newRow.images,
             specifications: newRow.specifications,
-            categoryId: newRow.categoryName,
-            categoryName: findCategoryNameById?.CategoryName,
+            categoryId: findCategoryIdByName?.CategoryId,
+            categoryName: newRow.categoryName,
           };
         }
         return row;
       });
       setTempRows(newTempRows);
     } else setTempRows((oldArray) => [...oldArray, updatedRow]);
-
     return updatedRow;
   };
 
@@ -335,7 +338,7 @@ export default function ListProductEdit(props: IProps) {
       headerName: "Images",
       align: "center",
       width: 300,
-      editable: true,
+
       type: "custom",
       renderCell: (params: GridRenderCellParams) => (
         <ExpandableCellImages {...params} />
@@ -366,22 +369,16 @@ export default function ListProductEdit(props: IProps) {
         </Box>
       ),
       valueOptions: Array.isArray(data)
-        ? data.map((item) => ({
-            value: item.CategoryId,
-            label: item.CategoryName,
-            id: item.CategoryId,
-          }))
+        ? data.map((item) => item.CategoryName)
         : [],
-      getOptionValue: (option: any) => option.id,
-      getOptionLabel: (option: any) => option.label,
     },
     {
       field: "actions",
       type: "actions",
       headerName: "Actions",
-      width: 100,
+      width: 200,
       cellClassName: "actions",
-      getActions: ({ id }) => {
+      getActions: ({ id, row }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
 
         if (isInEditMode) {
@@ -409,7 +406,7 @@ export default function ListProductEdit(props: IProps) {
             icon={<EditIcon />}
             label="Edit"
             className="textPrimary"
-            onClick={handleEditClick(id)}
+            onClick={handleEditClick(id, row)}
             color="inherit"
           />,
           <GridActionsCellItem
@@ -418,10 +415,67 @@ export default function ListProductEdit(props: IProps) {
             onClick={handleDeleteClick(id)}
             color="inherit"
           />,
+          <input
+            type="file"
+            ref={fileInputRef}
+            multiple
+            accept="image/*"
+            style={{ display: "none" }}
+            onChange={(e) => handleFileChange(e)}
+          />,
+          <GridActionsCellItem
+            icon={<AddPhotoAlternateIcon />}
+            label="Delete"
+            onClick={() => handleUploadClick(row)}
+            color="inherit"
+          />,
         ];
       },
     },
   ];
+
+  const handleUploadClick = (row: GridRowsProp) => {
+    // Trigger the hidden file input
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+      setNewTempRow(row);
+    }
+  };
+
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const selectedFiles = event?.target.files;
+    if (selectedFiles) {
+      const formData = new FormData();
+      Array.from(selectedFiles).forEach((file) => {
+        formData.append("files", file);
+      });
+      try {
+        const result = await uploadImages(formData);
+        if (!result) return;
+        const filesData = result.join(",");
+        const newGloTempRow = { ...newTempRow, images: filesData };
+        const findRow = tempRows.find(
+          (row) => row.productId === newTempRow.productId
+        );
+        if (tempRows.length > 0 && findRow) {
+          const newTempRows = tempRows.map((row) => {
+            if (row.productId === findRow.productId) {
+              return {
+                ...row,
+                images: filesData,
+              };
+            }
+            return row;
+          });
+          setTempRows(newTempRows);
+        } else setTempRows((oldArray) => [...oldArray, newGloTempRow]);
+      } catch (error) {
+        console.error("Error uploading files:", error);
+      }
+    }
+  };
 
   return (
     <Card

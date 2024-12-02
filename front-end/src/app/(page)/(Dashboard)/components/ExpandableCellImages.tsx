@@ -18,8 +18,8 @@ const ExpandableCellImages = (value: GridRenderCellParams) => {
           src={images[0]}
           alt="Product"
           style={{
-            width: "100%",
-            height: "auto",
+            width: "80%",
+            height: "80%",
             objectFit: "contain",
           }}
         />

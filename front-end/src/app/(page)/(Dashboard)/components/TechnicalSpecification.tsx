@@ -8,23 +8,16 @@ import { Box, Grid, IconButton, Paper } from "@mui/material";
 import useTechProductStore from "@/app/zustands/useTechProductStore";
 
 export default function TechnicalSpecification() {
-  const { specifications } = useTechProductStore();
-  const images = [
-    "https://firebasestorage.googleapis.com/v0/b/fir-d9bb1.appspot.com/o/Picture1.png?alt=media&token=0d6aa311-0673-4e3c-919b-ed72bbf1fbc5",
-    "https://firebasestorage.googleapis.com/v0/b/fir-d9bb1.appspot.com/o/Picture2.png?alt=media&token=c177a367-ddfb-4edb-94f1-494ebeed6541",
-    "https://firebasestorage.googleapis.com/v0/b/fir-d9bb1.appspot.com/o/Picture3.png?alt=media&token=d7339671-1af2-4e77-97d3-8922b1ef1c30",
-    "https://firebasestorage.googleapis.com/v0/b/fir-d9bb1.appspot.com/o/Picture4.png?alt=media&token=0a255df9-d213-41aa-93d1-2215f40c6da6",
-  ];
+  const { specifications, images } = useTechProductStore();
+
+  const [imagesArray, setImagesArray] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    const convertImages = images ? images.split(",") : [];
+    setImagesArray(convertImages);
+  }, [images]);
 
   const [selectedImage, setSelectedImage] = React.useState(0);
-
-  const handleNext = () => {
-    setSelectedImage((prev) => (prev + 1) % images.length);
-  };
-
-  const handlePrev = () => {
-    setSelectedImage((prev) => (prev - 1 + images.length) % images.length);
-  };
 
   return (
     <Box sx={{ padding: 4 }}>
@@ -39,11 +32,12 @@ export default function TechnicalSpecification() {
           <ArrowBackIosIcon />
         </IconButton> */}
         <img
-          src={images[selectedImage]}
-          alt={`Image ${selectedImage}`}
+          src={imagesArray[selectedImage]}
+          alt={`Image`}
           style={{
             width: "100%",
             maxWidth: "600px",
+            height: "100%",
             borderRadius: "8px",
             objectFit: "cover",
           }}
@@ -58,11 +52,11 @@ export default function TechnicalSpecification() {
 
       {/* Ảnh nhỏ bên dưới */}
       <Grid container spacing={1} justifyContent="center">
-        {images.map((image, index) => (
-          <Grid item key={index} xs={3} sm={2} md={2}>
+        {imagesArray.map((image, index) => (
+          <Grid item key={index} xs={3} sm={3} md={3}>
             <img
               src={image}
-              alt={`Thumbnail ${index}`}
+              alt={`Thumbnail`}
               onClick={() => setSelectedImage(index)}
               style={{
                 width: "100%",
