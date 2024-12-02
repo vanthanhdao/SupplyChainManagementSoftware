@@ -81,7 +81,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 height: { sm: "calc(100vh - 48px)", md: "100vh" },
                 flexGrow: 1,
                 backgroundImage:
-                  "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(0, 0%, 100%))",
+                  "radial-gradient(ellipse at 50% 50%, hsl(210, 100%, 97%), hsl(210, 100%, 97%))",
                 backgroundRepeat: "no-repeat",
                 overflow: "auto",
               })}

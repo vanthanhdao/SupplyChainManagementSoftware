@@ -27,6 +27,7 @@ const mainListItems: MenuItem[] = [
   { text: "Tasks", icon: <AssignmentRoundedIcon />, route: "Tasks" },
   { text: "Products", icon: <AssignmentRoundedIcon />, route: "Products" },
   { text: "Categories", icon: <AssignmentRoundedIcon />, route: "Categories" },
+  { text: "Shippings", icon: <AssignmentRoundedIcon />, route: "Shippings" },
 ];
 
 const userListItems: MenuItem[] = [

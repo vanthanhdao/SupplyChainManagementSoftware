@@ -7,6 +7,7 @@ import { APP_GUARD } from '@nestjs/core';
 import { JwtAuthGuard } from './auth/passport/jwt-auth.guard';
 import { ProductsModule } from './modules/products/products.module';
 import { CategoriesModule } from './modules/categories/categories.module';
+import { ShippingMethodsModule } from './modules/shipping-methods/shipping-methods.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CategoriesModule } from './modules/categories/categories.module';
     UsersModule,
     ProductsModule,
     CategoriesModule,
+    ShippingMethodsModule,
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
   ],

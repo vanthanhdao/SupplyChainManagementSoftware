@@ -31,3 +31,14 @@ interface IUpdateDataProduct {
   isNew: boolean;
   active: string;
 }
+
+interface IInputPurchaseOrder {
+  companyName: string;
+  companyAddress: string;
+  deliveryDate: DateTime;
+  shippingVia: string;
+  terms: string;
+  shipTo: string;
+  seller: string;
+  notes: string;
+}

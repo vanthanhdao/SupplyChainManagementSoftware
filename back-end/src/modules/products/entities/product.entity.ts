@@ -13,13 +13,14 @@ export class Products {
   ProductId: number;
   @Column()
   ProductName: string;
-  @Column()
+
+  @Column({ type: 'nvarchar', length: 4000 })
   Description: string;
   @Column()
   Price: number;
-  @Column()
+  @Column({ type: 'nvarchar', length: 4000 })
   Images: string;
-  @Column()
+  @Column({ type: 'nvarchar', length: 4000 })
   Specifications: string;
   @Column()
   CategoryId: number;

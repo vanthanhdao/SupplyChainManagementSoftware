@@ -22,17 +22,15 @@ import {
   GridSlots,
   GridToolbar,
   GridToolbarQuickFilter,
+  GridRenderCellParams,
 } from "@mui/x-data-grid";
-import { Card, Stack } from "@mui/material";
+import { Card, Link, Stack } from "@mui/material";
 import useSWR, { mutate } from "swr";
 import { v4 as uuidv4 } from "uuid";
-import {
-  useGetAllCategoryInfo,
-  useRecordProduct,
-} from "@/app/hook/useEthereum";
-import { getAccountWallet } from "@/app/apis/index-api";
 import { getAllCategory } from "@/app/apis/categories-api";
 import { updateRecordProduct } from "@/app/apis/products-api";
+import ExpandableCell from "./ExpandableCell";
+import ExpandableCellImages from "./ExpandableCellImages";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -69,12 +67,6 @@ export default function ListProductEdit(props: IProps) {
       specifications: item.Specifications,
       categoryId: item.CategoryId,
       categoryName: item.CategoryName,
-      // data && data.length > 0
-      //   ? data.find(
-      //       (category) =>
-      //         Number(category.CategoryId) === Number(item.CategoryId)
-      //     )?.CategoryName || null
-      //   : null,
       images: item.Images,
       isNew: false,
       active: null,
@@ -122,7 +114,7 @@ export default function ListProductEdit(props: IProps) {
 
     const handleClickSave = async () => {
       try {
-        // Handle get Wallet Address
+        // Handle updateRecordProduct
         console.table(tempRows);
         await updateRecordProduct(tempRows);
       } catch (error) {
@@ -234,20 +226,32 @@ export default function ListProductEdit(props: IProps) {
   };
 
   const processRowUpdate = (newRow: GridRowModel) => {
-    const findCategoryId = data?.find(
-      (item) => item.CategoryName === newRow.categoryName
+    const findCategoryNameById = data?.find(
+      (item) => item.CategoryId === newRow.categoryName
     );
     const updatedRow = {
       ...newRow,
-      categoryId: findCategoryId?.CategoryId,
+      categoryId: newRow.categoryName,
+      categoryName: findCategoryNameById?.CategoryName,
     };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     const findRow = tempRows.find((row) => row.productId === newRow.productId);
     if (tempRows.length > 0 && findRow) {
-      const newTempRows = tempRows.filter(
-        (row) => row.productId !== newRow.productId
-      );
-      newTempRows.push(updatedRow);
+      const newTempRows = tempRows.map((row) => {
+        if (row.productId === newRow.productId) {
+          return {
+            ...row,
+            productName: newRow.productName,
+            description: newRow.description,
+            price: newRow.price,
+            images: newRow.images,
+            specifications: newRow.specifications,
+            categoryId: newRow.categoryName,
+            categoryName: findCategoryNameById?.CategoryName,
+          };
+        }
+        return row;
+      });
       setTempRows(newTempRows);
     } else setTempRows((oldArray) => [...oldArray, updatedRow]);
 
@@ -266,6 +270,15 @@ export default function ListProductEdit(props: IProps) {
       width: 100,
       align: "left",
       headerAlign: "left",
+      renderCell: (params) => (
+        <Box
+          sx={{
+            p: 3,
+          }}
+        >
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: "productName",
@@ -273,6 +286,15 @@ export default function ListProductEdit(props: IProps) {
       type: "string",
       width: 180,
       editable: true,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            p: 3,
+          }}
+        >
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: "description",
@@ -280,6 +302,15 @@ export default function ListProductEdit(props: IProps) {
       type: "string",
       width: 180,
       editable: true,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            p: 3,
+          }}
+        >
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: "price",
@@ -289,20 +320,35 @@ export default function ListProductEdit(props: IProps) {
       align: "left",
       headerAlign: "left",
       editable: true,
+      renderCell: (params) => (
+        <Box
+          sx={{
+            p: 3,
+          }}
+        >
+          {params.value}
+        </Box>
+      ),
     },
     {
       field: "images",
       headerName: "Images",
-      width: 100,
+      align: "center",
+      width: 300,
       editable: true,
       type: "custom",
+      renderCell: (params: GridRenderCellParams) => (
+        <ExpandableCellImages {...params} />
+      ),
     },
     {
       field: "specifications",
       headerName: "Specifications",
-      width: 180,
+      width: 400,
       editable: true,
-      type: "string",
+      renderCell: (params: GridRenderCellParams) => (
+        <ExpandableCell {...params} />
+      ),
     },
     {
       field: "categoryName",
@@ -310,9 +356,24 @@ export default function ListProductEdit(props: IProps) {
       width: 180,
       editable: true,
       type: "singleSelect",
+      renderCell: (params) => (
+        <Box
+          sx={{
+            p: 3,
+          }}
+        >
+          {params.value}
+        </Box>
+      ),
       valueOptions: Array.isArray(data)
-        ? data.map((item) => item.CategoryName || "Unknown")
+        ? data.map((item) => ({
+            value: item.CategoryId,
+            label: item.CategoryName,
+            id: item.CategoryId,
+          }))
         : [],
+      getOptionValue: (option: any) => option.id,
+      getOptionLabel: (option: any) => option.label,
     },
     {
       field: "actions",
@@ -363,7 +424,10 @@ export default function ListProductEdit(props: IProps) {
   ];
 
   return (
-    <Card variant="outlined" sx={{ width: "100%" }}>
+    <Card
+      variant="outlined"
+      sx={{ width: "100%", height: 1000, overflow: "auto" }}
+    >
       <DataGrid
         rows={rows}
         columns={columns}
@@ -377,6 +441,13 @@ export default function ListProductEdit(props: IProps) {
         }}
         slotProps={{
           toolbar: { setRows, setRowModesModel },
+        }}
+        getEstimatedRowHeight={() => 100}
+        getRowHeight={() => "auto"}
+        sx={{
+          "& .MuiDataGrid-cell:hover": {
+            color: "primary.main",
+          },
         }}
       />
     </Card>

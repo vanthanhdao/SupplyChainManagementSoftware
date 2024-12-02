@@ -2,25 +2,29 @@
 import * as React from "react";
 import Grid from "@mui/material/Grid2";
 import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import ChartUserByCountry from "../components/ChartUserByCountry";
-import CustomizedTreeView from "../components/CustomizedTreeView";
 import { getAllProduct } from "@/app/apis/products-api";
 import useSWR from "swr";
 import ListProductSelect from "../components/ListProductSelect";
+import PurchaseOrderForm from "../components/PurchaseOrderForm";
+import InputPurchaseOrder from "../components/InputPurchaseOrder";
+import { getAllShipping } from "@/app/apis/shipping-api";
+import TechnicalSpecification from "../components/TechnicalSpecification";
+import { Card } from "@mui/material";
 
 const Store = () => {
-  const fetcher = async () => await getAllProduct();
+  const fetcher = async () => {
+    const [products, shippings] = await Promise.all([
+      getAllProduct(),
+      getAllShipping(),
+    ]);
+    return { products, shippings };
+  };
   const { data, error, isLoading } = useSWR(
-    `${process.env.NEXT_PUBLIC_API_URL}/products`,
-    fetcher,
-    {
-      revalidateIfStale: false,
-      revalidateOnFocus: false,
-      revalidateOnReconnect: false,
-    }
+    `${process.env.NEXT_PUBLIC_API_URL}/products-shippings`,
+    fetcher
   );
+
   if (error) return <div>Failed to load</div>;
   if (isLoading) return <div>Loading...</div>;
 
@@ -66,14 +70,48 @@ const Store = () => {
         Overview
       </Typography>
       <Grid container spacing={2} columns={12}>
-        <Grid size={{ md: 12, lg: 12 }}>
-          {data ? <ListProductSelect dataProducts={data} /> : null}
+        <Grid size={{ sm: 12, md: 8, lg: 8 }}>
+          <Card
+            variant="outlined"
+            sx={{ width: "100%", height: 500, overflow: "auto" }}
+          >
+            {data ? <ListProductSelect dataProducts={data.products} /> : null}
+          </Card>
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
-          <ChartUserByCountry />
+          <Card
+            variant="outlined"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              flexGrow: 1,
+              height: 500,
+              overflow: "auto",
+            }}
+          >
+            <TechnicalSpecification />
+          </Card>
+        </Grid>
+        <Grid size={{ sm: 12, md: 4, lg: 4 }}>
+          <Card
+            variant="outlined"
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "8px",
+              flexGrow: 1,
+              height: 1000,
+              overflow: "auto",
+            }}
+          >
+            {data ? (
+              <InputPurchaseOrder dataShippings={data.shippings} />
+            ) : null}
+          </Card>
         </Grid>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
-          <CustomizedTreeView />
+          <PurchaseOrderForm />
         </Grid>
       </Grid>
     </Box>

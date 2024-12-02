@@ -25,14 +25,10 @@ import {
 } from "@mui/x-data-grid";
 import { Card, Stack } from "@mui/material";
 import useSWR, { mutate } from "swr";
-import {
-  getAllCategory,
-  updateRecordCategory,
-} from "@/app/apis/categories-api";
 import { v4 as uuidv4 } from "uuid";
+import { getAllCategory } from "@/app/apis/categories-api";
 import { updateRecordProduct } from "@/app/apis/products-api";
-import { useRecordCategory, useStoreUserSession } from "@/app/hook/useEthereum";
-import { getAccountWallet } from "@/app/apis/index-api";
+import { updateRecordShipping } from "@/app/apis/shipping-api";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -42,28 +38,40 @@ interface EditToolbarProps {
 }
 
 interface IProps {
-  dataCategories: IDataCategory[];
+  dataShippings: IDataShipping[];
 }
 
-export default function ListCategoryEdit(props: IProps) {
+export default function ListShippingMethodEdit(props: IProps) {
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const [tempRows, setTempRows] = React.useState<GridRowsProp>([]);
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
     {}
   );
-  const { dataCategories } = props;
+  const { dataShippings } = props;
+
+  //   const fetcher = async () => await getAllCategory();
+  //   const { data } = useSWR(
+  //     `${process.env.NEXT_PUBLIC_API_URL}/categories`,
+  //     fetcher
+  //   );
 
   React.useEffect(() => {
-    const dataRows: GridRowsProp = dataCategories.map((item, index) => ({
+    const dataRows: GridRowsProp = dataShippings.map((item, index) => ({
       id: index + 1,
-      categoryId: item.CategoryId,
-      categoryName: item.CategoryName,
+      shippingMethodID: item.ShippingMethodID,
+      shippingMethodName: item.ShippingMethodName,
       description: item.Description,
+      shippingCost: item.ShippingCost,
+      deliveryTimeEstimate: item.DeliveryTimeEstimate,
+      maxWeight: item.MaxWeight,
+      applicableRegion: item.ApplicableRegion,
+      paymentMethod: item.PaymentMethod,
+      active: item.Active,
       isNew: false,
-      active: null,
+      activeRow: null,
     }));
     setRows(dataRows);
-  }, [dataCategories]);
+  }, [dataShippings]);
 
   const EditToolbar = (props: EditToolbarProps) => {
     const { setRows, setRowModesModel } = props;
@@ -75,17 +83,23 @@ export default function ListCategoryEdit(props: IProps) {
           ...oldRows,
           {
             id: newId,
-            categoryId: uuidv4(),
-            categoryName: "",
+            shippingMethodID: uuidv4(),
+            shippingMethodName: "",
             description: "",
+            shippingCost: "",
+            deliveryTimeEstimate: "",
+            maxWeight: "",
+            applicableRegion: "",
+            paymentMethod: "",
+            active: "True",
             isNew: true,
-            active: null,
+            activeRow: null,
           },
         ];
 
         setRowModesModel((oldModel) => ({
           ...oldModel,
-          [newId]: { mode: GridRowModes.Edit, fieldToFocus: "categoryName" },
+          [newId]: { mode: GridRowModes.Edit, fieldToFocus: "shippingName" },
         }));
 
         return updatedRows;
@@ -93,16 +107,17 @@ export default function ListCategoryEdit(props: IProps) {
     };
 
     const handleClickRefresh = async () => {
-      await mutate(`${process.env.NEXT_PUBLIC_API_URL}/categories`, false);
+      await mutate(
+        `${process.env.NEXT_PUBLIC_API_URL}/shipping-methods`,
+        false
+      );
       setTempRows([]);
     };
 
     const handleClickSave = async () => {
-      // Handle save transaction in Blockchain
       try {
-        // Handle create new category
-        console.table(tempRows);
-        await updateRecordCategory(tempRows);
+        // Handle updateRecordShipping
+        await updateRecordShipping(tempRows);
       } catch (error) {
         throw new Error(`HandleClickSave failed - ${error}`);
       }
@@ -181,11 +196,11 @@ export default function ListCategoryEdit(props: IProps) {
       setTempRows(findRowDiverseId);
     } else {
       const newTempRows = tempRows.filter(
-        (row) => row.categoryId !== findRowById?.categoryId
+        (row) => row.shippingMethodID !== findRowById?.shippingMethodID
       );
       const rowDelete = {
         ...findRowById,
-        active: "delete",
+        activeRow: "delete",
       };
       setTempRows(() => [...newTempRows, rowDelete]);
     }
@@ -217,15 +232,21 @@ export default function ListCategoryEdit(props: IProps) {
     };
     setRows(rows.map((row) => (row.id === newRow.id ? updatedRow : row)));
     const findRow = tempRows.find(
-      (row) => row.categoryId === newRow.categoryId
+      (row) => row.shippingMethodID === newRow.shippingMethodID
     );
     if (tempRows.length > 0 && findRow) {
       const newTempRows = tempRows.map((row) => {
-        if (row.categoryId === newRow.categoryId) {
+        if (row.shippingMethodID === newRow.shippingMethodID) {
           return {
             ...row,
-            categoryName: newRow.categoryName,
+            shippingMethodName: newRow.shippingMethodName,
             description: newRow.description,
+            shippingCost: newRow.shippingCost,
+            deliveryTimeEstimate: newRow.deliveryTimeEstimate,
+            maxWeight: newRow.maxWeight,
+            applicableRegion: newRow.applicableRegion,
+            paymentMethod: newRow.paymentMethod,
+            active: newRow.active,
           };
         }
         return row;
@@ -245,29 +266,76 @@ export default function ListCategoryEdit(props: IProps) {
       field: "id",
       headerName: "NO.",
       type: "number",
-      width: 200,
+      width: 100,
       align: "left",
       headerAlign: "left",
     },
     {
-      field: "categoryName",
-      headerName: "Category Name",
+      field: "shippingMethodName",
+      headerName: "Shipping Name",
       type: "string",
-      width: 280,
+      width: 180,
       editable: true,
     },
     {
       field: "description",
       headerName: "Description",
       type: "string",
-      width: 280,
+      width: 180,
       editable: true,
+    },
+    {
+      field: "shippingCost",
+      headerName: "Shipping Cost",
+      type: "number",
+      width: 180,
+      align: "left",
+      headerAlign: "left",
+      editable: true,
+    },
+    {
+      field: "deliveryTimeEstimate",
+      headerName: "Delivery Time Estimate",
+      width: 180,
+      editable: true,
+      type: "custom",
+    },
+    {
+      field: "maxWeight",
+      headerName: "Max Weight",
+      width: 180,
+      editable: true,
+      type: "string",
+      align: "center",
+      headerAlign: "center",
+    },
+    {
+      field: "applicableRegion",
+      headerName: "Applicable Region",
+      width: 180,
+      editable: true,
+      type: "string",
+    },
+    {
+      field: "paymentMethod",
+      headerName: "Payment Method",
+      width: 180,
+      editable: true,
+      type: "string",
+    },
+    {
+      field: "active",
+      headerName: "Active Status",
+      width: 100,
+      editable: true,
+      type: "singleSelect",
+      valueOptions: ["True", "False"],
     },
     {
       field: "actions",
       type: "actions",
       headerName: "Actions",
-      width: 200,
+      width: 100,
       cellClassName: "actions",
       getActions: ({ id }) => {
         const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
