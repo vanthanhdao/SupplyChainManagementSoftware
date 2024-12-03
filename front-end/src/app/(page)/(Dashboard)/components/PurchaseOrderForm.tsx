@@ -319,7 +319,20 @@ const Invoice = () => {
       }}
     >
       {/* Submit Button */}
-      <Box sx={{ textAlign: "right", marginTop: 4 }}>
+      <Box
+        sx={{
+          textAlign: "right",
+          marginTop: 4,
+        }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => reactToPrintFn()}
+          sx={{ marginRight: 5 }}
+        >
+          Confirm
+        </Button>
         <Button
           variant="contained"
           color="primary"
