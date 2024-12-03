@@ -41,6 +41,7 @@ lerna-debug.log*
 # .env.test.local
 # .env.production.local
 # .env.local
+.fir-d9bb1-firebase-adminsdk-eh6wu-00564f29c4.json
 
 # temp directory
 .temp
