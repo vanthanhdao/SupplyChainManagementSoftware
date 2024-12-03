@@ -10,6 +10,8 @@ import { CategoriesModule } from './modules/categories/categories.module';
 import { ShippingMethodsModule } from './modules/shipping-methods/shipping-methods.module';
 import { FirebaseStorageModule } from './modules/firebase-storage/firebase-storage.module';
 import { initializeFirebase } from './firebase.config';
+import { OrdersModule } from './modules/orders/orders.module';
+import { OrderDetailsModule } from './modules/order-details/order-details.module';
 
 @Module({
   imports: [
@@ -35,6 +37,8 @@ import { initializeFirebase } from './firebase.config';
     ProductsModule,
     CategoriesModule,
     ShippingMethodsModule,
+    OrdersModule,
+    OrderDetailsModule,
     ConfigModule.forRoot({ isGlobal: true }),
     AuthModule,
     FirebaseStorageModule,

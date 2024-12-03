@@ -16,7 +16,7 @@ export class Products {
 
   @Column({ type: 'nvarchar', length: 4000 })
   Description: string;
-  @Column()
+  @Column({ type: 'decimal', precision: 18, scale: 2 })
   Price: number;
   @Column({ type: 'nvarchar', length: 4000 })
   Images: string;
