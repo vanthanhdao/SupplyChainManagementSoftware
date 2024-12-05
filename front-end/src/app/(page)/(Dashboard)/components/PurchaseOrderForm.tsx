@@ -255,8 +255,7 @@ const columns: GridColDef[] = [
 ];
 
 const Invoice = () => {
-  const { selectedRows, subTotalRows, setSelectedRowState } =
-    useDetailOrderStore();
+  const { selectedRows, subTotalRows, setSubTotalRows } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -278,7 +277,7 @@ const Invoice = () => {
       }));
       setRows(dataRows);
     } else setRows([]);
-  }, [selectedRows]);
+  }, [selectedRows, subTotalRows]);
 
   const processRowUpdate = (updatedRow: GridRowModel) => {
     try {
@@ -291,13 +290,14 @@ const Invoice = () => {
               money: row.price * updatedRow.quantity,
             }
           : row
-      );
+      ) as DetailOrder[];
       setRows(updatedRows);
       updatedRow.money = updatedRow.price * updatedRow.quantity;
+      setSubTotalRows(updatedRows);
       return updatedRow;
     } catch (error) {
       console.error("Error updating row: ", error);
-      throw error; // Ném lỗi lại để DataGrid có thể bắt
+      throw error;
     }
   };
 
@@ -346,6 +346,7 @@ const Invoice = () => {
         <Grid container spacing={2}>
           <Grid item xs={6}>
             <Typography variant="h6">{inputs.companyName}</Typography>
+            <Typography>{inputs.companyAddress}</Typography>
           </Grid>
           <Grid item xs={6} textAlign="right">
             <Typography variant="h6">Purchase Order</Typography>
@@ -431,7 +432,7 @@ const Invoice = () => {
               {(
                 subTotalRows +
                 selectShippingCost +
-                (subTotalRows + selectShippingCost) * (86 / 100)
+                (subTotalRows + selectShippingCost) * (8.6 / 100)
               ).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,

@@ -151,7 +151,7 @@ export default function InputPurchaseOrder(props: IProps) {
         </Grid>
 
         {/* Seller */}
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <FormControl fullWidth>
             <FormLabel htmlFor="seller">Seller</FormLabel>
             <TextField
@@ -165,7 +165,7 @@ export default function InputPurchaseOrder(props: IProps) {
               onChange={(e) => setInputPO({ seller: e.target.value })}
             />
           </FormControl>
-        </Grid>
+        </Grid> */}
 
         {/* Note */}
         <Grid item xs={12}>
