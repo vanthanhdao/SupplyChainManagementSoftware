@@ -7,7 +7,7 @@ import {
   IsNotEmpty,
 } from 'class-validator';
 
-export class CreateOrderDTO {
+export class CreateOrderDto {
   @IsString()
   @IsNotEmpty({ message: 'Delivery date is required.' })
   deliveryDate: string;
@@ -18,18 +18,15 @@ export class CreateOrderDTO {
 
   @IsString()
   @IsNotEmpty({ message: 'Shipping address is required.' })
-  @Length(1, 500)
   shippingAddress: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Payment method is required.' })
-  @Length(1, 255)
   paymentMethod: string;
 
-  @IsString()
+  @IsNumber()
   @IsNotEmpty({ message: 'Shipping method is required.' })
-  @Length(1, 500)
-  shippingMethod: string;
+  shippingMethodId: number;
 
   @IsDecimal()
   @IsNotEmpty({ message: 'Total amount is required.' })
@@ -41,11 +38,9 @@ export class CreateOrderDTO {
 
   @IsOptional() // Optional vì có giá trị mặc định
   @IsString()
-  @Length(1, 50)
   status?: string;
 
   @IsString()
   @IsNotEmpty({ message: 'Note is required.' })
-  @Length(1, 4000)
   note: string;
 }

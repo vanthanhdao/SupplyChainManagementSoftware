@@ -1,28 +1,28 @@
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 
 @Entity('tblSCMS_OrderDetails')
-export class OrderDetail {
+export class OrderDetails {
   @PrimaryGeneratedColumn()
-  orderDetailId: number;
+  OrderDetailId: number;
 
   @Column()
-  orderId: number;
+  OrderId: number;
 
   @Column()
-  productId: number;
+  ProductId: number;
 
   @Column()
-  quantity: number;
+  Quantity: number;
 
   @Column()
-  unit: string;
+  Unit: string;
 
   @Column({ type: 'decimal', precision: 18, scale: 2 })
-  unitPrice: number;
+  UnitPrice: number;
 
   @Column({
     generatedType: 'STORED',
     asExpression: 'quantity * unitPrice',
   })
-  subtotal: number;
+  Subtotal: number;
 }

@@ -8,40 +8,40 @@ import {
 } from 'typeorm';
 
 @Entity('tblSCMS_Orders')
-export class Order {
+export class Orders {
   @PrimaryGeneratedColumn()
-  orderId: number;
+  OrderId: number;
 
   @Column()
-  deliveryDate: string;
+  DeliveryDate: string;
 
   @Column()
-  customerId: number;
+  CustomerId: number;
 
   @Column({ type: 'nvarchar', length: 500 })
-  shippingAddress: string;
+  ShippingAddress: string;
 
   @Column({ type: 'nvarchar', length: 255 })
-  paymentMethod: string;
+  PaymentMethod: string;
 
-  @Column({ type: 'nvarchar', length: 500 })
-  shippingMethod: string;
-
-  @Column({ type: 'decimal', precision: 18, scale: 2 })
-  totalAmount: number;
+  @Column()
+  ShippingMethodId: number;
 
   @Column({ type: 'decimal', precision: 18, scale: 2 })
-  taxRate: number;
+  TotalAmount: number;
+
+  @Column({ type: 'decimal', precision: 18, scale: 2 })
+  TaxRate: number;
 
   @Column({ type: 'nvarchar', length: 50, default: 'New' })
-  status: string;
+  Status: string;
 
   @Column({ type: 'nvarchar', length: 4000 })
-  note: string;
+  Note: string;
 
   @CreateDateColumn()
-  createdAt: string;
+  CreatedAt: string;
 
   @UpdateDateColumn()
-  updatedAt: string;
+  UpdatedAt: string;
 }
