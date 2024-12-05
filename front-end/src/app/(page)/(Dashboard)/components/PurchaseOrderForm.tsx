@@ -212,6 +212,7 @@ import {
 import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
 import { useReactToPrint } from "react-to-print";
 import useInputPOStore from "@/app/zustands/useInputPOStore";
+import DialogUploadImages from "./DialogUploadImages";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "NO.", width: 20 },
@@ -325,14 +326,7 @@ const Invoice = () => {
           marginTop: 4,
         }}
       >
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => reactToPrintFn()}
-          sx={{ marginRight: 5 }}
-        >
-          Confirm
-        </Button>
+        <DialogUploadImages />
         <Button
           variant="contained"
           color="primary"
