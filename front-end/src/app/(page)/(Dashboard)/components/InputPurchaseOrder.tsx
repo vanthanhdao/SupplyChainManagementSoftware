@@ -1,16 +1,12 @@
 "use client";
 import * as React from "react";
 import Typography from "@mui/material/Typography";
-import Card from "@mui/material/Card";
-import CardContent from "@mui/material/CardContent";
-import useTechProductStore from "@/app/zustands/useTechProductStore";
 import {
   Box,
   FormControl,
   FormLabel,
   Grid,
   MenuItem,
-  OutlinedInput,
   TextField,
 } from "@mui/material";
 import useInputPOStore from "@/app/zustands/useInputPOStore";
@@ -22,6 +18,10 @@ interface IProps {
 export default function InputPurchaseOrder(props: IProps) {
   const { setInputPO, setShippingCost } = useInputPOStore();
   const { dataShippings } = props;
+
+  React.useEffect(() => {
+    setInputPO({ shippingVia: dataShippings[0].ShippingMethodName });
+  }, []);
 
   return (
     <Box sx={{ padding: 4 }}>
@@ -89,6 +89,7 @@ export default function InputPurchaseOrder(props: IProps) {
             <TextField
               id="shippingVia"
               name="shippingVia"
+              value={dataShippings[0].ShippingMethodID}
               select
               onChange={(e) => {
                 const selectedKey = e.target.value;
@@ -99,6 +100,7 @@ export default function InputPurchaseOrder(props: IProps) {
                 if (findShippingCost) {
                   setInputPO({
                     shippingVia: findShippingCost.ShippingMethodName,
+                    shippingViaId: findShippingCost.ShippingMethodID,
                   });
                   setShippingCost(findShippingCost.ShippingCost);
                 }

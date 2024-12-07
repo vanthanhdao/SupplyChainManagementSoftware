@@ -15,10 +15,12 @@ const initialState: IInputPurchaseOrder = {
   companyAddress: "123 Street BD",
   deliveryDate: date.toLocaleDateString(),
   shippingVia: "Shipping Company",
+  shippingViaId: 0,
   terms: "Shipping and Payment Terms",
   shipTo: "123 Street BD",
-  seller: "Company Name",
+  seller: "Công ty TNHH thiết bị điện tử DAEWOO Việt Nam",
   notes: "Note*",
+  taxRate: 8.6,
 };
 
 // Create the store

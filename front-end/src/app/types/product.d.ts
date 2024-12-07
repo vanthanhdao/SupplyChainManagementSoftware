@@ -37,8 +37,10 @@ interface IInputPurchaseOrder {
   companyAddress: string;
   deliveryDate: DateTime;
   shippingVia: string;
+  shippingViaId: number;
   terms: string;
   shipTo: string;
   seller: string;
   notes: string;
+  taxRate: number;
 }

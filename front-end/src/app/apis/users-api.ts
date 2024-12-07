@@ -2,9 +2,6 @@ import axios from "axios";
 import { useGetAccessToken } from "../hook/useAccessToken";
 import { GridRowsProp } from "@mui/x-data-grid";
 
-
-
-
 // Call api for create a new account
 export const createAccount = async (data: IUser) => {
   try {
@@ -22,7 +19,7 @@ export const revertAccount = async (data: IUser) => {
   try {
     const response = await axios.delete(
       `${process.env.NEXT_PUBLIC_API_URL}/users/revert`,
-    { data }
+      { data }
     );
   } catch (error) {
     throw new Error(`RevertAccount failed - ${error}`);
@@ -30,10 +27,9 @@ export const revertAccount = async (data: IUser) => {
 };
 
 // Call api for create a new account
-export const getAccountWallet = async (
-): Promise<IUserWallet> => {
+export const getAccountWallet = async (): Promise<IUserWallet> => {
   try {
-    const access_token = await useGetAccessToken("access_token")
+    const access_token = await useGetAccessToken("access_token");
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/users/profileWallet`,
       { headers: { Authorization: `Bearer ${access_token}` } }
@@ -45,10 +41,9 @@ export const getAccountWallet = async (
 };
 
 // Call api for create a new account
-export const getAccount = async (
-  access_token: string
-): Promise<IUserAccessToken> => {
+export const getAccount = async (): Promise<IUserAccessToken> => {
   try {
+    const access_token = await useGetAccessToken("access_token");
     const response = await axios.get(
       `${process.env.NEXT_PUBLIC_API_URL}/users/profile`,
       { headers: { Authorization: `Bearer ${access_token}` } }
@@ -58,8 +53,6 @@ export const getAccount = async (
     throw new Error(`GetAccount failed: ${error}`);
   }
 };
-
-
 
 // // Call api for get list account
 // export const getListAccount = async (data: IUserAddress[]
@@ -77,17 +70,15 @@ export const getAccount = async (
 //   }
 // };
 
-
-
-  // Call api /users/ with axios when user update infimation
-export  const updateIsActive = async (access_token: string) => {
-    try {
-      const response = await axios.patch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/update`,
-        {isActive:true},
-        { headers: { Authorization: `Bearer ${access_token}` } }
-      );
-    } catch (error) {
-      throw new Error(`UpdateIsActive failed: ${error}`);
-    }
-  };
+// Call api /users/ with axios when user update infimation
+export const updateIsActive = async (access_token: string) => {
+  try {
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/update`,
+      { isActive: true },
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+  } catch (error) {
+    throw new Error(`UpdateIsActive failed: ${error}`);
+  }
+};

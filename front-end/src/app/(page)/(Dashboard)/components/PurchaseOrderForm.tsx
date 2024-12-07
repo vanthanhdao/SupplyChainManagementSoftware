@@ -326,7 +326,8 @@ const Invoice = () => {
           marginTop: 4,
         }}
       >
-        <DialogUploadImages />
+        {rows && rows.length > 0 ? <DialogUploadImages {...rows} /> : null}
+
         <Button
           variant="contained"
           color="primary"
@@ -419,14 +420,15 @@ const Invoice = () => {
                 maximumFractionDigits: 2,
               })}
             </Typography>
-            <Typography align="right">Tax Rate: 8.60%</Typography>
+            <Typography align="right">Tax Rate: {inputs.taxRate}%</Typography>
             {/* <Typography align="right">Sales Tax: $37.41</Typography> */}
             <Typography align="right" sx={{ fontWeight: "bold" }}>
               Total: $
               {(
                 subTotalRows +
                 selectShippingCost +
-                (subTotalRows + selectShippingCost) * (8.6 / 100)
+                (subTotalRows + selectShippingCost) *
+                  (Number(inputs.taxRate) / 100)
               ).toLocaleString("en-US", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,

@@ -5,36 +5,48 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useDropzone } from "react-dropzone";
-import { Box, Button, Typography } from "@mui/material";
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import { GridRowsProp } from "@mui/x-data-grid";
+import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
+import useInputPOStore from "@/app/zustands/useInputPOStore";
+import { getAccount } from "@/app/apis/users-api";
 
-export default function DialogUploadImages() {
+export default function DialogUploadImages(props: GridRowsProp) {
   const [open, setOpen] = React.useState(false);
+  const { selectedRows, subTotalRows, setSubTotalRows } = useDetailOrderStore();
+  const { inputs, selectShippingCost } = useInputPOStore();
   const [fileInfo, setFileInfo] = React.useState<{
     name: string;
     src: string | null;
     type: string;
   } | null>(null);
 
-  const handleClickOpen = () => {
-    setOpen(true);
+  const handleSendPO = async () => {
+    const account = await getAccount();
+    if (!account) return;
+    const purchaseOrder: IDataPurchaseOrder = {
+      deliveryDate: inputs.deliveryDate,
+      customerId: account.userId,
+      shippingAddress: inputs.shipTo,
+      paymentMethod: inputs.terms,
+      shippingMethodId: inputs.shippingViaId,
+      totalAmount:
+        subTotalRows +
+        selectShippingCost +
+        (subTotalRows + selectShippingCost) * (Number(inputs.taxRate) / 100),
+      taxRate: inputs.taxRate,
+      note: inputs.notes,
+    };
+
+    // setOpen(true);
   };
 
   const handleClose = () => {
     setOpen(false);
   };
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.files && event.target.files[0]) {
-      const file = event.target.files[0];
-      console.log("Uploaded file:", file);
-      // Thực hiện upload file hoặc xử lý file tại đây
-    }
-  };
-
   const handleConfirm = () => {
-    console.log("Order confirmed!");
-    // Gửi dữ liệu đơn hàng và file lên server
     handleClose();
   };
 
@@ -54,7 +66,7 @@ export default function DialogUploadImages() {
         });
       };
 
-      reader.readAsDataURL(file); // Đọc file dưới dạng Data URL
+      reader.readAsDataURL(file);
     }
   };
 
@@ -67,14 +79,14 @@ export default function DialogUploadImages() {
       <Button
         variant="contained"
         color="primary"
-        onClick={handleClickOpen}
+        onClick={handleSendPO}
         sx={{ marginRight: 5 }}
       >
         Confirm
       </Button>
       <Dialog
         open={open}
-        onClose={handleClose}
+        // onClose={handleClose}
         aria-labelledby="order-confirmation-dialog-title"
       >
         <DialogTitle id="order-confirmation-dialog-title">
@@ -136,6 +148,22 @@ export default function DialogUploadImages() {
               Browse Files
             </Button>
           </Box>
+          {/* <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              width: "100%",
+              height: "100%",
+              backgroundColor: "rgba(255, 255, 255, 0.3)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              zIndex: 2,
+            }}
+          >
+            <CircularProgress />
+          </Box> */}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>

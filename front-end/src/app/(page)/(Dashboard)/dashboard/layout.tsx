@@ -12,6 +12,7 @@ import { useGetAccessToken } from "@/app/hook/useAccessToken";
 import { updateIsActive } from "@/app/apis/index-api";
 import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
+import LinearProgress from "@mui/material/LinearProgress";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -73,6 +74,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
           <Box sx={{ display: "flex" }}>
             <SideMenu />
+
             <Box
               component="main"
               sx={(theme) => ({
