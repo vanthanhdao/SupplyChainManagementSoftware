@@ -1,9 +1,8 @@
 import axios from "axios";
+import { getServerSideProps } from "./getServerSideProp";
 
 // Call api for create a new account
-export const authJwtLogin = async (
-  data: IUserSignIn
-): Promise<IUserToken> => {
+export const authJwtLogin = async (data: IUserSignIn) => {
   try {
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/auth/login`,
@@ -11,7 +10,7 @@ export const authJwtLogin = async (
     );
     return response.data;
   } catch (error) {
-    throw new Error(`AuthJwtLogin Failed: ${error}`);
+    throw error;
   }
 };
 
@@ -24,7 +23,6 @@ export const authJwtProfile = async (access_token: string | null) => {
     );
     return response;
   } catch (error) {
-    console.error("Auth-api AuthJwtProfile: ", error);
+    throw error;
   }
 };
-

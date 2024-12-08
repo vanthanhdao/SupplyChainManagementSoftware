@@ -1,6 +1,7 @@
 import { authJwtProfile } from "@/app/apis/index-api";
+import { getServerSideProps } from "../apis/getServerSideProp";
 
-export const useGetAccessToken = (name_token: string): string => {
+export const useGetAccessToken = (name_token: string) => {
   try {
     const result = sessionStorage.getItem(name_token);
     if (!result) {
@@ -8,7 +9,7 @@ export const useGetAccessToken = (name_token: string): string => {
     }
     return result;
   } catch (error) {
-    throw new Error(`UseGetAccessToken failed: ${error}`);
+    getServerSideProps;
   }
 };
 

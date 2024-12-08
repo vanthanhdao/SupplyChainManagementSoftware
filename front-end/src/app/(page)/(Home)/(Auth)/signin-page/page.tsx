@@ -14,13 +14,10 @@ import { DataContext, DataProvider } from "../../../../hook/errorContext";
 import { useRouter } from "next/navigation";
 import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
-import { authJwtLogin, getAccountWallet } from "@/app/apis/index-api";
+import { authJwtLogin } from "@/app/apis/index-api";
 import { useSetAccessToken } from "@/app/hook/useAccessToken";
-import {
-  useConnectMetaMask,
-  useGetWalletAddress,
-  useProvideEthUser,
-} from "@/app/hook/useEthereum";
+import { getServerSideProps } from "@/app/apis/getServerSideProp";
+import { notFound } from "next/navigation";
 
 const SignIn = () => {
   const router = useRouter();
@@ -51,19 +48,11 @@ const SignIn = () => {
         useSetAccessToken("refresh_token", refresh_token),
       ]);
 
-      // const publicKey = await useGetWalletAddress();
-      // if (!publicKey) throw new Error(`Don't looking for publickey !`);
-
-      // // Connect MetaMask
-      // await useConnectMetaMask();
-
-      // // Handle provide ETH for user account
-      // await useProvideEthUser(publicKey);
-
       // Route to the dashboard
       router.push("/dashboard");
     } catch (error) {
-      throw new Error(`AuthUserSignIn failed - ${error}`);
+      console.error("authUserSignIn failed: ", error);
+      router.push("/Error");
     }
   };
 

@@ -35,18 +35,8 @@ export default function OptionsMenu() {
     setAnchorEl(null);
   };
 
-  const authUserSignOut = async () => {
-    // Handle get Wallet Address
-    const walletAddress = await getAccountWallet();
-    // Handle save transaction in Blockchain
-    if (walletAddress) {
-      await useStoreUserSession(walletAddress, "IGNORE", "SIGNOUT");
-    }
-  };
-
   // Handle logout account
   const handleLogOut = () => {
-    authUserSignOut();
     sessionStorage.clear();
     router.push("/");
   };

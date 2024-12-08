@@ -9,3 +9,11 @@ interface IDataPurchaseOrder {
   status?: string;
   note: string;
 }
+
+interface IDataPurchaseOrderDetail {
+  orderId: number;
+  productId: number;
+  quantity: number;
+  unit: string;
+  unitPrice: number;
+}

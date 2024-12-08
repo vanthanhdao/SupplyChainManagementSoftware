@@ -1,5 +1,11 @@
-import { createAccount, getAccount, getAccountWallet,getListAccount,updateIsActive,revertAccount } from "./users-api";
-import { authJwtLogin, authJwtProfile,generateAccountAdmin } from "./auth-api";
+import {
+  createAccount,
+  getAccount,
+  getAccountWallet,
+  updateIsActive,
+  revertAccount,
+} from "./users-api";
+import { authJwtLogin, authJwtProfile } from "./auth-api";
 
 export {
   createAccount,
@@ -8,7 +14,5 @@ export {
   getAccount,
   getAccountWallet,
   updateIsActive,
-  getListAccount,
-  generateAccountAdmin,
-  revertAccount
+  revertAccount,
 };

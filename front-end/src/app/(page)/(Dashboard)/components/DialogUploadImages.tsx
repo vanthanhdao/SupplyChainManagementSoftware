@@ -10,36 +10,57 @@ import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import { GridRowsProp } from "@mui/x-data-grid";
 import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
 import useInputPOStore from "@/app/zustands/useInputPOStore";
-import { getAccount } from "@/app/apis/users-api";
+import useUserStore from "@/app/zustands/userStore";
+import { useRouter } from "next/navigation";
+import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
 
 export default function DialogUploadImages(props: GridRowsProp) {
   const [open, setOpen] = React.useState(false);
-  const { selectedRows, subTotalRows, setSubTotalRows } = useDetailOrderStore();
+  const { subTotalRows } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
+  const { userId, initializeUser } = useUserStore();
   const [fileInfo, setFileInfo] = React.useState<{
     name: string;
     src: string | null;
     type: string;
   } | null>(null);
+  const router = useRouter();
+  const { setOrderCode } = useDetailOrderStore();
 
   const handleSendPO = async () => {
-    const account = await getAccount();
-    if (!account) return;
-    const purchaseOrder: IDataPurchaseOrder = {
-      deliveryDate: inputs.deliveryDate,
-      customerId: account.userId,
-      shippingAddress: inputs.shipTo,
-      paymentMethod: inputs.terms,
-      shippingMethodId: inputs.shippingViaId,
-      totalAmount:
-        subTotalRows +
-        selectShippingCost +
-        (subTotalRows + selectShippingCost) * (Number(inputs.taxRate) / 100),
-      taxRate: inputs.taxRate,
-      note: inputs.notes,
-    };
-
-    // setOpen(true);
+    try {
+      await initializeUser();
+      const purchaseOrder: IDataPurchaseOrder = {
+        deliveryDate: inputs.deliveryDate,
+        customerId: userId || 0,
+        shippingAddress: inputs.shipTo,
+        paymentMethod: inputs.terms,
+        shippingMethodId: inputs.shippingViaId,
+        totalAmount:
+          subTotalRows +
+          selectShippingCost +
+          (subTotalRows + selectShippingCost) * (Number(inputs.taxRate) / 100),
+        taxRate: inputs.taxRate,
+        note: inputs.notes,
+      };
+      const result_order = await createOrder(purchaseOrder);
+      if (!result_order) return;
+      const formatProps = Object.values(props);
+      const purchaseOrderDetails: IDataPurchaseOrderDetail[] = formatProps.map(
+        (item) => ({
+          orderId: result_order.OrderId,
+          productId: item.productId,
+          unitPrice: item.price,
+          unit: item.unit,
+          quantity: item.quantity,
+        })
+      );
+      const result_orderDetail = await createOrderDetails(purchaseOrderDetails);
+      if (!result_orderDetail) return;
+      setOpen(true);
+    } catch (error) {
+      router.push("/dashboard/Error");
+    }
   };
 
   const handleClose = () => {

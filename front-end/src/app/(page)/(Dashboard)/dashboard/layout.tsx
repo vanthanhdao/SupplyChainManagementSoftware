@@ -45,8 +45,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
   // Handle active a account
   const handleUpdateData = async () => {
-    const access_token = useGetAccessToken("access_token");
-    updateIsActive(access_token);
+    updateIsActive;
   };
 
   return (

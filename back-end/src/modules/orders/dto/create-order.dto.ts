@@ -28,11 +28,11 @@ export class CreateOrderDto {
   @IsNotEmpty({ message: 'Shipping method is required.' })
   shippingMethodId: number;
 
-  @IsDecimal()
+  @IsNumber()
   @IsNotEmpty({ message: 'Total amount is required.' })
   totalAmount: number;
 
-  @IsDecimal()
+  @IsNumber()
   @IsNotEmpty({ message: 'Tax rate is required.' })
   taxRate: number;
 

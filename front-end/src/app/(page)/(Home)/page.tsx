@@ -9,11 +9,7 @@ import Highlights from "./components/Highlights";
 import Pricing from "./components/Pricing";
 import FAQ from "./components/FAQ";
 
-
-
-
 export default function MarketingPage() {
-
   return (
     <div>
       <Hero />
@@ -29,7 +25,7 @@ export default function MarketingPage() {
         <Divider />
         <FAQ />
         <Divider />
-      </div>    
       </div>
+    </div>
   );
 }

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { useGetAccessToken } from "../hook/useAccessToken";
-import { GridRowsProp } from "@mui/x-data-grid";
+import { getServerSideProps } from "./getServerSideProp";
 
 // Call api for create a new account
 export const createAccount = async (data: IUser) => {
@@ -36,12 +36,13 @@ export const getAccountWallet = async (): Promise<IUserWallet> => {
     );
     return response.data;
   } catch (error) {
-    throw new Error(`GetAccountWallet Failed: ${error}`);
+    console.error("getAccountWallet failed: ", error);
+    throw error;
   }
 };
 
 // Call api for create a new account
-export const getAccount = async (): Promise<IUserAccessToken> => {
+export const getAccount = async () => {
   try {
     const access_token = await useGetAccessToken("access_token");
     const response = await axios.get(
@@ -50,7 +51,8 @@ export const getAccount = async (): Promise<IUserAccessToken> => {
     );
     return response.data;
   } catch (error) {
-    throw new Error(`GetAccount failed: ${error}`);
+    console.error("getAccount failed: ", error);
+    getServerSideProps;
   }
 };
 
@@ -71,8 +73,9 @@ export const getAccount = async (): Promise<IUserAccessToken> => {
 // };
 
 // Call api /users/ with axios when user update infimation
-export const updateIsActive = async (access_token: string) => {
+export const updateIsActive = async () => {
   try {
+    const access_token = await useGetAccessToken("access_token");
     const response = await axios.patch(
       `${process.env.NEXT_PUBLIC_API_URL}/users/update`,
       { isActive: true },

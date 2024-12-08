@@ -16,8 +16,11 @@ import ToggleColorMode from "./ToggleColorMode";
 import Sitemark from "./SitemarkIcon";
 import { useRouter } from "next/navigation";
 import AppBar_Button from "./AppBar_Button";
-import { useDeleteEth,deployContract, useGetBlockByAllEvent, useGetBlockByOneEvent } from "@/app/hook/useEthereum";
-
+import {
+  useDeleteEth,
+  useGetBlockByAllEvent,
+  useGetBlockByOneEvent,
+} from "@/app/hook/useEthereum";
 
 const StyledToolbar = styled(Toolbar)(({ theme }) => ({
   display: "flex",
@@ -58,12 +61,11 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
     >
       <Container maxWidth="lg">
         <StyledToolbar variant="dense" disableGutters>
-          
           <Box
             sx={{ flexGrow: 1, display: "flex", alignItems: "center", px: 0 }}
           >
             <Sitemark />
-            <AppBar_Button/>
+            <AppBar_Button />
           </Box>
           <Box
             sx={{
@@ -100,7 +102,12 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
             <IconButton aria-label="Menu button" onClick={toggleDrawer(true)}>
               <MenuIcon />
             </IconButton>
-            <Drawer sx={{ display: { sm: "flex", md: "none" } }} anchor="top" open={open} onClose={toggleDrawer(false)}>
+            <Drawer
+              sx={{ display: { sm: "flex", md: "none" } }}
+              anchor="top"
+              open={open}
+              onClose={toggleDrawer(false)}
+            >
               <Box sx={{ p: 2, backgroundColor: "background.default" }}>
                 <Box
                   sx={{
@@ -119,36 +126,60 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
                 </Box>
 
                 <Divider sx={{ my: 3 }} />
-
-                <MenuItem>        
-                  <Button onClick={deployContract}  fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'} }} size="large">
-                      Deploy Smart Contract
-                 </Button>
-               </MenuItem>
                 <MenuItem>
-                <Button onClick={useDeleteEth}  fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'} }} size="large">
-                       Delete Eth
-                </Button>
+                  <Button
+                    onClick={useDeleteEth}
+                    fullWidth
+                    variant="text"
+                    sx={{ justifyContent: { xs: "flex-start", sm: "center" } }}
+                    size="large"
+                  >
+                    Delete Eth
+                  </Button>
                 </MenuItem>
                 <MenuItem>
-                <Button onClick={()=>useGetBlockByAllEvent()}  fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'} }} size="large">
-                View Blocks All Event
-                </Button>
+                  <Button
+                    onClick={() => useGetBlockByAllEvent()}
+                    fullWidth
+                    variant="text"
+                    sx={{ justifyContent: { xs: "flex-start", sm: "center" } }}
+                    size="large"
+                  >
+                    View Blocks All Event
+                  </Button>
                 </MenuItem>
                 <MenuItem>
-                <Button onClick={()=>useGetBlockByOneEvent("StoreUserSignUp")}  fullWidth  variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'} }} size="large">
-                View Blocks Users Event
-                </Button>
-                </MenuItem> 
-                <MenuItem>
-                <Button onClick={()=>useGetBlockByOneEvent("StoreUserSession")} fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'}}} size="large">
-                View Blocks UserSession Event
-                </Button>
+                  <Button
+                    onClick={() => useGetBlockByOneEvent("StoreUserSignUp")}
+                    fullWidth
+                    variant="text"
+                    sx={{ justifyContent: { xs: "flex-start", sm: "center" } }}
+                    size="large"
+                  >
+                    View Blocks Users Event
+                  </Button>
                 </MenuItem>
                 <MenuItem>
-                <Button onClick={() => router.push("/blog-page")} fullWidth variant="text" sx={{ justifyContent: {xs:'flex-start',sm:'center'}}} size="large">
-                Blog
-                </Button>
+                  <Button
+                    onClick={() => useGetBlockByOneEvent("StoreUserSession")}
+                    fullWidth
+                    variant="text"
+                    sx={{ justifyContent: { xs: "flex-start", sm: "center" } }}
+                    size="large"
+                  >
+                    View Blocks UserSession Event
+                  </Button>
+                </MenuItem>
+                <MenuItem>
+                  <Button
+                    onClick={() => router.push("/blog-page")}
+                    fullWidth
+                    variant="text"
+                    sx={{ justifyContent: { xs: "flex-start", sm: "center" } }}
+                    size="large"
+                  >
+                    Blog
+                  </Button>
                 </MenuItem>
                 <MenuItem>
                   <Button
@@ -173,7 +204,6 @@ export default function AppAppBar({ mode, toggleColorMode }: AppAppBarProps) {
               </Box>
             </Drawer>
           </Box>
-          
         </StyledToolbar>
       </Container>
     </AppBar>

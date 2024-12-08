@@ -256,7 +256,8 @@ const columns: GridColDef[] = [
 ];
 
 const Invoice = () => {
-  const { selectedRows, subTotalRows, setSubTotalRows } = useDetailOrderStore();
+  const { selectedRows, subTotalRows, orderCode, setSubTotalRows } =
+    useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -346,7 +347,7 @@ const Invoice = () => {
           <Grid item xs={6} textAlign="right">
             <Typography variant="h6">Purchase Order</Typography>
             <Typography>Date: {date.toLocaleDateString()}</Typography>
-            <Typography>P.O: 12345678</Typography>
+            {orderCode && <Typography>P.O: {orderCode}</Typography>}
           </Grid>
         </Grid>
         <Divider sx={{ my: 2 }} />
