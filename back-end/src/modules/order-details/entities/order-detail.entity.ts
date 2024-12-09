@@ -20,9 +20,10 @@ export class OrderDetails {
   @Column({ type: 'decimal', precision: 18, scale: 2 })
   UnitPrice: number;
 
-  @Column({
-    generatedType: 'STORED',
-    asExpression: 'quantity * unitPrice',
-  })
+  // @Column({
+  //   generatedType: 'STORED',
+  //   asExpression: 'Quantity * UnitPrice',
+  // })
+  @Column({ type: 'decimal', precision: 18, scale: 2 })
   Subtotal: number;
 }

@@ -16,4 +16,5 @@ interface IDataPurchaseOrderDetail {
   quantity: number;
   unit: string;
   unitPrice: number;
+  subTotal: number;
 }

@@ -20,4 +20,8 @@ export class CreateOrderDetailDto {
   @IsDecimal()
   @IsNotEmpty({ message: 'Unit price is required.' })
   unitPrice: number;
+
+  @IsDecimal()
+  @IsNotEmpty({ message: 'subTotal price is required.' })
+  subTotal: number;
 }

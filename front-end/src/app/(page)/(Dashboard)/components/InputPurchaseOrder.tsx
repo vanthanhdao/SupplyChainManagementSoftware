@@ -20,7 +20,10 @@ export default function InputPurchaseOrder(props: IProps) {
   const { dataShippings } = props;
 
   React.useEffect(() => {
-    setInputPO({ shippingVia: dataShippings[0].ShippingMethodName });
+    setInputPO({
+      shippingVia: dataShippings[0].ShippingMethodName,
+      shippingViaId: dataShippings[0].ShippingMethodID,
+    });
   }, []);
 
   return (

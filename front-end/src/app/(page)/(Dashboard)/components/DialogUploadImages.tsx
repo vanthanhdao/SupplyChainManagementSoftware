@@ -53,11 +53,13 @@ export default function DialogUploadImages(props: GridRowsProp) {
           unitPrice: item.price,
           unit: item.unit,
           quantity: item.quantity,
+          subTotal: item.money,
         })
       );
       const result_orderDetail = await createOrderDetails(purchaseOrderDetails);
       if (!result_orderDetail) return;
       setOpen(true);
+      setOrderCode(result_order.OrderId);
     } catch (error) {
       router.push("/dashboard/Error");
     }

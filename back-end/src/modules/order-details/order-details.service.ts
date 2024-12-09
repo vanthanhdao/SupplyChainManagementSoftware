@@ -14,20 +14,21 @@ export class OrderDetailsService {
 
   create(createOrderDetailDto: CreateOrderDetailDto[]) {
     try {
-      createOrderDetailDto.forEach(async (item) => {
-        const orderDetail = this.orderDetailsRepository.create({
-          OrderId: item.orderId,
-          ProductId: item.productId,
-          Quantity: item.quantity,
-          Unit: item.unit,
-          UnitPrice: item.unitPrice,
-        });
-        if (!orderDetail)
-          throw new Error(
-            `OrderDetail with ${orderDetail.OrderDetailId} is not exists`,
-          );
-        await this.orderDetailsRepository.save(orderDetail);
-      });
+      const orderDetails = createOrderDetailDto.map((item) =>
+        this.orderDetailsRepository.save(
+          this.orderDetailsRepository.create({
+            OrderId: item.orderId,
+            ProductId: item.productId,
+            Quantity: item.quantity,
+            Unit: item.unit,
+            UnitPrice: item.unitPrice,
+            Subtotal: item.subTotal,
+          }),
+        ),
+      );
+
+      Promise.all(orderDetails);
+      return orderDetails;
     } catch (error) {
       throw new Error(`Create product failed: ${error} `);
     }
