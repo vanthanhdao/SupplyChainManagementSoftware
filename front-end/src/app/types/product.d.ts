@@ -17,6 +17,7 @@ interface DetailOrder {
   categoryName: string;
   quantity: number;
   money: number;
+  unit: string;
 }
 
 interface IUpdateDataProduct {

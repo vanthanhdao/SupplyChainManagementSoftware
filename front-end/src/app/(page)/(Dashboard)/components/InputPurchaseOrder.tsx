@@ -16,7 +16,7 @@ interface IProps {
 }
 
 export default function InputPurchaseOrder(props: IProps) {
-  const { setInputPO, setShippingCost } = useInputPOStore();
+  const { inputs, setInputPO, setShippingCost } = useInputPOStore();
   const { dataShippings } = props;
 
   React.useEffect(() => {
@@ -24,7 +24,8 @@ export default function InputPurchaseOrder(props: IProps) {
       shippingVia: dataShippings[0].ShippingMethodName,
       shippingViaId: dataShippings[0].ShippingMethodID,
     });
-  }, []);
+    setShippingCost(dataShippings[0].ShippingCost);
+  }, [dataShippings]);
 
   return (
     <Box sx={{ padding: 4 }}>
@@ -92,7 +93,7 @@ export default function InputPurchaseOrder(props: IProps) {
             <TextField
               id="shippingVia"
               name="shippingVia"
-              value={dataShippings[0].ShippingMethodID}
+              value={inputs.shippingViaId || ""}
               select
               onChange={(e) => {
                 const selectedKey = e.target.value;

@@ -33,7 +33,7 @@ export class Orders {
   @Column({ type: 'decimal', precision: 18, scale: 2 })
   TaxRate: number;
 
-  @Column({ type: 'nvarchar', length: 50, default: 'New' })
+  @Column({ type: 'nvarchar', length: 50, default: 'Created' })
   Status: string;
 
   @Column({ type: 'nvarchar', length: 4000 })

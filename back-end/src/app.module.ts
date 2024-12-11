@@ -26,7 +26,7 @@ import { OrderDetailsModule } from './modules/order-details/order-details.module
         database: configService.get<string>('DATABASE_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         // dropSchema: true,
-        synchronize: true,
+        // synchronize: true,
         options: {
           encrypt: false, // MSSQL-specific option
         },

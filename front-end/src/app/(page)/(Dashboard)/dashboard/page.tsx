@@ -101,7 +101,6 @@ const Store = () => {
               flexDirection: "column",
               gap: "8px",
               flexGrow: 1,
-              height: 1000,
               overflow: "auto",
             }}
           >

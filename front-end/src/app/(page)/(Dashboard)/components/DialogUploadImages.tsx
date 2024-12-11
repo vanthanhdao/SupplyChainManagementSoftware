@@ -14,7 +14,15 @@ import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
 import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
 
-export default function DialogUploadImages(props: GridRowsProp) {
+interface DialogUploadImagesProps {
+  rows: GridRowsProp;
+  onPrint: () => void;
+}
+
+const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
+  rows,
+  onPrint,
+}) => {
   const [open, setOpen] = React.useState(false);
   const { subTotalRows } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
@@ -32,7 +40,7 @@ export default function DialogUploadImages(props: GridRowsProp) {
       await initializeUser();
       const purchaseOrder: IDataPurchaseOrder = {
         deliveryDate: inputs.deliveryDate,
-        customerId: userId || 0,
+        customerId: userId,
         shippingAddress: inputs.shipTo,
         paymentMethod: inputs.terms,
         shippingMethodId: inputs.shippingViaId,
@@ -45,7 +53,7 @@ export default function DialogUploadImages(props: GridRowsProp) {
       };
       const result_order = await createOrder(purchaseOrder);
       if (!result_order) return;
-      const formatProps = Object.values(props);
+      const formatProps = Object.values(rows);
       const purchaseOrderDetails: IDataPurchaseOrderDetail[] = formatProps.map(
         (item) => ({
           orderId: result_order.OrderId,
@@ -58,8 +66,9 @@ export default function DialogUploadImages(props: GridRowsProp) {
       );
       const result_orderDetail = await createOrderDetails(purchaseOrderDetails);
       if (!result_orderDetail) return;
+      await setOrderCode(result_order.OrderId);
+      await onPrint();
       setOpen(true);
-      setOrderCode(result_order.OrderId);
     } catch (error) {
       router.push("/dashboard/Error");
     }
@@ -70,7 +79,9 @@ export default function DialogUploadImages(props: GridRowsProp) {
   };
 
   const handleConfirm = () => {
-    handleClose();
+    console.log(fileInfo);
+    handleClose;
+    // window.location.reload();
   };
 
   const onDrop = (acceptedFiles: File[]) => {
@@ -80,15 +91,13 @@ export default function DialogUploadImages(props: GridRowsProp) {
 
       reader.onload = () => {
         const fileType = file.type;
-        const isImage = fileType.startsWith("image/");
 
         setFileInfo({
           name: file.name,
-          src: isImage ? (reader.result as string) : null,
+          src: reader.result as string,
           type: fileType,
         });
       };
-
       reader.readAsDataURL(file);
     }
   };
@@ -99,12 +108,7 @@ export default function DialogUploadImages(props: GridRowsProp) {
 
   return (
     <React.Fragment>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={handleSendPO}
-        sx={{ marginRight: 5 }}
-      >
+      <Button variant="contained" color="primary" onClick={handleSendPO}>
         Confirm
       </Button>
       <Dialog
@@ -115,6 +119,7 @@ export default function DialogUploadImages(props: GridRowsProp) {
         <DialogTitle id="order-confirmation-dialog-title">
           Order Comfirm
         </DialogTitle>
+
         <DialogContent>
           <DialogContentText>
             Please upload a verification image to complete your order setup.
@@ -197,4 +202,6 @@ export default function DialogUploadImages(props: GridRowsProp) {
       </Dialog>
     </React.Fragment>
   );
-}
+};
+
+export default DialogUploadImages;

@@ -132,6 +132,7 @@ export default function ListProductSelect(props: IProps) {
       categoryName: item.categoryName,
       quantity: 1,
       money: item.price,
+      unit: "Pieces",
     }));
     setSelectedRowState(newSelectesRow);
     setSubTotalRows(newSelectesRow);

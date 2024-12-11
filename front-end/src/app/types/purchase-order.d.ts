@@ -1,6 +1,6 @@
 interface IDataPurchaseOrder {
   deliveryDate: string;
-  customerId: number;
+  customerId: number | null;
   shippingAddress: string;
   paymentMethod: string;
   shippingMethodId: number;
