@@ -4,6 +4,8 @@ import {
   UseInterceptors,
   BadRequestException,
   UploadedFiles,
+  Body,
+  Param,
 } from '@nestjs/common';
 import { FirebaseStorageService } from './firebase-storage.service';
 import { FilesInterceptor } from '@nestjs/platform-express';
@@ -13,6 +15,7 @@ export class FirebaseStorageController {
   constructor(
     private readonly firebaseStorageService: FirebaseStorageService,
   ) {}
+
   @Post('uploads')
   @UseInterceptors(FilesInterceptor('files'))
   async uploadFile(@UploadedFiles() files: Express.Multer.File[]) {

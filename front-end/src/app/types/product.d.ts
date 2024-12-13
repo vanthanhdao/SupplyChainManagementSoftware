@@ -4,7 +4,7 @@ interface IDataProduct {
   Description: string;
   Price: string;
   Images: string;
-  Specifications: boolean;
+  Specifications: string;
   CategoryId: number;
   CategoryName: string;
 }
@@ -18,6 +18,8 @@ interface DetailOrder {
   quantity: number;
   money: number;
   unit: string;
+  images: string;
+  specifications: string;
 }
 
 interface IUpdateDataProduct {

@@ -16,8 +16,11 @@ import CardCustom from "../components/CardCustom";
 import SitemarkIcon from "../../components/SitemarkIcon";
 import { authJwtLogin } from "@/app/apis/index-api";
 import { useSetAccessToken } from "@/app/hook/useAccessToken";
-import { getServerSideProps } from "@/app/apis/getServerSideProp";
-import { notFound } from "next/navigation";
+import {
+  useConnectMetaMask,
+  useGetWalletAddress,
+  useProvideEthUser,
+} from "@/app/hook/useEthereum";
 
 const SignIn = () => {
   const router = useRouter();
@@ -38,6 +41,10 @@ const SignIn = () => {
     }
 
     try {
+      await useConnectMetaMask();
+      const wallet = await useGetWalletAddress();
+      if (!wallet) return;
+      useProvideEthUser(wallet);
       // Handle veryfired email and password
       const response = await authJwtLogin(data);
       const { access_token, refresh_token } = response;

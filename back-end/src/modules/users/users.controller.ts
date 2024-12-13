@@ -30,6 +30,11 @@ export class UsersController {
     return this.usersService.findAll(query);
   }
 
+  // @Get(':id')
+  // findById(@Param('id') userId: number) {
+  //   return this.usersService.findById(userId);
+  // }
+
   // @Post('getByBlock')
   // getUserByBlock(@Body() data: any) {
   //   return this.usersService.getUserByBlock(data);
@@ -42,7 +47,7 @@ export class UsersController {
 
   @Get('profile')
   findOneProfile(@Request() req) {
-    return req.user;
+    return this.usersService.findOneProfile(req.user);
   }
 
   @Patch('update')

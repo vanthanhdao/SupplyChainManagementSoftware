@@ -70,17 +70,11 @@ export class UsersService {
   // }
 
   // Find wallet users by id
-  async findOneProfile(payload: IUserAccessToken): Promise<IUserAccessToken> {
+  async findOneProfile(payload: any): Promise<Users> {
     const user = await this.usersRepository.findOneBy({
       UserId: payload.userId,
     });
-    const res = {
-      userId: user.UserId,
-      email: user.Email,
-      isActive: user.IsActive,
-      role: user.Role,
-    };
-    return res;
+    return user;
   }
 
   // Delete users by id
@@ -127,14 +121,15 @@ export class UsersService {
     await this.usersRepository.save(user);
   }
 
-  // async bulkUpdate(usersData: { userId: number; fieldsToUpdate: Partial<User> }[]) {
-  //   const updatePromises = usersData.map(({ userId, fieldsToUpdate }) =>
-  //     this.usersRepository.update(userId, {
-  //       ...fieldsToUpdate,
-  //       updateAt: new Date().toISOString(),
-  //     }),
-  //   );
+  async findById(userId: number): Promise<Users> {
+    const user = await this.usersRepository.findOneBy({
+      UserId: userId,
+    });
 
-  //   await Promise.all(updatePromises); // Thực thi tất cả các cập nhật đồng thời
-  // }
+    if (!user) {
+      throw new Error(`User ${userId} not found`);
+    }
+
+    return user;
+  }
 }

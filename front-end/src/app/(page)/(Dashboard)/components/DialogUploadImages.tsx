@@ -13,6 +13,8 @@ import useInputPOStore from "@/app/zustands/useInputPOStore";
 import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
 import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
+import { useAddOrder } from "@/app/hook/useEthereum";
+import { uploadImages } from "@/app/apis/uploads-api";
 
 interface DialogUploadImagesProps {
   rows: GridRowsProp;
@@ -23,17 +25,42 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   rows,
   onPrint,
 }) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = React.useState<boolean>(false);
   const { subTotalRows } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
-  const { userId, initializeUser } = useUserStore();
   const [fileInfo, setFileInfo] = React.useState<{
     name: string;
     src: string | null;
     type: string;
+    acceptedFiles: File[];
   } | null>(null);
+  const { selectedRows, orderCode, setOrderCode } = useDetailOrderStore();
+  const {
+    userId,
+    nameCompany,
+    email,
+    phoneNumber,
+    taxCode,
+    role,
+    initializeUser,
+  } = useUserStore();
   const router = useRouter();
-  const { setOrderCode } = useDetailOrderStore();
+  const date = new Date();
+
+  const storeBlockChain = async (purchaseOrder: string) => {
+    if (!selectedRows || !orderCode || !purchaseOrder) return;
+    const history = [
+      `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role},Date:${date.toLocaleDateString()},Status:'New'}`,
+    ];
+    const productList = selectedRows.map(
+      (item) =>
+        `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
+    );
+    const po = [`${purchaseOrder}`];
+    const checkTransac = await useAddOrder(orderCode, productList, history, po);
+    setOpen(checkTransac);
+    window.location.reload();
+  };
 
   const handleSendPO = async () => {
     try {
@@ -67,7 +94,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
       const result_orderDetail = await createOrderDetails(purchaseOrderDetails);
       if (!result_orderDetail) return;
       await setOrderCode(result_order.OrderId);
-      await onPrint();
+      onPrint();
       setOpen(true);
     } catch (error) {
       router.push("/dashboard/Error");
@@ -75,30 +102,42 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   };
 
   const handleClose = () => {
+    setFileInfo(null);
     setOpen(false);
   };
 
-  const handleConfirm = () => {
-    console.log(fileInfo);
-    handleClose;
-    // window.location.reload();
+  const handleConfirm = async () => {
+    const formData = new FormData();
+    if (!fileInfo) return;
+    Array.from(fileInfo.acceptedFiles).forEach((file) => {
+      formData.append("files", file);
+    });
+    const result = await uploadImages(formData);
+    if (!result) return;
+    const filesData = result.join(",");
+    await storeBlockChain(filesData);
   };
 
-  const onDrop = (acceptedFiles: File[]) => {
+  const onDrop = async (acceptedFiles: File[]) => {
     const file = acceptedFiles[0];
     if (file) {
-      const reader = new FileReader();
+      try {
+        const reader = new FileReader();
 
-      reader.onload = () => {
-        const fileType = file.type;
+        reader.onload = () => {
+          const fileType = file.type;
 
-        setFileInfo({
-          name: file.name,
-          src: reader.result as string,
-          type: fileType,
-        });
-      };
-      reader.readAsDataURL(file);
+          setFileInfo({
+            name: file.name,
+            src: reader.result as string,
+            type: fileType,
+            acceptedFiles,
+          });
+        };
+        reader.readAsDataURL(file);
+      } catch (error) {
+        console.error("Error uploading files:", error);
+      }
     }
   };
 

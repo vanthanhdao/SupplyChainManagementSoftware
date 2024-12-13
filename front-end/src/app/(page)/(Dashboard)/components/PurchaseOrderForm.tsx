@@ -62,11 +62,11 @@ const Invoice = () => {
   } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
   const [rows, setRows] = React.useState<GridRowsProp>([]);
-  const [tempRows, setTempRows] = React.useState<GridRowsProp>([]);
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({
     contentRef,
   });
+
   const date = new Date();
 
   React.useEffect(() => {
