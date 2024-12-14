@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   Query,
+  Request,
 } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
@@ -22,13 +23,13 @@ export class CategoriesController {
   }
 
   @Get()
-  findAll(@Query() query: string) {
-    return this.categoriesService.findAll(query);
+  findAll(@Query() query: string, @Request() req) {
+    return this.categoriesService.findAll(query, req.user);
   }
 
   @Post('updateRecords')
-  updateRecord(@Body() data: any) {
-    return this.categoriesService.updateRecord(data);
+  updateRecord(@Body() data: any, @Request() req) {
+    return this.categoriesService.updateRecord(data, req.user);
   }
 
   @Get(':id')

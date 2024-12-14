@@ -26,6 +26,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   onPrint,
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
+  const [loading, setLoading] = React.useState<boolean>(false);
   const { subTotalRows } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
   const [fileInfo, setFileInfo] = React.useState<{
@@ -58,6 +59,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
     );
     const po = [`${purchaseOrder}`];
     const checkTransac = await useAddOrder(orderCode, productList, history, po);
+    setLoading(checkTransac);
     setOpen(checkTransac);
     window.location.reload();
   };
@@ -107,6 +109,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   };
 
   const handleConfirm = async () => {
+    setLoading(true);
     const formData = new FormData();
     if (!fileInfo) return;
     Array.from(fileInfo.acceptedFiles).forEach((file) => {
@@ -215,22 +218,24 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
               Browse Files
             </Button>
           </Box>
-          {/* <Box
-            sx={{
-              position: "absolute",
-              top: 0,
-              left: 0,
-              width: "100%",
-              height: "100%",
-              backgroundColor: "rgba(255, 255, 255, 0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              zIndex: 2,
-            }}
-          >
-            <CircularProgress />
-          </Box> */}
+          {loading && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(255, 255, 255, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 2,
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>

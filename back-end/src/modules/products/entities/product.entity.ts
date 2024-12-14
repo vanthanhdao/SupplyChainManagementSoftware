@@ -24,6 +24,8 @@ export class Products {
   Specifications: string;
   @Column()
   CategoryId: number;
+  @Column()
+  Type: string;
   @CreateDateColumn()
   CreateAt: string;
   @UpdateDateColumn()

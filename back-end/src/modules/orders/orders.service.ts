@@ -2,14 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { Orders } from './entities/order.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
+import { DeleteOrderDto } from './dto/delete-order.dto';
+import { OrderDetailsService } from '../order-details/order-details.service';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Orders)
     private ordersRepository: Repository<Orders>,
+    private readonly orderDetailsService: OrderDetailsService,
     // private configService: ConfigService,
   ) {}
   // Add a new Order to the database
@@ -44,19 +47,34 @@ export class OrdersService {
     }
   }
 
-  findAll() {
-    return `This action returns all orders`;
+  async findAll(query: any, payload: IUserAccessToken) {
+    const { page, limit } = query;
+    const userId = payload.userId;
+    const role = payload.role;
+    const resultProcedure = await this.ordersRepository.query(
+      'EXEC pro_GetAllOrders @0 , @1',
+      [userId, role],
+    );
+    if (page && limit) {
+      const [result, total] = await resultProcedure.findAndCount({
+        skip: (page - 1) * limit,
+        take: limit,
+        // order: { id: 'DESC' },
+      });
+      return { data: result, total };
+    }
+    return resultProcedure;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} order`;
-  }
-
-  update(id: number, updateOrderDto: UpdateOrderDto) {
-    return `This action updates a #${id} order`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} order`;
+  // Delete list  order to the database
+  async deleteById(data: number[]) {
+    try {
+      await this.ordersRepository.delete({
+        OrderId: In(data),
+      });
+      await this.orderDetailsService.deleteById(data);
+    } catch (error) {
+      throw new Error(`Create product failed: ${error} `);
+    }
   }
 }

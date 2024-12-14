@@ -18,3 +18,15 @@ interface IDataPurchaseOrderDetail {
   unitPrice: number;
   subTotal: number;
 }
+
+interface IDataOrder {
+  OrderId: number;
+  DeliveryDate: string;
+  ShippingAddress: string;
+  PaymentMethod: string;
+  Note: string;
+  TotalAmount: number;
+  TaxRate: number;
+  Status: string;
+  ShippingCost: number;
+}

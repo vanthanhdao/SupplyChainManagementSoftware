@@ -8,20 +8,18 @@ import CssBaseline from "@mui/material/CssBaseline";
 import getMPTheme from "../../../theme/getMPTheme";
 import Snackbar, { SnackbarCloseReason } from "@mui/material/Snackbar";
 import Alert from "@mui/material/Alert";
-import { useGetAccessToken } from "@/app/hook/useAccessToken";
 import { updateIsActive } from "@/app/apis/index-api";
 import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
-import LinearProgress from "@mui/material/LinearProgress";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   const router = useRouter();
   const [mode, setMode] = React.useState<PaletteMode>("light");
   const [showCustomTheme, setShowCustomTheme] = React.useState(true);
   const MPTheme = createTheme(getMPTheme(mode));
   const defaultTheme = createTheme({ palette: { mode } });
   const [open, setOpen] = React.useState(false);
-  const { isActive, initializeUser } = useUserStore();
+  const { role, isActive, initializeUser } = useUserStore();
 
   React.useEffect(() => {
     initializeUser();
@@ -31,7 +29,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     } else if (!isActive) {
       router.push("/");
     }
-  }, [isActive]);
+  }, [isActive, role]);
 
   const handleClose = (
     event?: React.SyntheticEvent | Event,
@@ -104,4 +102,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </body>
     </html>
   );
-}
+};
+
+export default Layout;

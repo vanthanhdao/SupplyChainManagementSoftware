@@ -27,7 +27,9 @@ export class CategoriesService {
     }
   }
 
-  async findAll(query: any) {
+  async findAll(query: any, payload: IUserAccessToken) {
+    const role = payload.role === 'SUPPLIER' ? 'material' : 'product';
+    const checkAdmin = payload.role === 'ADMIN' ? true : false;
     const { page, limit } = query;
     if (page && limit) {
       const [result, total] = await this.categoriesRepository.findAndCount({
@@ -37,16 +39,20 @@ export class CategoriesService {
       });
       return { data: result, total };
     }
-    return await this.categoriesRepository.find();
+    if (checkAdmin) return await this.categoriesRepository.find();
+    return await this.categoriesRepository.findBy({
+      Type: role,
+    });
   }
 
   // Add list new Category to the database
-  async createListCategory(data: CreateCategoryDto[]) {
+  async createListCategory(data: CreateCategoryDto[], role: string) {
     try {
       data.forEach(async (item) => {
         const Category = this.categoriesRepository.create({
           CategoryName: item.categoryName,
           Description: item.description,
+          Type: role === 'SUPPLIER' ? 'material' : 'product',
         });
         if (!Category)
           throw new Error(`Category with ${Category.CategoryId} is not exists`);
@@ -93,7 +99,8 @@ export class CategoriesService {
     }
   }
 
-  updateRecord(data: any) {
+  updateRecord(data: any, payload: IUserAccessToken) {
+    const role = payload.role;
     const createCategory = data.filter(
       (item) => item.isNew && item.active === null,
     );
@@ -104,7 +111,7 @@ export class CategoriesService {
       (item) => !item.isNew && item.active === 'delete',
     );
     if (createCategory && createCategory.length > 0)
-      this.createListCategory(createCategory);
+      this.createListCategory(createCategory, role);
     if (updateCategory && updateCategory.length > 0)
       this.updateListCategory(updateCategory);
     if (deleteCategory && deleteCategory.length > 0)

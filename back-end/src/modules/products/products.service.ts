@@ -3,7 +3,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Products } from './entities/product.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ConfigService } from '@nestjs/config';
 
 @Injectable()
@@ -41,9 +41,29 @@ export class ProductsService {
   }
 
   // Add list new product to the database
-  async createListProduct(data: CreateProductDto[]) {
+  async createListProduct(data: CreateProductDto[], role: string) {
     try {
-      data.forEach(async (item) => {
+      // const savePromises = data.map(async (item) => {
+      //   const product = this.productsRepository.create({
+      //     ProductName: item.productName,
+      //     Description: item.description,
+      //     Price: item.price,
+      //     Images: item.images,
+      //     Specifications: item.specifications,
+      //     CategoryId: item.categoryId,
+      //     Type: 'product',
+      //   });
+
+      //   if (!product) {
+      //     throw new Error(`Product with ${product.ProductId} does not exist`);
+      //   }
+
+      //   return this.productsRepository.save(product);
+      // });
+
+      // // Wait for all promises to resolve
+      // await Promise.all(savePromises);
+      for (const item of data) {
         const product = this.productsRepository.create({
           ProductName: item.productName,
           Description: item.description,
@@ -51,11 +71,15 @@ export class ProductsService {
           Images: item.images,
           Specifications: item.specifications,
           CategoryId: item.categoryId,
+          Type: role === 'SUPPLIER' ? 'material' : 'product',
         });
-        if (!product)
-          throw new Error(`Product with ${product.ProductId} is not exists`);
+
+        if (!product) {
+          throw new Error(`Product with ${product.ProductId} does not exist`);
+        }
+
         await this.productsRepository.save(product);
-      });
+      }
     } catch (error) {
       throw new Error(`Create product failed: ${error} `);
     }
@@ -64,12 +88,14 @@ export class ProductsService {
   // Update list new product to the database
   async updateListProduct(data: UpdateProductDto[]) {
     try {
-      data.forEach(async (item) => {
+      for (const item of data) {
         const product = await this.productsRepository.findOneBy({
           ProductId: item.productId,
         });
-        if (!product)
-          throw new Error(`Product with ${product.ProductId} is not exists`);
+
+        if (!product) {
+          throw new Error(`Product with ID ${item.productId} does not exist`);
+        }
         const updateDate = new Date();
         product.ProductName = item.productName;
         product.Description = item.description;
@@ -78,33 +104,35 @@ export class ProductsService {
         product.Specifications = item.specifications;
         product.CategoryId = item.categoryId;
         product.UpdateAt = updateDate.toString();
+
         await this.productsRepository.save(product);
-      });
+      }
     } catch (error) {
       throw new Error(`Create product failed: ${error} `);
     }
   }
 
-  // Update list new product to the database
+  // Delete list product to the database
   async deleteListProduct(data: UpdateProductDto[]) {
     try {
-      data.forEach(async (item) => {
-        const product = await this.productsRepository.findOneBy({
-          ProductId: item.productId,
-        });
-        if (!product)
-          throw new Error(`Product with ${product.ProductId} is not exists`);
-        await this.productsRepository.delete(product.ProductId);
+      const productIds = data.map((item) => item.productId);
+      if (productIds.length === 0) {
+        throw new Error('No products to delete');
+      }
+      await this.productsRepository.delete({
+        ProductId: In(productIds),
       });
     } catch (error) {
       throw new Error(`Create product failed: ${error} `);
     }
   }
 
-  async findAll(query: any) {
+  async findAll(query: any, payload: IUserAccessToken) {
     const { page, limit } = query;
+    const role = payload.role;
     const resultProcedure = await this.productsRepository.query(
-      'EXEC pro_GetAllProductsHaveCategory',
+      'EXEC pro_GetAllProductsHaveCategory @0',
+      [role],
     );
     if (page && limit) {
       // const [result, total] = await this.productsRepository.findAndCount({
@@ -122,7 +150,8 @@ export class ProductsService {
     return resultProcedure;
   }
 
-  updateRecord(data: any) {
+  updateRecord(data: any, payload: IUserAccessToken) {
+    const role = payload.role;
     const createProduct = data.filter(
       (item) => item.isNew && item.active === null,
     );
@@ -133,7 +162,7 @@ export class ProductsService {
       (item) => !item.isNew && item.active === 'delete',
     );
     if (createProduct && createProduct.length > 0)
-      this.createListProduct(createProduct);
+      this.createListProduct(createProduct, role);
     if (updateProduct && updateProduct.length > 0)
       this.updateListProduct(updateProduct);
     if (deleteProduct && deleteProduct.length > 0)

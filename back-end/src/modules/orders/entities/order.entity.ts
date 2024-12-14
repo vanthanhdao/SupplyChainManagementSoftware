@@ -39,6 +39,9 @@ export class Orders {
   @Column({ type: 'nvarchar', length: 4000 })
   Note: string;
 
+  @Column({ default: null })
+  SubOrderId: number;
+
   @CreateDateColumn()
   CreatedAt: string;
 

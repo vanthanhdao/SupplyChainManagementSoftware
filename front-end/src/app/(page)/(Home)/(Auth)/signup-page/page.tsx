@@ -108,11 +108,11 @@ const SignUp = () => {
       if (!checkValidPass)
         return alert("You must provide RePassword a valid information");
 
-      // Connect MetaMask
-      await useConnectMetaMask();
+      // // Connect MetaMask
+      // await useConnectMetaMask();
 
-      const publicKey = await useGetWalletAddress();
-      if (!publicKey) throw new Error(`Don't looking for publickey !`);
+      // const publicKey = await useGetWalletAddress();
+      // if (!publicKey) throw new Error(`Don't looking for publickey !`);
 
       const data: IUser = {
         email: valueInput.email,

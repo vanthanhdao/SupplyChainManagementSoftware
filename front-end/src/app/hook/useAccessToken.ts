@@ -1,18 +1,20 @@
 import { authJwtProfile } from "@/app/apis/index-api";
 
 export const useGetAccessToken = (name_token: string) => {
-  try {
-    const result = sessionStorage.getItem(name_token);
-    if (!result) {
-      throw new Error(`Empty AccessToken !`);
-    }
-    return result;
-  } catch (error) {
-    throw new Error(`useGetAccessToken failed`);
+  if (typeof window === "undefined") {
+    return null;
   }
+  const result = sessionStorage.getItem(name_token);
+  if (!result) {
+    console.log(`Empty AccessToken !`);
+  }
+  return result;
 };
 
 export const useSetAccessToken = (name_token: string, access_token: string) => {
+  if (typeof window === "undefined") {
+    return null;
+  }
   sessionStorage.setItem(name_token, access_token);
 };
 

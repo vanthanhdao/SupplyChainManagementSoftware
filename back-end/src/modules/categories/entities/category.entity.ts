@@ -15,6 +15,8 @@ export class Categories {
   CategoryName: string;
   @Column({ type: 'nvarchar', length: 4000 })
   Description: string;
+  @Column()
+  Type: string;
   @CreateDateColumn()
   CreateAt: string;
   @UpdateDateColumn()

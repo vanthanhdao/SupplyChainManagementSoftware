@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Request } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 
@@ -12,12 +12,12 @@ export class ProductsController {
   }
 
   @Get()
-  findAll(@Query() query: string) {
-    return this.productsService.findAll(query);
+  findAll(@Query() query: string, @Request() req) {
+    return this.productsService.findAll(query, req.user);
   }
 
   @Post('updateRecords')
-  updateRecord(@Body() data: any) {
-    return this.productsService.updateRecord(data);
+  updateRecord(@Body() data: any, @Request() req) {
+    return this.productsService.updateRecord(data, req.user);
   }
 }

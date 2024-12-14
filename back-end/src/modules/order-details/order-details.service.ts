@@ -3,7 +3,7 @@ import { CreateOrderDetailDto } from './dto/create-order-detail.dto';
 import { UpdateOrderDetailDto } from './dto/update-order-detail.dto';
 import { OrderDetails } from './entities/order-detail.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 
 @Injectable()
 export class OrderDetailsService {
@@ -46,7 +46,20 @@ export class OrderDetailsService {
     return `This action updates a #${id} orderDetail`;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} orderDetail`;
+  // Delete list  order to the database
+  async deleteById(dataOrderId: number[]) {
+    try {
+      const orderdetails = await this.orderDetailsRepository.findBy({
+        OrderId: In(dataOrderId),
+      });
+      const foundIds = orderdetails.map(
+        (orderdetails) => orderdetails.OrderDetailId,
+      );
+      await this.orderDetailsRepository.delete({
+        OrderDetailId: In(foundIds),
+      });
+    } catch (error) {
+      throw new Error(`Create product failed: ${error} `);
+    }
   }
 }

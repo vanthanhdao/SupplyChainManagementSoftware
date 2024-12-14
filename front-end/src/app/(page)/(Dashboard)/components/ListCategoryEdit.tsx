@@ -31,7 +31,6 @@ import {
 } from "@/app/apis/categories-api";
 import { v4 as uuidv4 } from "uuid";
 import { updateRecordProduct } from "@/app/apis/products-api";
-import { useRecordCategory, useStoreUserSession } from "@/app/hook/useEthereum";
 import { getAccountWallet } from "@/app/apis/index-api";
 
 interface EditToolbarProps {

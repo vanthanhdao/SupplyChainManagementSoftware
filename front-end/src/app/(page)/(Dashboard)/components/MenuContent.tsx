@@ -17,24 +17,59 @@ type MenuItem = {
   text: string;
   icon: React.ReactElement;
   route: string;
+  role: string[];
 };
 
 const mainListItems: MenuItem[] = [
-  { text: "Store", icon: <StoreIcon />, route: "" },
-  { text: "Orders", icon: <AnalyticsRoundedIcon />, route: "Orders" },
-  { text: "Histories", icon: <PeopleRoundedIcon />, route: "Histories" },
-  { text: "Demo", icon: <HomeRoundedIcon />, route: "Demo" },
-  { text: "Tasks", icon: <AssignmentRoundedIcon />, route: "Tasks" },
-  { text: "Products", icon: <AssignmentRoundedIcon />, route: "Products" },
-  { text: "Categories", icon: <AssignmentRoundedIcon />, route: "Categories" },
-  { text: "Shippings", icon: <AssignmentRoundedIcon />, route: "Shippings" },
-];
-
-const userListItems: MenuItem[] = [
-  { text: "Store", icon: <StoreIcon />, route: "" },
-  { text: "Orders", icon: <AnalyticsRoundedIcon />, route: "Orders" },
-  { text: "Products", icon: <AssignmentRoundedIcon />, route: "Products" },
-  { text: "Categories", icon: <AssignmentRoundedIcon />, route: "Categories" },
+  {
+    text: "Home",
+    icon: <StoreIcon />,
+    route: "",
+    role: ["ADMIN", "MANUFACTURER", "CUSTOMER", "SUPPLIER", "CARRIER"],
+  },
+  {
+    text: "Stores",
+    icon: <StoreIcon />,
+    route: "Stores",
+    role: ["ADMIN", "MANUFACTURER", "CUSTOMER"],
+  },
+  {
+    text: "Orders",
+    icon: <AnalyticsRoundedIcon />,
+    route: "Orders",
+    role: ["ADMIN", "MANUFACTURER", "CUSTOMER"],
+  },
+  {
+    text: "Histories",
+    icon: <PeopleRoundedIcon />,
+    route: "Histories",
+    role: ["ADMIN"],
+  },
+  { text: "Demo", icon: <HomeRoundedIcon />, route: "Demo", role: ["ADMIN"] },
+  {
+    text: "Tasks",
+    icon: <AssignmentRoundedIcon />,
+    route: "Tasks",
+    role: ["ADMIN"],
+  },
+  {
+    text: "Products",
+    icon: <AssignmentRoundedIcon />,
+    route: "Products",
+    role: ["ADMIN", "MANUFACTURER", "SUPPLIER"],
+  },
+  {
+    text: "Categories",
+    icon: <AssignmentRoundedIcon />,
+    route: "Categories",
+    role: ["ADMIN", "MANUFACTURER", "SUPPLIER"],
+  },
+  {
+    text: "Shippings",
+    icon: <AssignmentRoundedIcon />,
+    route: "Shippings",
+    role: ["ADMIN", "CARRIER"],
+  },
 ];
 
 export default function MenuContent() {
@@ -42,11 +77,15 @@ export default function MenuContent() {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
   const [menuContent, setMenuContent] = React.useState<MenuItem[]>([]);
   const { role } = useUserStore();
+  const getMenuItemsByRole = (userRole: string | null) => {
+    if (!userRole) return;
+    setMenuContent(
+      mainListItems.filter((item) => item.role.includes(userRole))
+    );
+  };
 
   React.useEffect(() => {
-    if (role === "ADMIN") setMenuContent(mainListItems);
-    else setMenuContent(userListItems);
-    // Kiểm tra client-side trước khi sử dụng sessionStorage
+    getMenuItemsByRole(role);
     const selectStorage = Number(sessionStorage.getItem("selectedIndex")) || 0;
     setSelectedIndex(selectStorage);
   }, [role]);
