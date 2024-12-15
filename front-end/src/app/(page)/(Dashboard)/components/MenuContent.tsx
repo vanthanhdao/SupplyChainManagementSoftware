@@ -5,13 +5,16 @@ import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
-import HomeRoundedIcon from "@mui/icons-material/HomeRounded";
-import AnalyticsRoundedIcon from "@mui/icons-material/AnalyticsRounded";
-import PeopleRoundedIcon from "@mui/icons-material/PeopleRounded";
 import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
 import StoreIcon from "@mui/icons-material/Store";
+import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
+import HomeIcon from "@mui/icons-material/Home";
 import { useRouter } from "next/navigation";
 import useUserStore from "@/app/zustands/userStore";
+import HistoryIcon from "@mui/icons-material/History";
+import MemoryIcon from "@mui/icons-material/Memory";
+import CategoryIcon from "@mui/icons-material/Category";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
 
 type MenuItem = {
   text: string;
@@ -23,7 +26,7 @@ type MenuItem = {
 const mainListItems: MenuItem[] = [
   {
     text: "Home",
-    icon: <StoreIcon />,
+    icon: <HomeIcon />,
     route: "",
     role: ["ADMIN", "MANUFACTURER", "CUSTOMER", "SUPPLIER", "CARRIER"],
   },
@@ -35,17 +38,16 @@ const mainListItems: MenuItem[] = [
   },
   {
     text: "Orders",
-    icon: <AnalyticsRoundedIcon />,
+    icon: <ReceiptLongIcon />,
     route: "Orders",
     role: ["ADMIN", "MANUFACTURER", "CUSTOMER"],
   },
   {
     text: "Histories",
-    icon: <PeopleRoundedIcon />,
+    icon: <HistoryIcon />,
     route: "Histories",
     role: ["ADMIN"],
   },
-  { text: "Demo", icon: <HomeRoundedIcon />, route: "Demo", role: ["ADMIN"] },
   {
     text: "Tasks",
     icon: <AssignmentRoundedIcon />,
@@ -54,19 +56,19 @@ const mainListItems: MenuItem[] = [
   },
   {
     text: "Products",
-    icon: <AssignmentRoundedIcon />,
+    icon: <MemoryIcon />,
     route: "Products",
     role: ["ADMIN", "MANUFACTURER", "SUPPLIER"],
   },
   {
     text: "Categories",
-    icon: <AssignmentRoundedIcon />,
+    icon: <CategoryIcon />,
     route: "Categories",
     role: ["ADMIN", "MANUFACTURER", "SUPPLIER"],
   },
   {
     text: "Shippings",
-    icon: <AssignmentRoundedIcon />,
+    icon: <LocalShippingIcon />,
     route: "Shippings",
     role: ["ADMIN", "CARRIER"],
   },

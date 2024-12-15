@@ -20,9 +20,14 @@ export class OrderDetailsController {
     return this.orderDetailsService.create(createOrderDetailDto);
   }
 
+  @Get()
+  findAll() {
+    return this.orderDetailsService.findAll();
+  }
+
   @Get(':id')
-  findAllById(@Param('id') id: string) {
-    return this.orderDetailsService.findAllById(+id);
+  findOne(@Param('id') id: string) {
+    return this.orderDetailsService.findOne(+id);
   }
 
   @Patch(':id')

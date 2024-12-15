@@ -6,6 +6,8 @@ import {
   Query,
   Request,
   Delete,
+  Param,
+  Patch,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -30,8 +32,8 @@ export class OrdersController {
     return this.ordersService.deleteById(deleteOrderDto);
   }
 
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateOrderDto: UpdateOrderDto) {
-  //   return this.ordersService.update(+id, updateOrderDto);
-  // }
+  @Patch(':id')
+  updateStatus(@Param('id') orderId: string, @Body('status') status: string) {
+    return this.ordersService.updateStatus(+orderId, status);
+  }
 }

@@ -11,7 +11,7 @@ interface InputPurchaseOrderState {
 const date = new Date();
 
 const initialState: IInputPurchaseOrder = {
-  companyName: "Company Name",
+  companyName: null,
   companyAddress: "123 Street BD",
   deliveryDate: date.toLocaleDateString(),
   shippingVia: "Shipping Company",

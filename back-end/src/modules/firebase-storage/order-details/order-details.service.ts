@@ -34,15 +34,8 @@ export class OrderDetailsService {
     }
   }
 
-  findAllById(orderId: number) {
-    try {
-      const orderDetails = this.orderDetailsRepository.findBy({
-        OrderId: orderId,
-      });
-      return orderDetails;
-    } catch (error) {
-      throw new Error(`findAllById product failed: ${error} `);
-    }
+  findAll() {
+    return `This action returns all orderDetails`;
   }
 
   findOne(id: number) {

@@ -28,7 +28,11 @@ export default function InputPurchaseOrder(props: IProps) {
   }, [dataShippings]);
 
   return (
-    <Box sx={{ padding: 4 }}>
+    <Box
+      sx={{
+        padding: 4,
+      }}
+    >
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Edit Information
       </Typography>
@@ -51,7 +55,7 @@ export default function InputPurchaseOrder(props: IProps) {
         </Grid>
 
         {/* Address */}
-        <Grid item xs={12}>
+        {/* <Grid item xs={12}>
           <FormControl fullWidth>
             <FormLabel htmlFor="addressCompany">Address Company</FormLabel>
             <TextField
@@ -65,7 +69,7 @@ export default function InputPurchaseOrder(props: IProps) {
               onChange={(e) => setInputPO({ companyAddress: e.target.value })}
             />
           </FormControl>
-        </Grid>
+        </Grid> */}
 
         {/* Delivery Date */}
         <Grid item xs={12}>
@@ -185,7 +189,7 @@ export default function InputPurchaseOrder(props: IProps) {
               size="small"
               fullWidth
               multiline
-              rows={4}
+              rows={10}
               onChange={(e) => setInputPO({ notes: e.target.value })}
             />
           </FormControl>

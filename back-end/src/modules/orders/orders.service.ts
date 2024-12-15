@@ -6,6 +6,7 @@ import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DeleteOrderDto } from './dto/delete-order.dto';
 import { OrderDetailsService } from '../order-details/order-details.service';
+import { error } from 'console';
 
 @Injectable()
 export class OrdersService {
@@ -64,6 +65,21 @@ export class OrdersService {
       return { data: result, total };
     }
     return resultProcedure;
+  }
+
+  async updateStatus(orderId: number, status: string) {
+    try {
+      const Order = await this.ordersRepository.findOneBy({
+        OrderId: orderId,
+      });
+      if (!Order) throw new Error(`Order with ${orderId} is not exists`);
+      const updateDate = new Date();
+      Order.Status = status;
+      Order.UpdatedAt = updateDate.toString();
+      await this.ordersRepository.save(Order);
+    } catch (error) {
+      throw new Error(`updateStatus product failed: ${error} `);
+    }
   }
 
   // Delete list  order to the database

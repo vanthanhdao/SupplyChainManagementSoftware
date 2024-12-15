@@ -40,7 +40,7 @@ export default function NavbarBreadcrumbs() {
             key={index}
             sx={{ color: "text.primary", fontWeight: 600 }}
           >
-            {pathname ? pathname : "Store"}
+            {pathname ? pathname : "Home"}
           </Typography>
         );
       })}

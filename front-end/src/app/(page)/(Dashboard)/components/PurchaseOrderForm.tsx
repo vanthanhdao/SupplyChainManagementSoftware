@@ -10,6 +10,7 @@ import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
 import { useReactToPrint } from "react-to-print";
 import useInputPOStore from "@/app/zustands/useInputPOStore";
 import DialogUploadImages from "./DialogUploadImages";
+import useUserStore from "@/app/zustands/userStore";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "NO.", width: 20 },
@@ -61,6 +62,7 @@ const Invoice = () => {
     setSelectedRowState,
   } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
+  const { nameCompany } = useUserStore();
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({
@@ -121,10 +123,8 @@ const Invoice = () => {
     <Card
       variant="outlined"
       sx={{
-        display: "flex",
-        flexDirection: "column",
-        gap: "8px",
-        flexGrow: 1,
+        width: "100%",
+        height: 850,
         overflow: "auto",
       }}
     >
@@ -143,7 +143,9 @@ const Invoice = () => {
         {/* Header Section */}
         <Grid container spacing={2}>
           <Grid item xs={6}>
-            <Typography variant="h6">{inputs.companyName}</Typography>
+            <Typography variant="h6">
+              {inputs.companyName ? inputs.companyName : nameCompany}
+            </Typography>
             <Typography>{inputs.companyAddress}</Typography>
           </Grid>
           <Grid item xs={6} textAlign="right">

@@ -16,6 +16,19 @@ export const getAllProduct = async (): Promise<IDataProduct[]> => {
   }
 };
 
+export const getProductByOrderId = async (orderId: number) => {
+  try {
+    const access_token = useGetAccessToken("access_token");
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/${orderId}`,
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`GetAccount failed: ${error}`);
+  }
+};
+
 // Call api CRUD products
 export const updateRecordProduct = async (data: GridRowsProp) => {
   try {

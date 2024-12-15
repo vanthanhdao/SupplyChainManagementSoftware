@@ -36,7 +36,7 @@ interface IUpdateDataProduct {
 }
 
 interface IInputPurchaseOrder {
-  companyName: string;
+  companyName: string | null;
   companyAddress: string;
   deliveryDate: DateTime;
   shippingVia: string;

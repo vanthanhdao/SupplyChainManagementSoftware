@@ -6,6 +6,8 @@ import Typography from "@mui/material/Typography";
 import useSWR from "swr";
 import ListOrderSelect from "../../../components/ListOrderSelect";
 import { getAllOrder } from "@/app/apis/order-api";
+import OrderDetail from "../../../components/OrderDetail";
+import Grid from "@mui/material/Grid2";
 
 export default function Orders() {
   const fetcher = async () => await getAllOrder();
@@ -26,7 +28,14 @@ export default function Orders() {
       <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
         Overview
       </Typography>
-      {data ? <ListOrderSelect dataOrders={data} /> : null}
+      <Grid container spacing={5} columns={12}>
+        <Grid size={{ sm: 12, md: 12, lg: 12 }}>
+          {data ? <ListOrderSelect dataOrders={data} /> : null}
+        </Grid>
+        <Grid size={{ sm: 12, md: 12, lg: 12 }}>
+          <OrderDetail />
+        </Grid>
+      </Grid>
     </Box>
   );
 }

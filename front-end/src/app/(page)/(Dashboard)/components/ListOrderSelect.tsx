@@ -1,12 +1,11 @@
 import * as React from "react";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
-import EditIcon from "@mui/icons-material/Edit";
+import PreviewIcon from "@mui/icons-material/Preview";
 import RefreshIcon from "@mui/icons-material/Refresh";
 import {
   GridRowsProp,
   GridRowModesModel,
-  GridRowModes,
   DataGrid,
   GridColDef,
   GridToolbarContainer,
@@ -20,16 +19,10 @@ import {
 import { Card, Stack } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import SaveIcon from "@mui/icons-material/Save";
-import useSWR, { mutate } from "swr";
-import { v4 as uuidv4 } from "uuid";
-import { getAllCategory } from "@/app/apis/categories-api";
-import { updateRecordProduct } from "@/app/apis/products-api";
-import ExpandableCell from "./ExpandableCell";
-import ExpandableCellImages from "./ExpandableCellImages";
-import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import { uploadImages } from "@/app/apis/uploads-api";
+import { mutate } from "swr";
 import { deletePurchaseOrder } from "@/app/apis/order-api";
 import { useRouter } from "next/navigation";
+import DialogUploadImagesUpdate from "./DialogUploadImagesUpdate";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -45,9 +38,6 @@ interface IProps {
 export default function ListOrderSelect(props: IProps) {
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const [tempRows, setTempRows] = React.useState<number[]>([]);
-  const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
-    {}
-  );
   const { dataOrders } = props;
   const router = useRouter();
 
@@ -140,7 +130,6 @@ export default function ListOrderSelect(props: IProps) {
 
   const handleEditClick = (id: GridRowId, row: GridRowModel) => () => {
     console.table(row);
-    setRowModesModel({ ...rowModesModel, [id]: { mode: GridRowModes.Edit } });
   };
 
   const columns: GridColDef[] = [
@@ -298,13 +287,7 @@ export default function ListOrderSelect(props: IProps) {
       getActions: ({ id, row }) => {
         if (row.status === "Created") {
           return [
-            <GridActionsCellItem
-              icon={<EditIcon />}
-              label="Edit"
-              className="textPrimary"
-              onClick={handleEditClick(id, row)}
-              color="inherit"
-            />,
+            <DialogUploadImagesUpdate orderId={row.orderId} />,
             <GridActionsCellItem
               icon={<DeleteIcon />}
               label="Delete"
@@ -316,10 +299,9 @@ export default function ListOrderSelect(props: IProps) {
 
         return [
           <GridActionsCellItem
-            icon={<EditIcon />}
-            label="Edit"
-            className="textPrimary"
-            onClick={handleEditClick(id, row)}
+            icon={<PreviewIcon />}
+            label="Delete"
+            // onClick={handleDeleteClick(id, row)}
             color="inherit"
           />,
         ];

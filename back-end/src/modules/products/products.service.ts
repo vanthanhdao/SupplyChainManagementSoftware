@@ -150,6 +150,14 @@ export class ProductsService {
     return resultProcedure;
   }
 
+  async findAllById(orderId: number) {
+    const resultProcedure = await this.productsRepository.query(
+      'EXEC pro_GetProductByOrderId @0',
+      [orderId],
+    );
+    return resultProcedure;
+  }
+
   updateRecord(data: any, payload: IUserAccessToken) {
     const role = payload.role;
     const createProduct = data.filter(

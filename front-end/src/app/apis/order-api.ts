@@ -16,6 +16,19 @@ export const getAllOrder = async (): Promise<IDataOrder[]> => {
   }
 };
 
+export const updateStatusOrder = async (orderId: number, status: string) => {
+  try {
+    const response = await axios.patch(
+      `${process.env.NEXT_PUBLIC_API_URL}/orders/${orderId}`,
+      { status },
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`GetAccount failed: ${error}`);
+  }
+};
+
 export const deletePurchaseOrder = async (data: number[]) => {
   try {
     const response = await axios.post(
