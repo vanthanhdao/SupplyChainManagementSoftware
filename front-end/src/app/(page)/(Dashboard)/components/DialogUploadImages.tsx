@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
 import { useAddOrder } from "@/app/hook/useEthereum";
 import { uploadImages } from "@/app/apis/uploads-api";
+import { updateStatusOrder } from "@/app/apis/order-api";
 
 interface DialogUploadImagesProps {
   rows: GridRowsProp;
@@ -51,17 +52,28 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   const storeBlockChain = async (purchaseOrder: string) => {
     if (!selectedRows || !orderCode || !purchaseOrder) return;
     const history = [
-      `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role},Date:${date.toLocaleDateString()},Status:'New'}`,
+      `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`,
+    ];
+    const timeLine = [
+      `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'}`,
     ];
     const productList = selectedRows.map(
       (item) =>
-        `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
+        // `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
+        `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
     );
     const po = [`${purchaseOrder}`];
-    const checkTransac = await useAddOrder(orderCode, productList, history, po);
+    const checkTransac = await useAddOrder(
+      orderCode,
+      productList,
+      history,
+      timeLine,
+      po
+    );
     setLoading(checkTransac);
     setOpen(checkTransac);
     window.location.reload();
+    await updateStatusOrder(orderCode, "New");
   };
 
   const handleSendPO = async () => {
@@ -91,11 +103,12 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
           unit: item.unit,
           quantity: item.quantity,
           subTotal: item.money,
+          subOrderId: role !== "CUSTOMER" ? orderCode : null,
         })
       );
       const result_orderDetail = await createOrderDetails(purchaseOrderDetails);
       if (!result_orderDetail) return;
-      await setOrderCode(result_order.OrderId);
+      if (role !== "CUSTOMER") setOrderCode(result_order.OrderId);
       onPrint();
       setOpen(true);
     } catch (error) {

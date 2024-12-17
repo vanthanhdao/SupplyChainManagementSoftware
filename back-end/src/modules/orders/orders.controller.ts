@@ -32,6 +32,11 @@ export class OrdersController {
     return this.ordersService.deleteById(deleteOrderDto);
   }
 
+  @Get('group/:id')
+  findGroupById(@Param('id') orderId: string) {
+    return this.ordersService.findGroupById(+orderId);
+  }
+
   @Patch(':id')
   updateStatus(@Param('id') orderId: string, @Body('status') status: string) {
     return this.ordersService.updateStatus(+orderId, status);

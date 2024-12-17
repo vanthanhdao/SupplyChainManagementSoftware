@@ -7,6 +7,7 @@ interface IDataProduct {
   Specifications: string;
   CategoryId: number;
   CategoryName: string;
+  Type: string;
 }
 
 interface DetailOrder {
@@ -37,12 +38,12 @@ interface IUpdateDataProduct {
 
 interface IInputPurchaseOrder {
   companyName: string | null;
-  companyAddress: string;
+  companyAddress: string | null;
   deliveryDate: DateTime;
   shippingVia: string;
   shippingViaId: number;
   terms: string;
-  shipTo: string;
+  shipTo: string | null;
   seller: string;
   notes: string;
   taxRate: number;

@@ -67,6 +67,14 @@ export class OrdersService {
     return resultProcedure;
   }
 
+  async findGroupById(orderId: number) {
+    const resultProcedure = await this.ordersRepository.query(
+      'EXEC pro_GetOrderUserShippingByOrderId @0',
+      [orderId],
+    );
+    return resultProcedure;
+  }
+
   async updateStatus(orderId: number, status: string) {
     try {
       const Order = await this.ordersRepository.findOneBy({

@@ -3,6 +3,8 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import PreviewIcon from "@mui/icons-material/Preview";
 import RefreshIcon from "@mui/icons-material/Refresh";
+import SaveIcon from "@mui/icons-material/Save";
+import DeleteIcon from "@mui/icons-material/Delete";
 import {
   GridRowsProp,
   GridRowModesModel,
@@ -17,12 +19,15 @@ import {
   GridToolbarQuickFilter,
 } from "@mui/x-data-grid";
 import { Card, Stack } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import { mutate } from "swr";
-import { deletePurchaseOrder } from "@/app/apis/order-api";
+import EditIcon from "@mui/icons-material/Edit";
+import { deletePurchaseOrder, getGroupOrder } from "@/app/apis/order-api";
 import { useRouter } from "next/navigation";
 import DialogUploadImagesUpdate from "./DialogUploadImagesUpdate";
+import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
+import { getGroupOrderDetails } from "@/app/apis/orderDetail-api";
+import useUserStore from "@/app/zustands/userStore";
+import { mutate } from "swr";
+import DialogSelectStatus from "./DialogSelectStatus";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -38,14 +43,10 @@ interface IProps {
 export default function ListOrderSelect(props: IProps) {
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const [tempRows, setTempRows] = React.useState<number[]>([]);
+  const { role, userId } = useUserStore();
   const { dataOrders } = props;
+  const { setGroupOrder, setGroupOrderDetails } = useGroupDetailOrderStore();
   const router = useRouter();
-
-  //   const fetcher = async () => await getAllCategory();
-  //   const { data } = useSWR(
-  //     `${process.env.NEXT_PUBLIC_API_URL}/categories`,
-  //     fetcher
-  //   );
 
   React.useEffect(() => {
     const dataRows: GridRowsProp = dataOrders.map((item, index) => ({
@@ -59,6 +60,7 @@ export default function ListOrderSelect(props: IProps) {
       status: item.Status,
       paymentMethod: item.PaymentMethod,
       shippingCost: item.ShippingCost,
+      customerId: item.CustomerId,
     }));
     setRows(dataRows);
   }, [dataOrders]);
@@ -70,9 +72,10 @@ export default function ListOrderSelect(props: IProps) {
     const handleClickSave = async () => {
       try {
         // Handle updateRecordProduct
+        console.log(tempRows);
         await deletePurchaseOrder(tempRows);
       } catch (error) {
-        router.push("/dashboard/Error");
+        throw new Error(`HandleClickSave failed - ${error}`);
       }
     };
 
@@ -90,7 +93,6 @@ export default function ListOrderSelect(props: IProps) {
             <Box>
               <GridToolbar />
             </Box>
-
             <Button
               color="primary"
               sx={{ mt: 0.5, mr: 2 }}
@@ -128,8 +130,18 @@ export default function ListOrderSelect(props: IProps) {
     setRows(newRows);
   };
 
-  const handleEditClick = (id: GridRowId, row: GridRowModel) => () => {
-    console.table(row);
+  const handlePreviewClick = (orderId: number) => async () => {
+    try {
+      const [order, orderDetails] = await Promise.all([
+        getGroupOrder(orderId),
+        getGroupOrderDetails(orderId),
+      ]);
+      const formatOrder = order.length > 0 ? order[0] : null;
+      setGroupOrder(formatOrder);
+      setGroupOrderDetails(orderDetails);
+    } catch (error) {
+      router.push("/dashboard/Error");
+    }
   };
 
   const columns: GridColDef[] = [
@@ -285,25 +297,49 @@ export default function ListOrderSelect(props: IProps) {
       flex: 0,
       cellClassName: "actions",
       getActions: ({ id, row }) => {
-        if (row.status === "Created") {
-          return [
-            <DialogUploadImagesUpdate orderId={row.orderId} />,
-            <GridActionsCellItem
-              icon={<DeleteIcon />}
-              label="Delete"
-              onClick={handleDeleteClick(id, row)}
-              color="inherit"
-            />,
-          ];
-        }
+        if (!role && !row) return [];
+        // if (role === "" && row.status === "Created") {
+        //   return [
+        //     <DialogUploadImagesUpdate orderId={row.orderId} />,
+        //     <GridActionsCellItem
+        //       icon={<DeleteIcon />}
+        //       label="Delete"
+        //       onClick={handleDeleteClick(id, row)}
+        //       color="inherit"
+        //     />,
+        //   ];
+        // }
+        console.log("row", row.customerId);
 
         return [
+          (role === "CUSTOMER" || role === "MANUFACTURER") &&
+          row.status === "Created" &&
+          row.customerId === userId ? (
+            <DialogUploadImagesUpdate orderId={row.orderId} />
+          ) : (
+            <></>
+          ),
+          role !== "CUSTOMER" && row.status !== "Created" ? (
+            <DialogSelectStatus orderId={row.orderId} status={row.status} />
+          ) : (
+            <></>
+          ),
           <GridActionsCellItem
             icon={<PreviewIcon />}
-            label="Delete"
-            // onClick={handleDeleteClick(id, row)}
+            label="Preview"
+            onClick={handlePreviewClick(row.orderId)}
             color="inherit"
           />,
+          row.status === "Created" ? (
+            <GridActionsCellItem
+              icon={<DeleteIcon />}
+              label="Preview"
+              onClick={handleDeleteClick(id, row)}
+              color="inherit"
+            />
+          ) : (
+            <></>
+          ),
         ];
       },
     },

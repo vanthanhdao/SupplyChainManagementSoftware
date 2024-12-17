@@ -1,7 +1,7 @@
 interface IDataPurchaseOrder {
   deliveryDate: string;
   customerId: number | null;
-  shippingAddress: string;
+  shippingAddress: string | null;
   paymentMethod: string;
   shippingMethodId: number;
   totalAmount: number;
@@ -17,6 +17,7 @@ interface IDataPurchaseOrderDetail {
   unit: string;
   unitPrice: number;
   subTotal: number;
+  subOrderId: number | null;
 }
 
 interface IDataOrder {
@@ -29,4 +30,5 @@ interface IDataOrder {
   TaxRate: number;
   Status: string;
   ShippingCost: number;
+  CustomerId: number;
 }

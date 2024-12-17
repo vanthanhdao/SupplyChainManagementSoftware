@@ -150,6 +150,23 @@ export class ProductsService {
     return resultProcedure;
   }
 
+  async findAllStorePage(query: any, payload: IUserAccessToken) {
+    const { page, limit } = query;
+    const role = payload.role;
+    const resultProcedure = await this.productsRepository.query(
+      'EXEC pro_GetAllProductsHaveCategory_StorePage @0',
+      [role],
+    );
+    if (page && limit) {
+      const [result, total] = await resultProcedure.findAndCount({
+        skip: (page - 1) * limit,
+        take: limit,
+      });
+      return { data: result, total };
+    }
+    return resultProcedure;
+  }
+
   async findAllById(orderId: number) {
     const resultProcedure = await this.productsRepository.query(
       'EXEC pro_GetProductByOrderId @0',

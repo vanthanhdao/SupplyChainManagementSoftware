@@ -40,7 +40,7 @@ const mainListItems: MenuItem[] = [
     text: "Orders",
     icon: <ReceiptLongIcon />,
     route: "Orders",
-    role: ["ADMIN", "MANUFACTURER", "CUSTOMER"],
+    role: ["ADMIN", "MANUFACTURER", "CUSTOMER", "SUPPLIER", "CARRIER"],
   },
   {
     text: "Histories",

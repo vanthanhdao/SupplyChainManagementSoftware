@@ -4,6 +4,7 @@ import { getAccount } from "@/app/apis/index-api";
 interface UserState {
   userId: number | null;
   nameCompany: string | null;
+  addressCompany: string | null;
   taxCode: string | null;
   certificates: string | null;
   phoneNumber: string | null;
@@ -16,6 +17,7 @@ interface UserState {
 const useUserStore = create<UserState>((set) => ({
   userId: null,
   nameCompany: null,
+  addressCompany: null,
   taxCode: null,
   certificates: null,
   phoneNumber: null,
@@ -29,6 +31,7 @@ const useUserStore = create<UserState>((set) => ({
         set({
           userId: response.UserId,
           nameCompany: response.NameCompany,
+          addressCompany: response.UserAddress,
           taxCode: response.TaxCode,
           certificates: response.Certificates,
           phoneNumber: response.PhobeNumber,

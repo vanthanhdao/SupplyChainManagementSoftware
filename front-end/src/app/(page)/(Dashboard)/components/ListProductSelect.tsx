@@ -21,6 +21,7 @@ import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
 
 interface IProps {
   dataProducts: IDataProduct[];
+  isLoading: boolean;
 }
 
 const columns: GridColDef[] = [
@@ -150,6 +151,13 @@ export default function ListProductSelect(props: IProps) {
       }}
       onRowClick={handleRowClick}
       onRowSelectionModelChange={handleSelectionChange}
+      loading={props.isLoading}
+      slotProps={{
+        loadingOverlay: {
+          variant: "skeleton",
+          noRowsVariant: "skeleton",
+        },
+      }}
     />
   );
 }

@@ -12,7 +12,20 @@ export const getAllProduct = async (): Promise<IDataProduct[]> => {
     );
     return response.data;
   } catch (error) {
-    throw new Error(`GetAccount failed: ${error}`);
+    throw new Error(`getAllProduct failed: ${error}`);
+  }
+};
+
+export const getAllProduct_StorePage = async (): Promise<IDataProduct[]> => {
+  try {
+    const access_token = useGetAccessToken("access_token");
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/products/store-page`,
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`getAllProduct_StorePage failed: ${error}`);
   }
 };
 
@@ -25,7 +38,7 @@ export const getProductByOrderId = async (orderId: number) => {
     );
     return response.data;
   } catch (error) {
-    throw new Error(`GetAccount failed: ${error}`);
+    throw new Error(`getProductByOrderId failed: ${error}`);
   }
 };
 

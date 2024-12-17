@@ -7,10 +7,17 @@ import NavbarBreadcrumbs from "./NavbarBreadcrumbs";
 import ToggleColorMode from "./ToggleColorMode";
 import MenuButton from "./MenuButton";
 import MenuIcon from "@mui/icons-material/Menu";
-import MoreVertIcon from '@mui/icons-material/MoreVert';
+import MoreVertIcon from "@mui/icons-material/MoreVert";
 
 import Search from "./Search";
-import { Box, Button, Divider, Drawer, IconButton, MenuItem } from "@mui/material";
+import {
+  Box,
+  Button,
+  Divider,
+  Drawer,
+  IconButton,
+  MenuItem,
+} from "@mui/material";
 import SelectContent from "./SelectContent";
 
 export default function Header() {
@@ -18,9 +25,8 @@ export default function Header() {
 
   const toggleDrawer = () => {
     setOpen(!open);
-    console.log(open)
+    console.log(open);
   };
-
 
   return (
     <Stack
@@ -39,10 +45,10 @@ export default function Header() {
         <MenuButton showBadge aria-label="Open notifications">
           <NotificationsRoundedIcon />
         </MenuButton>
-           {/* Menu Reponsive */}
-          <Box sx={{ display: { xs:"flex",sm: "none", md: "none" } }}>
-            <SelectContent/>
-          </Box>
+        {/* Menu Reponsive */}
+        <Box sx={{ display: { xs: "flex", sm: "flex", md: "none" } }}>
+          <SelectContent />
+        </Box>
       </Stack>
     </Stack>
   );

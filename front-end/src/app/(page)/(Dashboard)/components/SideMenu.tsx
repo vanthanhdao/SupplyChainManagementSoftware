@@ -11,6 +11,7 @@ import SelectContent from "./SelectContent";
 import MenuContent from "./MenuContent";
 import CardAlert from "./CardAlert";
 import OptionsMenu from "./OptionsMenu";
+import useUserStore from "@/app/zustands/userStore";
 
 const drawerWidth = 240;
 
@@ -25,11 +26,12 @@ const Drawer = styled(MuiDrawer)({
 });
 
 export default function SideMenu() {
+  const { email, nameCompany } = useUserStore();
   return (
     <Drawer
       variant="permanent"
       sx={{
-        display: { xs: "none",sm:"block", md: "block" },
+        display: { xs: "none", sm: "none", md: "block" },
         [`& .${drawerClasses.paper}`]: {
           backgroundColor: "background.paper",
         },
@@ -67,10 +69,10 @@ export default function SideMenu() {
             variant="body2"
             sx={{ fontWeight: 500, lineHeight: "16px" }}
           >
-            Riley Carter
+            {nameCompany}
           </Typography>
           <Typography variant="caption" sx={{ color: "text.secondary" }}>
-            {/* {user.email} */}
+            {email}
           </Typography>
         </Box>
         <OptionsMenu />

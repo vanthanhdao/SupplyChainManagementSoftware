@@ -34,9 +34,9 @@ export class OrderDetailsService {
     }
   }
 
-  findAllById(orderId: number) {
+  async findAllById(orderId: number) {
     try {
-      const orderDetails = this.orderDetailsRepository.findBy({
+      const orderDetails = await this.orderDetailsRepository.findBy({
         OrderId: orderId,
       });
       return orderDetails;
@@ -45,8 +45,12 @@ export class OrderDetailsService {
     }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} orderDetail`;
+  async findGroupById(orderId: number) {
+    const resultProcedure = await this.orderDetailsRepository.query(
+      'EXEC pro_GetAllDetailOrdersByOrderId @0',
+      [orderId],
+    );
+    return resultProcedure;
   }
 
   update(id: number, updateOrderDetailDto: UpdateOrderDetailDto) {

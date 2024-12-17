@@ -25,6 +25,11 @@ export class OrderDetailsController {
     return this.orderDetailsService.findAllById(+id);
   }
 
+  @Get('group/:id')
+  findGroupById(@Param('id') orderId: string) {
+    return this.orderDetailsService.findGroupById(+orderId);
+  }
+
   @Patch(':id')
   update(
     @Param('id') id: string,

@@ -221,6 +221,7 @@ export const useAddOrder = async (
   orderId: number,
   productList: string[],
   history: string[],
+  timeLine: string[],
   po: string[]
 ): Promise<boolean> => {
   try {
@@ -234,6 +235,7 @@ export const useAddOrder = async (
       orderId,
       productList,
       history,
+      timeLine,
       po
     );
     // Đợi cho giao dịch được xác nhận
@@ -250,6 +252,26 @@ export const useAddOrder = async (
     //   transactionHash,
     //   address: from,
     // };
+  } catch (error) {
+    throw new Error(`useAddOrder failed: ${error}`);
+  }
+};
+
+export const usePushToTimeLine = async (
+  orderId: number,
+  timeLine: string[]
+): Promise<boolean> => {
+  try {
+    if (!window.ethereum) {
+      throw new Error(`MetaMask is not installed.`);
+    }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    const txResponse = await contract.pushToTimeLine(orderId, timeLine);
+    // Đợi cho giao dịch được xác nhận
+    await txResponse.wait();
+    return false;
   } catch (error) {
     throw new Error(`useAddOrder failed: ${error}`);
   }

@@ -27,6 +27,8 @@ export class Users {
   IsActive: boolean;
   @Column({ default: null })
   Role: string;
+  @Column({ default: null })
+  UserAddress: string;
   @CreateDateColumn()
   CreateAt: string;
   @UpdateDateColumn()

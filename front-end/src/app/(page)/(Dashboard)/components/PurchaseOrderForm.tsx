@@ -62,7 +62,7 @@ const Invoice = () => {
     setSelectedRowState,
   } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
-  const { nameCompany } = useUserStore();
+  const { nameCompany, addressCompany } = useUserStore();
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({
@@ -146,7 +146,9 @@ const Invoice = () => {
             <Typography variant="h6">
               {inputs.companyName ? inputs.companyName : nameCompany}
             </Typography>
-            <Typography>{inputs.companyAddress}</Typography>
+            <Typography>
+              {inputs.companyAddress ? inputs.companyAddress : addressCompany}
+            </Typography>
           </Grid>
           <Grid item xs={6} textAlign="right">
             <Typography variant="h6">Purchase Order</Typography>
@@ -175,7 +177,9 @@ const Invoice = () => {
         {/* Shipping Details */}
         <Grid container spacing={2} sx={{ mb: 2 }}>
           <Grid item xs={6}>
-            <Typography>Ship To: {inputs.shipTo}</Typography>
+            <Typography>
+              Ship To: {inputs.shipTo ? inputs.shipTo : addressCompany}
+            </Typography>
           </Grid>
           <Grid item xs={6}>
             <Typography>Seller: {inputs.seller}</Typography>

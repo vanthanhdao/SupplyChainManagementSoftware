@@ -24,6 +24,11 @@ export class ProductsController {
     return this.productsService.findAll(query, req.user);
   }
 
+  @Get('store-page')
+  findAllStorePage(@Query() query: string, @Request() req) {
+    return this.productsService.findAllStorePage(query, req.user);
+  }
+
   @Get(':id')
   findAllById(@Param('id') id: string) {
     return this.productsService.findAllById(+id);

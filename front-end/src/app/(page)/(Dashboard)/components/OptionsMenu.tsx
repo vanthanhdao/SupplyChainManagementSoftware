@@ -15,7 +15,6 @@ import { useRouter } from "next/navigation";
 import { useGetAccessToken } from "@/app/hook/useAccessToken";
 import { getAccountWallet } from "@/app/apis/index-api";
 import useUserStore from "@/app/zustands/userStore";
-import { useStoreUserSession } from "@/app/hook/useEthereum";
 
 const MenuItem = styled(MuiMenuItem)({
   margin: "2px 0",

@@ -15,9 +15,11 @@ import { useRouter } from "next/navigation";
 import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
 import { useAddOrder } from "@/app/hook/useEthereum";
 import { uploadImages } from "@/app/apis/uploads-api";
-import EditIcon from "@mui/icons-material/Edit";
+import ImageIcon from "@mui/icons-material/Image";
 import { getProductByOrderId } from "@/app/apis/products-api";
 import { updateStatusOrder } from "@/app/apis/order-api";
+import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
+import CircularLoading from "./CircularLoading";
 
 interface DialogUploadImagesProps {
   orderId: number;
@@ -61,14 +63,24 @@ const DialogUploadImagesUpdate: React.FC<DialogUploadImagesProps> = ({
   const storeBlockChain = async (purchaseOrder: string) => {
     if (!selectedRows || !orderId || !purchaseOrder) return;
     const history = [
-      `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role},Date:${date.toLocaleDateString()},Status:'New'}`,
+      `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`,
+    ];
+    const timeLine = [
+      `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'}`,
     ];
     const productList = selectedRows.map(
       (item) =>
-        `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
+        // `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
+        `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
     );
     const po = [`${purchaseOrder}`];
-    const checkTransac = await useAddOrder(orderId, productList, history, po);
+    const checkTransac = await useAddOrder(
+      orderId,
+      productList,
+      history,
+      timeLine,
+      po
+    );
     setLoading(checkTransac);
     setOpen(checkTransac);
     window.location.reload();
@@ -123,12 +135,13 @@ const DialogUploadImagesUpdate: React.FC<DialogUploadImagesProps> = ({
   return (
     <React.Fragment>
       <GridActionsCellItem
-        icon={<EditIcon />}
+        icon={<ImageIcon />}
         label="Edit"
         className="textPrimary"
         color="inherit"
         onClick={handleSend}
       />
+
       <Dialog
         open={open}
         // onClose={handleClose}
@@ -194,24 +207,7 @@ const DialogUploadImagesUpdate: React.FC<DialogUploadImagesProps> = ({
               Browse Files
             </Button>
           </Box>
-          {loading && (
-            <Box
-              sx={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(255, 255, 255, 0.3)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                zIndex: 2,
-              }}
-            >
-              <CircularProgress />
-            </Box>
-          )}
+          {loading && <CircularLoading />}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>
