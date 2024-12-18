@@ -62,7 +62,7 @@ const Invoice = () => {
     setSelectedRowState,
   } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
-  const { nameCompany, addressCompany } = useUserStore();
+  const { nameCompany, addressCompany, role } = useUserStore();
   const [rows, setRows] = React.useState<GridRowsProp>([]);
   const contentRef = useRef<HTMLDivElement>(null);
   const reactToPrintFn = useReactToPrint({
@@ -135,7 +135,9 @@ const Invoice = () => {
           marginTop: 4,
         }}
       >
-        {rows && rows.length > 0 ? (
+        {(role === "CUSTOMER" || (role === "MANUFACTURER" && orderCode)) &&
+        rows &&
+        rows.length > 0 ? (
           <DialogUploadImages rows={rows} onPrint={reactToPrintFn} />
         ) : null}
       </Box>

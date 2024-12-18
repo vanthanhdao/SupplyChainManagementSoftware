@@ -21,7 +21,6 @@ import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
 
 interface IProps {
   dataProducts: IDataProduct[];
-  isLoading: boolean;
 }
 
 const columns: GridColDef[] = [
@@ -142,22 +141,27 @@ export default function ListProductSelect(props: IProps) {
   };
 
   return (
-    <DataGrid
-      rows={rows}
-      columns={columns}
-      checkboxSelection={checkboxSelection}
-      slots={{
-        toolbar: CustomToolbar,
-      }}
-      onRowClick={handleRowClick}
-      onRowSelectionModelChange={handleSelectionChange}
-      loading={props.isLoading}
-      slotProps={{
-        loadingOverlay: {
-          variant: "skeleton",
-          noRowsVariant: "skeleton",
-        },
-      }}
-    />
+    <Card
+      variant="outlined"
+      sx={{ width: "100%", height: 500, overflow: "auto" }}
+    >
+      <DataGrid
+        rows={rows}
+        columns={columns}
+        checkboxSelection={checkboxSelection}
+        slots={{
+          toolbar: CustomToolbar,
+        }}
+        onRowClick={handleRowClick}
+        onRowSelectionModelChange={handleSelectionChange}
+        // loading
+        // slotProps={{
+        //   loadingOverlay: {
+        //     variant: "skeleton",
+        //     noRowsVariant: "skeleton",
+        //   },
+        // }}
+      />
+    </Card>
   );
 }

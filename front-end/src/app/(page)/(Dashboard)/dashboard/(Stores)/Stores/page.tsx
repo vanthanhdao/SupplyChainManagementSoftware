@@ -15,9 +15,13 @@ import ListOrderDetailsSelect from "../../../components/ListOrderDetailsSelect";
 import SelectButton from "../../../components/ButtonSelectOrderDetail";
 import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
 import { getAllOrder } from "@/app/apis/order-api";
+import useUserStore from "@/app/zustands/userStore";
+import ChartUserByCountry from "../../../components/ChartUserByCountry";
+import SkeletonCus from "../../../components/SkeletonCus";
 
 const Stores = () => {
   const { orderCode } = useDetailOrderStore();
+  const { role } = useUserStore();
   const fetcher = async () => {
     const [products, shippings, orders] = await Promise.all([
       getAllProduct_StorePage(),
@@ -39,7 +43,7 @@ const Stores = () => {
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       {/* cards */}
-      <Grid container spacing={2} columns={12}>
+      <Grid container spacing={2} columns={12} sx={{ mb: 2 }}>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
           <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
             Overview
@@ -51,59 +55,35 @@ const Stores = () => {
           alignItems="center"
           justifyContent="flex-end"
         >
-          {data ? <SelectButton dataOrders={data.orders} /> : null}
+          {role !== "CUSTOMER" && data ? (
+            <SelectButton dataOrders={data.orders} />
+          ) : null}
         </Grid>
       </Grid>
 
       <Grid container spacing={2} columns={12}>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
-          {orderCode ? <ListOrderDetailsSelect /> : null}
+          {role !== "CUSTOMER" && orderCode ? <ListOrderDetailsSelect /> : null}
         </Grid>
-        <Grid size={{ sm: 12, md: 8, lg: 4 }}></Grid>
+        <Grid size={{ sm: 12, md: 8, lg: 4 }}>
+          {role !== "CUSTOMER" && orderCode ? <ChartUserByCountry /> : null}
+        </Grid>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
-          <Card
-            variant="outlined"
-            sx={{ width: "100%", height: 500, overflow: "auto" }}
-          >
-            {data ? (
-              <ListProductSelect
-                dataProducts={data.products}
-                isLoading={isLoading}
-              />
-            ) : null}
-          </Card>
+          {data ? (
+            <ListProductSelect dataProducts={data.products} />
+          ) : (
+            <SkeletonCus variant="rectangular" height="100%" />
+          )}
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
-          <Card
-            variant="outlined"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-              flexGrow: 1,
-              height: 500,
-              overflow: "auto",
-            }}
-          >
-            <TechnicalSpecification />
-          </Card>
+          <TechnicalSpecification />
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
-          <Card
-            variant="outlined"
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              gap: "8px",
-              flexGrow: 1,
-              height: 850,
-              overflow: "auto",
-            }}
-          >
-            {data ? (
-              <InputPurchaseOrder dataShippings={data.shippings} />
-            ) : null}
-          </Card>
+          {data ? (
+            <InputPurchaseOrder dataShippings={data.shippings} />
+          ) : (
+            <SkeletonCus variant="rectangular" height="100%" />
+          )}
         </Grid>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
           <PurchaseOrderForm />

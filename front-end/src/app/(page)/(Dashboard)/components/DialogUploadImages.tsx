@@ -13,7 +13,7 @@ import useInputPOStore from "@/app/zustands/useInputPOStore";
 import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
 import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
-import { useAddOrder } from "@/app/hook/useEthereum";
+import { useAddOrder, usePushToSubOrder } from "@/app/hook/useEthereum";
 import { uploadImages } from "@/app/apis/uploads-api";
 import { updateStatusOrder } from "@/app/apis/order-api";
 
@@ -27,6 +27,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   onPrint,
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
+  const [newOrderCode, setNewOrderCode] = React.useState<number | null>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const { subTotalRows } = useDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
@@ -49,7 +50,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   const router = useRouter();
   const date = new Date();
 
-  const storeBlockChain = async (purchaseOrder: string) => {
+  const storeAddOrderBlockChain = async (purchaseOrder: string) => {
     if (!selectedRows || !orderCode || !purchaseOrder) return;
     const history = [
       `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`,
@@ -74,6 +75,29 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
     setOpen(checkTransac);
     window.location.reload();
     await updateStatusOrder(orderCode, "New");
+  };
+
+  const storePushOrderBlockChain = async (purchaseOrder: string) => {
+    if (!selectedRows || !orderCode || !purchaseOrder || !newOrderCode) return;
+    const history = `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`;
+    const timeLine = `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'}`;
+    const materialList = selectedRows.map(
+      (item) =>
+        // `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
+        `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
+    );
+    const po = `${purchaseOrder}`;
+    const checkTransac = await usePushToSubOrder(
+      orderCode,
+      materialList,
+      history,
+      timeLine,
+      po
+    );
+    setLoading(checkTransac);
+    setOpen(checkTransac);
+    window.location.reload();
+    await updateStatusOrder(newOrderCode, "New");
   };
 
   const handleSendPO = async () => {
@@ -108,7 +132,8 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
       );
       const result_orderDetail = await createOrderDetails(purchaseOrderDetails);
       if (!result_orderDetail) return;
-      if (role !== "CUSTOMER") setOrderCode(result_order.OrderId);
+      if (role === "CUSTOMER") setOrderCode(result_order.OrderId);
+      else setNewOrderCode(result_order.OrderId);
       onPrint();
       setOpen(true);
     } catch (error) {
@@ -131,7 +156,8 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
     const result = await uploadImages(formData);
     if (!result) return;
     const filesData = result.join(",");
-    await storeBlockChain(filesData);
+    if (role !== "CUSTOMER") await storePushOrderBlockChain(filesData);
+    else await storeAddOrderBlockChain(filesData);
   };
 
   const onDrop = async (acceptedFiles: File[]) => {

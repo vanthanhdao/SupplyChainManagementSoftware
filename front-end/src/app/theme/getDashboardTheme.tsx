@@ -18,7 +18,6 @@ export default function getDashboardTheme(mode: PaletteMode): ThemeOptions {
     ...getDesignTokens(mode),
     components: {
       ...inputsCustomizations,
-      ...inputsCustomizations,
       ...dataDisplayCustomizations,
       ...feedbackCustomizations,
       ...navigationCustomizations,

@@ -66,8 +66,8 @@ const ListOrderDetailsSelect = () => {
   }, [groupOrderDetails]);
 
   return (
-    <Card variant="outlined" sx={{ width: "100%", overflow: "auto", p: 3 }}>
-      <Typography variant="h6" fontWeight="bold" gutterBottom>
+    <Card variant="outlined" sx={{ width: "100%", p: 3, height: 600 }}>
+      <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>
         Item Summary
       </Typography>
       <DataGrid

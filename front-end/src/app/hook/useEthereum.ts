@@ -5,7 +5,7 @@ import { ethers, verifyMessage } from "ethers";
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
-const contractAddress = "0x13c2CE84642E4C7d23de2f7926f5b0BCF8B1302e"; // SuppyChain
+const contractAddress = "0xcc0C37129CF00530995029B0947d48Ad7b6293Cc"; // SuppyChain
 // Các hàm trong smart contract
 const contractABISuppyChain = contract.abi;
 const contractABI = contract.abi;
@@ -252,6 +252,34 @@ export const useAddOrder = async (
     //   transactionHash,
     //   address: from,
     // };
+  } catch (error) {
+    throw new Error(`useAddOrder failed: ${error}`);
+  }
+};
+
+export const usePushToSubOrder = async (
+  orderId: number,
+  materialList: string[],
+  history: string,
+  timeLine: string,
+  po: string
+): Promise<boolean> => {
+  try {
+    if (!window.ethereum) {
+      throw new Error(`MetaMask is not installed.`);
+    }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    const txResponse = await contract.pushToSubOrder(
+      orderId,
+      history,
+      timeLine,
+      po,
+      materialList
+    );
+    await txResponse.wait();
+    return false;
   } catch (error) {
     throw new Error(`useAddOrder failed: ${error}`);
   }

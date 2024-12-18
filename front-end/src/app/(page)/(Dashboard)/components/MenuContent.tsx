@@ -15,6 +15,7 @@ import HistoryIcon from "@mui/icons-material/History";
 import MemoryIcon from "@mui/icons-material/Memory";
 import CategoryIcon from "@mui/icons-material/Category";
 import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import SkeletonCus from "./SkeletonCus";
 
 type MenuItem = {
   text: string;
@@ -101,17 +102,21 @@ export default function MenuContent() {
   return (
     <Stack sx={{ flexGrow: 1, p: 1, justifyContent: "space-between" }}>
       <List dense>
-        {menuContent.map((item, index) => (
-          <ListItem key={index} disablePadding sx={{ display: "block" }}>
-            <ListItemButton
-              selected={selectedIndex === index}
-              onClick={() => handleListItemClick(item, index)}
-            >
-              <ListItemIcon>{item.icon}</ListItemIcon>
-              <ListItemText primary={item.text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
+        {menuContent ? (
+          menuContent.map((item, index) => (
+            <ListItem key={index} disablePadding sx={{ display: "block" }}>
+              <ListItemButton
+                selected={selectedIndex === index}
+                onClick={() => handleListItemClick(item, index)}
+              >
+                <ListItemIcon>{item.icon}</ListItemIcon>
+                <ListItemText primary={item.text} />
+              </ListItemButton>
+            </ListItem>
+          ))
+        ) : (
+          <SkeletonCus variant="rectangular" height="100%" />
+        )}
       </List>
     </Stack>
   );

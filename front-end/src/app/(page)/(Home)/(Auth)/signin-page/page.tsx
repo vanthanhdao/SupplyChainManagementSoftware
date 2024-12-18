@@ -26,7 +26,6 @@ import useUserStore from "@/app/zustands/userStore";
 const SignIn = () => {
   const router = useRouter();
   const [showButton, setShowButton] = React.useState(true);
-  const { initializeUser } = useUserStore();
 
   // Use context for error variable
   const context = React.useContext(DataContext);
@@ -43,10 +42,10 @@ const SignIn = () => {
     }
 
     try {
-      // await useConnectMetaMask();
-      // const wallet = await useGetWalletAddress();
-      // if (!wallet) return;
-      // await useProvideEthUser(wallet);
+      await useConnectMetaMask();
+      const wallet = await useGetWalletAddress();
+      if (!wallet) return;
+      await useProvideEthUser(wallet);
       // Handle veryfired email and password
       const response = await authJwtLogin(data);
       const { access_token, refresh_token } = response;
