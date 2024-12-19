@@ -231,7 +231,7 @@ export const useAddOrder = async (
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    const txResponse = await contract.addOrder(
+    const txResponse = await contract.addOrderCustomer(
       orderId,
       productList,
       history,
@@ -257,12 +257,14 @@ export const useAddOrder = async (
   }
 };
 
-export const usePushToSubOrder = async (
+export const useAddSubOrder = async (
+  subOrderId: number,
+  subTimeLine: string[],
+  subpo: string,
   orderId: number,
-  materialList: string[],
   history: string,
   timeLine: string,
-  po: string
+  materialList: string[]
 ): Promise<boolean> => {
   try {
     if (!window.ethereum) {
@@ -271,11 +273,13 @@ export const usePushToSubOrder = async (
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
-    const txResponse = await contract.pushToSubOrder(
+    const txResponse = await contract.addSubOrderManufacturer(
+      subOrderId,
+      subTimeLine,
+      subpo,
       orderId,
       history,
       timeLine,
-      po,
       materialList
     );
     await txResponse.wait();
@@ -287,7 +291,7 @@ export const usePushToSubOrder = async (
 
 export const usePushToTimeLine = async (
   orderId: number,
-  timeLine: string[]
+  timeLine: string
 ): Promise<boolean> => {
   try {
     if (!window.ethereum) {
@@ -297,6 +301,29 @@ export const usePushToTimeLine = async (
     const signer = await provider.getSigner();
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
     const txResponse = await contract.pushToTimeLine(orderId, timeLine);
+    // Đợi cho giao dịch được xác nhận
+    await txResponse.wait();
+    return false;
+  } catch (error) {
+    throw new Error(`useAddOrder failed: ${error}`);
+  }
+};
+
+export const usePushToSubTimeLine = async (
+  subOrderId: number,
+  subTimeLine: string
+): Promise<boolean> => {
+  try {
+    if (!window.ethereum) {
+      throw new Error(`MetaMask is not installed.`);
+    }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    const txResponse = await contract.pushToSubTimeLine(
+      subOrderId,
+      subTimeLine
+    );
     // Đợi cho giao dịch được xác nhận
     await txResponse.wait();
     return false;

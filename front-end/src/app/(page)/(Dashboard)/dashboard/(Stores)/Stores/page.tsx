@@ -13,23 +13,24 @@ import InputPurchaseOrder from "../../../components/InputPurchaseOrder";
 import PurchaseOrderForm from "../../../components/PurchaseOrderForm";
 import ListOrderDetailsSelect from "../../../components/ListOrderDetailsSelect";
 import SelectButton from "../../../components/ButtonSelectOrderDetail";
-import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
 import { getAllOrder } from "@/app/apis/order-api";
 import useUserStore from "@/app/zustands/userStore";
 import ChartUserByCountry from "../../../components/ChartUserByCountry";
 import SkeletonCus from "../../../components/SkeletonCus";
 import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
+import { getAllAccountByRole } from "@/app/apis/users-api";
 
 const Stores = () => {
   const { groupOrderId } = useGroupDetailOrderStore();
   const { role } = useUserStore();
   const fetcher = async () => {
-    const [products, shippings, orders] = await Promise.all([
+    const [products, shippings, orders, users] = await Promise.all([
       getAllProduct_StorePage(),
       getAllShipping(),
       getAllOrder(),
+      getAllAccountByRole(),
     ]);
-    return { products, shippings, orders };
+    return { products, shippings, orders, users };
   };
   const { data, error, isLoading } = useSWR(
     `${process.env.NEXT_PUBLIC_API_URL}/products-shippings-orders-storepage`,
@@ -83,7 +84,10 @@ const Stores = () => {
         </Grid>
         <Grid size={{ sm: 12, md: 4, lg: 4 }}>
           {data ? (
-            <InputPurchaseOrder dataShippings={data.shippings} />
+            <InputPurchaseOrder
+              dataShippings={data.shippings}
+              dataUsers={data.users}
+            />
           ) : (
             <SkeletonCus variant="rectangular" height="100%" />
           )}

@@ -1,4 +1,4 @@
-export interface IDataShipping {
+interface IDataShipping {
   ShippingMethodID: number;
   ShippingMethodName: string;
   Description: string;

@@ -41,10 +41,11 @@ interface IInputPurchaseOrder {
   companyAddress: string | null;
   deliveryDate: DateTime;
   shippingVia: string;
-  shippingViaId: number;
+  shippingViaId: number | null;
   terms: string;
   shipTo: string | null;
   seller: string;
+  sellerId: number | null;
   notes: string;
   taxRate: number;
 }

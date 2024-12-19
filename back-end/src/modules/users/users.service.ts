@@ -70,11 +70,31 @@ export class UsersService {
   // }
 
   // Find wallet users by id
-  async findOneProfile(payload: any): Promise<Users> {
+  async findOneProfile(payload: IUserAccessToken): Promise<Users> {
     const user = await this.usersRepository.findOneBy({
       UserId: payload.userId,
     });
     return user;
+  }
+
+  async findByRole() {
+    // const resultProcedure = await this.usersRepository.query(
+    //   'EXEC pro_GetAllUserByRole @0',
+    //   [role],
+    // );
+    const resultProcedure = await this.usersRepository.findBy({
+      Role: 'SUPPLIER',
+    });
+    const respone = resultProcedure.map((item) => ({
+      userId: item.UserId,
+      nameCompany: item.NameCompany,
+      role: item.Role,
+    }));
+    if (!respone || respone.length === 0) {
+      throw new Error(`No users found `);
+    }
+
+    return respone;
   }
 
   // Delete users by id

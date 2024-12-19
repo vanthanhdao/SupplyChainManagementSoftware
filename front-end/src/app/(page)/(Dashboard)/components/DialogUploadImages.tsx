@@ -13,7 +13,7 @@ import useInputPOStore from "@/app/zustands/useInputPOStore";
 import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
 import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
-import { useAddOrder, usePushToSubOrder } from "@/app/hook/useEthereum";
+import { useAddOrder, useAddSubOrder } from "@/app/hook/useEthereum";
 import { uploadImages } from "@/app/apis/uploads-api";
 import { updateStatusOrder } from "@/app/apis/order-api";
 import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
@@ -79,27 +79,34 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
     await updateStatusOrder(orderCode, "New");
   };
 
-  const storePushOrderBlockChain = async (purchaseOrder: string) => {
+  const storeAddSubOrderBlockChain = async (purchaseOrder: string) => {
     if (!selectedRows || !orderCode || !purchaseOrder || !groupOrderId) return;
     const history = `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`;
-    const timeLine = `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'}`;
+    const timeLine = `{Date:${date.toLocaleDateString()},Status:'Material-Ordered',Title:'Submit Order and Wait for Confirmation'`;
+    const subTimeLine = [
+      `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'`,
+    ];
     const materialList = selectedRows.map(
       (item) =>
-        // `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
         `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
     );
-    const po = `${purchaseOrder}`;
-    const checkTransac = await usePushToSubOrder(
+    const subpo = `${purchaseOrder}`;
+    const checkTransac = await useAddSubOrder(
+      groupOrderId,
+      subTimeLine,
+      subpo,
       orderCode,
-      materialList,
       history,
       timeLine,
-      po
+      materialList
     );
     setLoading(checkTransac);
     setOpen(checkTransac);
     window.location.reload();
-    await updateStatusOrder(groupOrderId, "New");
+    Promise.all([
+      updateStatusOrder(groupOrderId, "New"),
+      updateStatusOrder(orderCode, "Material-Ordered"),
+    ]);
   };
 
   const handleSendPO = async () => {
@@ -111,6 +118,8 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
         shippingAddress: inputs.shipTo ? inputs.shipTo : addressCompany,
         paymentMethod: inputs.terms,
         shippingMethodId: inputs.shippingViaId,
+        sellerId: inputs.sellerId,
+        subOrderId: groupOrderId ? groupOrderId : null,
         totalAmount:
           subTotalRows +
           selectShippingCost +
@@ -146,6 +155,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   const handleClose = () => {
     setFileInfo(null);
     setOpen(false);
+    setOrderCode(null);
   };
 
   const handleConfirm = async () => {
@@ -158,7 +168,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
     const result = await uploadImages(formData);
     if (!result) return;
     const filesData = result.join(",");
-    if (role !== "CUSTOMER") await storePushOrderBlockChain(filesData);
+    if (groupOrderId) await storeAddSubOrderBlockChain(filesData);
     else await storeAddOrderBlockChain(filesData);
   };
 

@@ -28,3 +28,9 @@ interface IUserToken {
 interface IUserAddress {
   address: string;
 }
+
+interface IDataUser {
+  userId: number;
+  nameCompany: string;
+  role: string;
+}

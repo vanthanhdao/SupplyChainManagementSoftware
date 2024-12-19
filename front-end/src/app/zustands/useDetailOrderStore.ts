@@ -7,7 +7,7 @@ interface DetailOrderState {
   orderCode: number | null;
   setSelectedRowState: (newSelected: DetailOrder[]) => void;
   setSubTotalRows: (newTotalRows: DetailOrder[]) => void;
-  setOrderCode: (newOrderCode: number) => void;
+  setOrderCode: (newOrderCode: number | null) => void;
 }
 
 // Create the store

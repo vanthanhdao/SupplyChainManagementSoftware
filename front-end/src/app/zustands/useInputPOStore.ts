@@ -15,10 +15,11 @@ const initialState: IInputPurchaseOrder = {
   companyAddress: null,
   deliveryDate: date.toLocaleDateString(),
   shippingVia: "Shipping Company",
-  shippingViaId: 0,
+  shippingViaId: null,
   terms: "Shipping and Payment Terms",
   shipTo: null,
-  seller: "DAEWOO",
+  seller: "Manufacturer",
+  sellerId: null,
   notes: "Note*",
   taxRate: 8.6,
 };

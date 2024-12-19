@@ -135,11 +135,12 @@ const Invoice = () => {
           marginTop: 4,
         }}
       >
-        {(role === "CUSTOMER" || (role === "MANUFACTURER" && orderCode)) &&
-        rows &&
-        rows.length > 0 ? (
-          <DialogUploadImages rows={rows} onPrint={reactToPrintFn} />
-        ) : null}
+        {
+          // (role === "CUSTOMER" || (role === "MANUFACTURER" && orderCode)) &&
+          rows && rows.length > 0 ? (
+            <DialogUploadImages rows={rows} onPrint={reactToPrintFn} />
+          ) : null
+        }
       </Box>
       <Box sx={{ padding: 4 }} ref={contentRef}>
         {/* Header Section */}

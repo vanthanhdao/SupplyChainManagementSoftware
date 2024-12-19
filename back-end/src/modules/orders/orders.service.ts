@@ -30,6 +30,7 @@ export class OrdersService {
         note,
         status,
         subOrderId,
+        sellerId,
       } = createOrderDto;
       const Order = this.ordersRepository.create({
         DeliveryDate: deliveryDate,
@@ -42,6 +43,7 @@ export class OrdersService {
         Note: note,
         Status: status,
         SubOrderId: subOrderId,
+        SellerId: sellerId,
       });
       await this.ordersRepository.save(Order);
       return Order;

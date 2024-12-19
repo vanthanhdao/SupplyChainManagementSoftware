@@ -42,6 +42,9 @@ export class Orders {
   @Column({ default: null })
   SubOrderId: number;
 
+  @Column({ default: null })
+  SellerId: number;
+
   @CreateDateColumn()
   CreatedAt: string;
 

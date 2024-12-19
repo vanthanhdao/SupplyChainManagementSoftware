@@ -3,7 +3,9 @@ interface IDataPurchaseOrder {
   customerId: number | null;
   shippingAddress: string | null;
   paymentMethod: string;
-  shippingMethodId: number;
+  shippingMethodId: number | null;
+  sellerId: number | null;
+  subOrderId: number | null;
   totalAmount: number;
   taxRate: number;
   status?: string;
@@ -31,4 +33,5 @@ interface IDataOrder {
   Status: string;
   ShippingCost: number;
   CustomerId: number;
+  SubOrderId: number;
 }

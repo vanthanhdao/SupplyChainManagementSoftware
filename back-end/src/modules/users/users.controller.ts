@@ -30,6 +30,10 @@ export class UsersController {
     return this.usersService.findAll(query);
   }
 
+  @Get('role')
+  findByRole() {
+    return this.usersService.findByRole();
+  }
   // @Get(':id')
   // findById(@Param('id') userId: number) {
   //   return this.usersService.findById(userId);

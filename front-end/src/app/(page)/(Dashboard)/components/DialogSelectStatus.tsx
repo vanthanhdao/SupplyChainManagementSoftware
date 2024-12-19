@@ -12,24 +12,79 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
-import { DialogContentText, TextField } from "@mui/material";
+import { DialogContentText, MenuList, TextField } from "@mui/material";
 import { updateStatusOrder } from "@/app/apis/order-api";
-import { usePushToTimeLine } from "@/app/hook/useEthereum";
+import {
+  usePushToSubTimeLine,
+  usePushToTimeLine,
+} from "@/app/hook/useEthereum";
 import CircularLoading from "./CircularLoading";
+import useUserStore from "@/app/zustands/userStore";
+import { subscribe } from "diagnostics_channel";
 
 interface DialogUploadImagesProps {
   orderId: number;
   status: string;
+  subOrderId: number;
 }
+// type MenuItem = {
+//   value: string;
+//   status: string[];
+//   role: string[];
+// };
+
+// const statusListItems: MenuItem[] = [
+//   {
+//     value: "Confirm",
+//     status: ["New"],
+//     role: [],
+//   },
+//   {
+//     value: "Reject",
+//     status: ["New"],
+//     role: [],
+//   },
+//   {
+//     value: "Analyzing",
+//     status: ["Confirm"],
+//     role: ["MANUFACTURER"],
+//   },
+//   {
+//     value: "Material-Ordered",
+//     status: ["Analyzing"],
+//     role: ["MANUFACTURER"],
+//   },
+//   // {
+//   //   value: "In-Transit",
+//   //   status: ["Confirm"],
+//   //   role: ["MANUFACTURER"],
+//   // },
+//   // {
+//   //   value: "Received",
+//   //   status: ["Confirm"],
+//   //   role: ["MANUFACTURER"],
+//   // },
+//   {
+//     value: "Production",
+//     status: ["Received"],
+//     role: ["MANUFACTURER"],
+//   },
+// ];
 
 const DialogSelectStatus: React.FC<DialogUploadImagesProps> = ({
   orderId,
   status,
+  subOrderId,
 }) => {
   const [open, setOpen] = React.useState(false);
+  const [checkTransac, setCheckTransac] = React.useState(true);
   const [newStatus, setNewStatus] = React.useState<string>(status);
+  const [rejectReason, setRejectReason] = React.useState<string>("");
+  const [title, setTitle] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
+  const { role } = useUserStore();
   const date = new Date();
+
   const handleChange = (event: SelectChangeEvent<string>) => {
     setNewStatus(event.target.value);
   };
@@ -44,20 +99,41 @@ const DialogSelectStatus: React.FC<DialogUploadImagesProps> = ({
   };
 
   const storeBlockChain = async () => {
-    if (!orderId || !status) return;
+    if (!orderId || !newStatus || !subOrderId || !role) return;
+    if (rejectReason && rejectReason.length > 0) {
+      setTitle("Order Rejected");
+    }
 
-    const timeLine = [
-      `{Date:${date.toLocaleDateString()},Status:${status},Title:'Order Confirmed'}`,
-    ];
-    const checkTransac = await usePushToTimeLine(orderId, timeLine);
+    const timeLine = `{Date:${date.toLocaleDateString()},Status:${newStatus},Title:${title} ${rejectReason}}`;
+    if (role === "MANUFACTURER") {
+      setCheckTransac(await usePushToTimeLine(subOrderId, timeLine));
+    }
+    setCheckTransac(await usePushToSubTimeLine(orderId, timeLine));
     setLoading(checkTransac);
     setOpen(checkTransac);
     // window.location.reload();
+
+    handleUpdateStatusOrder;
+  };
+
+  const handleUpdateStatusOrder = async () => {
+    const invalidStatuses = [
+      "Reject",
+      "Prepared-Shipment",
+      "In-Transit",
+      "Production",
+    ];
     await updateStatusOrder(orderId, newStatus);
+    if (subOrderId && !invalidStatuses.includes(newStatus)) {
+      if (newStatus === "Delivered")
+        await updateStatusOrder(subOrderId, "Material-Received");
+      if (newStatus === "Confirm")
+        await updateStatusOrder(subOrderId, "In-Transit");
+    }
   };
 
   const handleSendStatus = async () => {
-    setLoading(true);
+    setLoading(checkTransac);
     await storeBlockChain();
   };
 
@@ -96,14 +172,41 @@ const DialogSelectStatus: React.FC<DialogUploadImagesProps> = ({
               <InputLabel htmlFor="demo-dialog-native">Status</InputLabel>
               <Select
                 renderValue={(newStatus) => {
-                  return <em>{newStatus}</em>;
+                  return <em>{newStatus || "Choose status"}</em>;
                 }}
-                value={newStatus}
+                // value={status || ""}
+                defaultValue={status}
                 onChange={handleChange}
                 input={<OutlinedInput label="Status" id="demo-dialog-native" />}
               >
-                <MenuItem value="Confirm">Confirm</MenuItem>
-                <MenuItem value="Reject">Reject</MenuItem>
+                {status === "New" && [
+                  <MenuItem key="Confirm" value="Confirm">
+                    Confirm
+                  </MenuItem>,
+                  <MenuItem key="Reject" value="Reject">
+                    Reject
+                  </MenuItem>,
+                ]}
+                {status === "Material-Received" && (
+                  <MenuItem key="Production" value="Production">
+                    Production
+                  </MenuItem>
+                )}
+                {role === "SUPPLIER" &&
+                  status === "Confirm" && [
+                    <MenuItem key="Prepared-Shipment" value="Prepared-Shipment">
+                      Prepared-Shipment
+                    </MenuItem>,
+                    <MenuItem key="In-Transit1" value="In-Transit">
+                      In-Transit
+                    </MenuItem>,
+                    <MenuItem key="Delivered" value="Delivered ">
+                      Delivered
+                    </MenuItem>,
+                  ]}
+                <MenuItem key={status} value={status}>
+                  {status}
+                </MenuItem>
               </Select>
             </FormControl>
             {newStatus && newStatus === "Reject" && (
@@ -112,6 +215,7 @@ const DialogSelectStatus: React.FC<DialogUploadImagesProps> = ({
                   id="outlined-basic"
                   label="Reason"
                   variant="outlined"
+                  onChange={(e) => setRejectReason(e.target.value)}
                 />
               </FormControl>
             )}

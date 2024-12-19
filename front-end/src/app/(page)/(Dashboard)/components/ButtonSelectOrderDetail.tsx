@@ -66,8 +66,11 @@ const SelectButton = (props: IProps) => {
         }}
       >
         {props &&
-          props.dataOrders.map((item: any) => (
-            <MenuItem onClick={() => handleMenuItemClick(item.OrderId)}>
+          props.dataOrders.map((item: any, index) => (
+            <MenuItem
+              key={index}
+              onClick={() => handleMenuItemClick(item.OrderId)}
+            >
               Order Number #{item.OrderId} | <em>Status {item.Status}</em>
             </MenuItem>
           ))}

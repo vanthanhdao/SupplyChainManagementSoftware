@@ -62,6 +62,7 @@ export default function ListOrderSelect(props: IProps) {
       paymentMethod: item.PaymentMethod,
       shippingCost: item.ShippingCost,
       customerId: item.CustomerId,
+      subOrderId: item.SubOrderId,
     }));
     setRows(dataRows);
   }, [dataOrders]);
@@ -69,11 +70,11 @@ export default function ListOrderSelect(props: IProps) {
   const EditToolbar = (props: EditToolbarProps) => {
     const handleClickRefresh = async () => {
       await mutate(`${process.env.NEXT_PUBLIC_API_URL}/orders`, false);
+      setGroupOrder(null);
+      setGroupOrderDetails(null);
     };
     const handleClickSave = async () => {
       try {
-        // Handle updateRecordProduct
-        console.log(tempRows);
         await deletePurchaseOrder(tempRows);
       } catch (error) {
         throw new Error(`HandleClickSave failed - ${error}`);
@@ -311,7 +312,6 @@ export default function ListOrderSelect(props: IProps) {
         //     />,
         //   ];
         // }
-        console.log("row", row.customerId);
 
         return [
           (role === "CUSTOMER" || role === "MANUFACTURER") &&
@@ -321,8 +321,16 @@ export default function ListOrderSelect(props: IProps) {
           ) : (
             <></>
           ),
-          role !== "CUSTOMER" && row.status !== "Created" ? (
-            <DialogSelectStatus orderId={row.orderId} status={row.status} />
+          ((role === "MANUFACTURER" || role === "SUPPLIER") &&
+            row.status === "New" &&
+            row.customerId !== userId) ||
+          (role === "SUPPLIER" && row.status === "Confirm") ||
+          (role === "MANUFACTURER" && row.status === "Material-Received") ? (
+            <DialogSelectStatus
+              orderId={row.orderId}
+              status={row.status}
+              subOrderId={row.subOrderId}
+            />
           ) : (
             <></>
           ),

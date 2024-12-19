@@ -56,19 +56,19 @@ export const getAccount = async () => {
   }
 };
 
-// export const getAccountById = async (userId: number) => {
-//   try {
-//     const access_token = await useGetAccessToken("access_token");
-//     const response = await axios.get(
-//       `${process.env.NEXT_PUBLIC_API_URL}/users/${userId}`,
-//       { headers: { Authorization: `Bearer ${access_token}` } }
-//     );
-//     return response.data;
-//   } catch (error) {
-//     console.error("getAccountById failed: ", error);
-//     throw error;
-//   }
-// };
+export const getAllAccountByRole = async () => {
+  try {
+    const access_token = await useGetAccessToken("access_token");
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/role`,
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("getAllAccountByRole failed: ", error);
+    throw error;
+  }
+};
 
 // // Call api for get list account
 // export const getListAccount = async (data: IUserAddress[]

@@ -11,23 +11,36 @@ import {
   TextField,
 } from "@mui/material";
 import useInputPOStore from "@/app/zustands/useInputPOStore";
-import { IDataShipping } from "@/app/types/shipping";
+import useUserStore from "@/app/zustands/userStore";
 
 interface IProps {
   dataShippings: IDataShipping[];
+  dataUsers: IDataUser[];
 }
 
 export default function InputPurchaseOrder(props: IProps) {
   const { inputs, setInputPO, setShippingCost } = useInputPOStore();
-  const { dataShippings } = props;
+  const { role } = useUserStore();
+  const { dataShippings, dataUsers } = props;
 
   React.useEffect(() => {
-    setInputPO({
-      shippingVia: dataShippings[0].ShippingMethodName,
-      shippingViaId: dataShippings[0].ShippingMethodID,
-    });
-    setShippingCost(dataShippings[0].ShippingCost);
-  }, [dataShippings]);
+    if (role === "CUSTOMER") {
+      setInputPO({
+        shippingVia: dataShippings[0].ShippingMethodName,
+        shippingViaId: dataShippings[0].ShippingMethodID,
+        seller: inputs.seller,
+        sellerId: inputs.sellerId,
+      });
+    } else {
+      setInputPO({
+        shippingVia: dataShippings[0].ShippingMethodName,
+        shippingViaId: dataShippings[0].ShippingMethodID,
+        seller: dataUsers[0].nameCompany,
+        sellerId: dataUsers[0].userId,
+      });
+      setShippingCost(dataShippings[0].ShippingCost);
+    }
+  }, [dataShippings, dataUsers]);
 
   return (
     <Card
@@ -174,21 +187,37 @@ export default function InputPurchaseOrder(props: IProps) {
           </Grid>
 
           {/* Seller */}
-          {/* <Grid item xs={12}>
-          <FormControl fullWidth>
-            <FormLabel htmlFor="seller">Seller</FormLabel>
-            <TextField
-              id="seller"
-              name="seller"
-              type="text"
-              placeholder="Seller"
-              autoComplete="seller"
-              size="small"
-              fullWidth
-              onChange={(e) => setInputPO({ seller: e.target.value })}
-            />
-          </FormControl>
-        </Grid> */}
+          {role && role !== "CUSTOMER"}
+          <Grid item xs={12}>
+            <FormControl fullWidth>
+              <FormLabel htmlFor="seller">Seller</FormLabel>
+              <TextField
+                id="seller"
+                name="seller"
+                value={inputs.sellerId || ""}
+                select
+                onChange={(e) => {
+                  const selectedKey = e.target.value;
+
+                  const findUser = dataUsers.find(
+                    (item) => item.userId === Number(selectedKey)
+                  );
+                  if (findUser) {
+                    setInputPO({
+                      seller: findUser.nameCompany,
+                      sellerId: findUser.userId,
+                    });
+                  }
+                }}
+              >
+                {dataUsers.map((option) => (
+                  <MenuItem key={option.userId} value={option.userId}>
+                    {option.nameCompany}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </FormControl>
+          </Grid>
 
           {/* Note */}
           <Grid item xs={12}>

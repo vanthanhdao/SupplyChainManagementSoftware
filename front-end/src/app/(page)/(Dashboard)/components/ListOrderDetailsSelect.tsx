@@ -49,7 +49,7 @@ const columns: GridColDef[] = [
 
 const ListOrderDetailsSelect = () => {
   const [rows, setRows] = useState<GridRowsProp>([]);
-  const { groupOrderDetails } = useGroupDetailOrderStore();
+  const { groupOrder, groupOrderDetails } = useGroupDetailOrderStore();
 
   useEffect(() => {
     if (groupOrderDetails) {
@@ -68,7 +68,7 @@ const ListOrderDetailsSelect = () => {
   return (
     <Card variant="outlined" sx={{ width: "100%", p: 3, height: 600 }}>
       <Typography variant="h6" fontWeight="bold" gutterBottom sx={{ mt: 3 }}>
-        Item Summary
+        {`Item Summary for Order Number #${groupOrder?.OrderId}`}
       </Typography>
       <DataGrid
         rows={rows}

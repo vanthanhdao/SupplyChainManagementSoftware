@@ -7,7 +7,7 @@ interface DetailOrderState {
   groupOrderDetails: OrderDetailGroup[] | null;
   setGroupOrderId: (newGroupOrderId: number | null) => void;
   setGroupOrder: (newGroupOrder: OrderGroup | null) => void;
-  setGroupOrderDetails: (newGroupOrder: OrderDetailGroup[]) => void;
+  setGroupOrderDetails: (newGroupOrder: OrderDetailGroup[] | null) => void;
 }
 
 // Create the store
