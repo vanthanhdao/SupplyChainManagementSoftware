@@ -17,3 +17,19 @@ export const uploadImages = async (
     throw new Error(`uploadImages failed - ${error}`);
   }
 };
+
+export const uploadImagesToSave = async (
+  files: FormData,
+  productId: number
+): Promise<String[]> => {
+  try {
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_API_URL}/firebase-storage/uploads-save/${productId}`,
+      files,
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`uploadImages failed - ${error}`);
+  }
+};

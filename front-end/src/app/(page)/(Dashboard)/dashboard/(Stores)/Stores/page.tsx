@@ -18,9 +18,10 @@ import { getAllOrder } from "@/app/apis/order-api";
 import useUserStore from "@/app/zustands/userStore";
 import ChartUserByCountry from "../../../components/ChartUserByCountry";
 import SkeletonCus from "../../../components/SkeletonCus";
+import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
 
 const Stores = () => {
-  const { orderCode } = useDetailOrderStore();
+  const { groupOrderId } = useGroupDetailOrderStore();
   const { role } = useUserStore();
   const fetcher = async () => {
     const [products, shippings, orders] = await Promise.all([
@@ -43,9 +44,9 @@ const Stores = () => {
   return (
     <Box sx={{ width: "100%", maxWidth: { sm: "100%", md: "1700px" } }}>
       {/* cards */}
-      <Grid container spacing={2} columns={12} sx={{ mb: 2 }}>
+      <Grid container spacing={2} columns={12}>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
-          <Typography component="h2" variant="h6" sx={{ mb: 2 }}>
+          <Typography component="h2" variant="h6">
             Overview
           </Typography>
         </Grid>
@@ -63,10 +64,12 @@ const Stores = () => {
 
       <Grid container spacing={2} columns={12}>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
-          {role !== "CUSTOMER" && orderCode ? <ListOrderDetailsSelect /> : null}
+          {role !== "CUSTOMER" && groupOrderId ? (
+            <ListOrderDetailsSelect />
+          ) : null}
         </Grid>
         <Grid size={{ sm: 12, md: 8, lg: 4 }}>
-          {role !== "CUSTOMER" && orderCode ? <ChartUserByCountry /> : null}
+          {role !== "CUSTOMER" && groupOrderId ? <ChartUserByCountry /> : null}
         </Grid>
         <Grid size={{ sm: 12, md: 8, lg: 8 }}>
           {data ? (

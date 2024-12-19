@@ -16,6 +16,7 @@ import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
 import { useAddOrder, usePushToSubOrder } from "@/app/hook/useEthereum";
 import { uploadImages } from "@/app/apis/uploads-api";
 import { updateStatusOrder } from "@/app/apis/order-api";
+import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
 
 interface DialogUploadImagesProps {
   rows: GridRowsProp;
@@ -27,10 +28,11 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   onPrint,
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
-  const [newOrderCode, setNewOrderCode] = React.useState<number | null>();
   const [loading, setLoading] = React.useState<boolean>(false);
   const { subTotalRows } = useDetailOrderStore();
+  const { groupOrderId } = useGroupDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
+  const { addressCompany } = useUserStore();
   const [fileInfo, setFileInfo] = React.useState<{
     name: string;
     src: string | null;
@@ -78,7 +80,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
   };
 
   const storePushOrderBlockChain = async (purchaseOrder: string) => {
-    if (!selectedRows || !orderCode || !purchaseOrder || !newOrderCode) return;
+    if (!selectedRows || !orderCode || !purchaseOrder || !groupOrderId) return;
     const history = `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`;
     const timeLine = `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'}`;
     const materialList = selectedRows.map(
@@ -97,7 +99,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
     setLoading(checkTransac);
     setOpen(checkTransac);
     window.location.reload();
-    await updateStatusOrder(newOrderCode, "New");
+    await updateStatusOrder(groupOrderId, "New");
   };
 
   const handleSendPO = async () => {
@@ -106,7 +108,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
       const purchaseOrder: IDataPurchaseOrder = {
         deliveryDate: inputs.deliveryDate,
         customerId: userId,
-        shippingAddress: inputs.shipTo,
+        shippingAddress: inputs.shipTo ? inputs.shipTo : addressCompany,
         paymentMethod: inputs.terms,
         shippingMethodId: inputs.shippingViaId,
         totalAmount:
@@ -118,6 +120,7 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
       };
       const result_order = await createOrder(purchaseOrder);
       if (!result_order) return;
+      setOrderCode(result_order.OrderId);
       const formatProps = Object.values(rows);
       const purchaseOrderDetails: IDataPurchaseOrderDetail[] = formatProps.map(
         (item) => ({
@@ -132,11 +135,10 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
       );
       const result_orderDetail = await createOrderDetails(purchaseOrderDetails);
       if (!result_orderDetail) return;
-      if (role === "CUSTOMER") setOrderCode(result_order.OrderId);
-      else setNewOrderCode(result_order.OrderId);
       onPrint();
       setOpen(true);
     } catch (error) {
+      console.log(error);
       router.push("/dashboard/Error");
     }
   };

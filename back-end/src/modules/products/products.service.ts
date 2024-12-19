@@ -193,4 +193,10 @@ export class ProductsService {
     if (deleteProduct && deleteProduct.length > 0)
       this.deleteListProduct(deleteProduct);
   }
+
+  async findOneById(productId: number): Promise<Products> {
+    return await this.productsRepository.findOneBy({
+      ProductId: productId,
+    });
+  }
 }

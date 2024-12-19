@@ -40,6 +40,10 @@ export class CreateOrderDto {
   @IsString()
   status?: string;
 
+  @IsOptional() // Optional vì có giá trị mặc định
+  @IsString()
+  subOrderId?: number;
+
   @IsString()
   @IsNotEmpty({ message: 'Note is required.' })
   note: string;

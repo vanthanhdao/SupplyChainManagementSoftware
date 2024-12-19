@@ -5,7 +5,7 @@ import { ethers, verifyMessage } from "ethers";
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
-const contractAddress = "0xcc0C37129CF00530995029B0947d48Ad7b6293Cc"; // SuppyChain
+const contractAddress = "0x3385Bd907872051bB5A2e4381D60cF5ad956E359"; // SuppyChain
 // Các hàm trong smart contract
 const contractABISuppyChain = contract.abi;
 const contractABI = contract.abi;

@@ -45,7 +45,8 @@ export default function ListOrderSelect(props: IProps) {
   const [tempRows, setTempRows] = React.useState<number[]>([]);
   const { role, userId } = useUserStore();
   const { dataOrders } = props;
-  const { setGroupOrder, setGroupOrderDetails } = useGroupDetailOrderStore();
+  const { setGroupOrder, setGroupOrderDetails, setGroupOrderId } =
+    useGroupDetailOrderStore();
   const router = useRouter();
 
   React.useEffect(() => {
@@ -139,6 +140,7 @@ export default function ListOrderSelect(props: IProps) {
       const formatOrder = order.length > 0 ? order[0] : null;
       setGroupOrder(formatOrder);
       setGroupOrderDetails(orderDetails);
+      setGroupOrderId(orderId);
     } catch (error) {
       router.push("/dashboard/Error");
     }

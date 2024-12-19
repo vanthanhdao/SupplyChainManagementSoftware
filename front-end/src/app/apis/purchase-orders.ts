@@ -5,6 +5,7 @@ import { useGetAccessToken } from "../hook/useAccessToken";
 export const createOrder = async (data: IDataPurchaseOrder) => {
   try {
     const access_token = useGetAccessToken("access_token");
+    console.log(data);
     const response = await axios.post(
       `${process.env.NEXT_PUBLIC_API_URL}/orders`,
       data,

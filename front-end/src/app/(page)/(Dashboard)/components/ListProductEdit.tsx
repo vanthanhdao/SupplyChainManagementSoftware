@@ -32,7 +32,7 @@ import { updateRecordProduct } from "@/app/apis/products-api";
 import ExpandableCell from "./ExpandableCell";
 import ExpandableCellImages from "./ExpandableCellImages";
 import AddPhotoAlternateIcon from "@mui/icons-material/AddPhotoAlternate";
-import { uploadImages } from "@/app/apis/uploads-api";
+import { uploadImages, uploadImagesToSave } from "@/app/apis/uploads-api";
 
 interface EditToolbarProps {
   setRows: (newRows: (oldRows: GridRowsProp) => GridRowsProp) => void;
@@ -47,6 +47,7 @@ interface IProps {
 
 export default function ListProductEdit(props: IProps) {
   const [rows, setRows] = React.useState<GridRowsProp>([]);
+  const [productId, setProductId] = React.useState<number>();
   const [tempRows, setTempRows] = React.useState<GridRowsProp>([]);
   const [newTempRow, setNewTempRow] = React.useState<any>();
   const [rowModesModel, setRowModesModel] = React.useState<GridRowModesModel>(
@@ -434,7 +435,8 @@ export default function ListProductEdit(props: IProps) {
     },
   ];
 
-  const handleUploadClick = (row: GridRowsProp) => {
+  const handleUploadClick = (row: GridRowModel) => {
+    setProductId(row.productId);
     // Trigger the hidden file input
     if (fileInputRef.current) {
       fileInputRef.current.click();
@@ -452,7 +454,8 @@ export default function ListProductEdit(props: IProps) {
         formData.append("files", file);
       });
       try {
-        const result = await uploadImages(formData);
+        if (!productId) return;
+        const result = await uploadImagesToSave(formData, productId);
         if (!result) return;
         const filesData = result.join(",");
         const newGloTempRow = { ...newTempRow, images: filesData };

@@ -22,25 +22,25 @@ export default function RootLayout({
   const defaultTheme = createTheme({ palette: { mode } });
 
   const generateAdminCalled = React.useRef(false);
-  const generateAdmin = async () => {
-    try {
-      const data: IUser = {
-        email: "admin@gmail.com",
-        password: "admin0",
-      };
-      await createAccount(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const generateAdmin = async () => {
+  //   try {
+  //     const data: IUser = {
+  //       email: "admin@gmail.com",
+  //       password: "admin0",
+  //     };
+  //     await createAccount(data);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  React.useEffect(() => {
-    sessionStorage.clear();
-    if (!generateAdminCalled.current) {
-      generateAdminCalled.current = true;
-      generateAdmin();
-    }
-  }, []);
+  // React.useEffect(() => {
+  //   sessionStorage.clear();
+  //   if (!generateAdminCalled.current) {
+  //     generateAdminCalled.current = true;
+  //     generateAdmin();
+  //   }
+  // }, []);
 
   const toggleColorMode = () => {
     const newMode = mode === "dark" ? "light" : "dark";

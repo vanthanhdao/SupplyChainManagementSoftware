@@ -14,8 +14,8 @@ interface IProps {
 const SelectButton = (props: IProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const { setOrderCode } = useDetailOrderStore();
-  const { setGroupOrder, setGroupOrderDetails } = useGroupDetailOrderStore();
+  const { setGroupOrder, setGroupOrderDetails, setGroupOrderId } =
+    useGroupDetailOrderStore();
 
   // Handle button click to open the menu
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -24,7 +24,6 @@ const SelectButton = (props: IProps) => {
 
   // Handle menu item click
   const handleMenuItemClick = async (orderId: number) => {
-    setOrderCode(orderId);
     const [order, orderDetails] = await Promise.all([
       getGroupOrder(orderId),
       getGroupOrderDetails(orderId),
@@ -32,6 +31,7 @@ const SelectButton = (props: IProps) => {
     const formatOrder = order.length > 0 ? order[0] : null;
     setGroupOrder(formatOrder);
     setGroupOrderDetails(orderDetails);
+    setGroupOrderId(orderId);
     setAnchorEl(null);
   };
 
