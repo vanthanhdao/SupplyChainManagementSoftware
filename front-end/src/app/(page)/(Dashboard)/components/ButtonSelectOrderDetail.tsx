@@ -14,7 +14,7 @@ interface IProps {
 const SelectButton = (props: IProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
-  const { setGroupOrder, setGroupOrderDetails, setGroupOrderId } =
+  const { groupOrder, setGroupOrder, setGroupOrderDetails, setGroupOrderId } =
     useGroupDetailOrderStore();
 
   // Handle button click to open the menu

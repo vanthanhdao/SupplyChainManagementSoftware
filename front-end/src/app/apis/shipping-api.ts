@@ -17,6 +17,18 @@ export const getAllShipping = async (): Promise<IDataShipping[]> => {
   }
 };
 
+export const getShippingById = async (shipmentId: number) => {
+  try {
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/shipping-methods/${shipmentId}`,
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`getShippingById failed - ${error}`);
+  }
+};
+
 // Call api CRUD Shippings
 export const updateRecordShipping = async (data: GridRowsProp) => {
   try {

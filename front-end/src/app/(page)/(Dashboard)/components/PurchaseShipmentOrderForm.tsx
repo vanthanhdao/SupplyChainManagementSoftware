@@ -3,6 +3,7 @@ import { Box, Typography, Grid, Divider, Card, Button } from "@mui/material";
 import {
   DataGrid,
   GridColDef,
+  GridRenderCellParams,
   GridRowModel,
   GridRowsProp,
 } from "@mui/x-data-grid";
@@ -11,9 +12,20 @@ import { useReactToPrint } from "react-to-print";
 import useInputPOStore from "@/app/zustands/useInputPOStore";
 import DialogUploadImages from "./DialogUploadImages";
 import useUserStore from "@/app/zustands/userStore";
+import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
+import ExpandableCellImages from "./ExpandableCellImages";
+import DialogShipmentUploadImages from "./DialogShipmentUploadImages";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "NO.", width: 20 },
+  {
+    field: "productId",
+    headerName: "Item Code",
+    type: "number",
+    width: 180,
+    headerAlign: "center",
+    align: "center",
+  },
   {
     field: "productName",
     headerName: "Item #",
@@ -23,44 +35,41 @@ const columns: GridColDef[] = [
     align: "center",
   },
   {
+    field: "images",
+    headerName: "Item #",
+    type: "custom",
+    width: 180,
+    headerAlign: "center",
+    renderCell: (params: GridRenderCellParams) => (
+      <ExpandableCellImages {...params} />
+    ),
+  },
+  {
     field: "unit",
     headerName: "Unit",
     type: "singleSelect",
     valueOptions: ["Pieces", "Box", "Kg"],
     width: 100,
-    editable: true,
   },
   {
     field: "quantity",
     headerName: "Qty",
     type: "number",
     width: 80,
-    editable: true,
     headerAlign: "center",
     align: "center",
   },
   {
-    field: "price",
-    headerName: "Price",
-    type: "number",
-    width: 150,
-  },
-  {
-    field: "money",
-    headerName: "Total Price",
+    field: "categoryName",
+    headerName: "CategoryName",
     type: "number",
     width: 150,
   },
 ];
 
-const Invoice = () => {
-  const {
-    selectedRows,
-    subTotalRows,
-    orderCode,
-    setSubTotalRows,
-    setSelectedRowState,
-  } = useDetailOrderStore();
+const PurchaseShipmentOrderForm = () => {
+  const { selectedRows, subTotalRows, orderCode } = useDetailOrderStore();
+  const { groupOrderDetails } = useGroupDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
   const { nameCompany, addressCompany, role } = useUserStore();
   const [rows, setRows] = React.useState<GridRowsProp>([]);
@@ -72,52 +81,19 @@ const Invoice = () => {
   const date = new Date();
 
   React.useEffect(() => {
-    if (selectedRows) {
-      const dataRows: GridRowsProp = selectedRows.map((item, index) => ({
+    if (groupOrderDetails) {
+      const dataRows: GridRowsProp = groupOrderDetails?.map((item, index) => ({
         id: index + 1,
-        productId: item.productId,
-        productName: item.productName,
-        price: item.price,
-        unit: item.unit,
-        quantity: item.quantity,
-        money: item.money,
+        productId: item.ProductId,
+        productName: item.ProductName,
+        unit: item.Unit,
+        quantity: item.Quantity,
+        categoryName: item.CategoryName,
+        images: item.Images,
       }));
       setRows(dataRows);
     }
-  }, [selectedRows, subTotalRows, orderCode]);
-
-  const processRowUpdate = (updatedRow: GridRowModel) => {
-    try {
-      const newRows = {
-        ...updatedRow,
-        quantity: updatedRow.quantity as number,
-        money: (updatedRow.price * updatedRow.quantity) as number,
-        unit: updatedRow.unit as string,
-      };
-      if (!selectedRows) return newRows;
-      const newSelectesRows: DetailOrder[] = selectedRows?.map((item) =>
-        item.productId === updatedRow.productId
-          ? {
-              ...item,
-              quantity: updatedRow.quantity as number,
-              money: (updatedRow.price * updatedRow.quantity) as number,
-              unit: updatedRow.unit as string,
-            }
-          : item
-      );
-      setSelectedRowState(newSelectesRows);
-      setSubTotalRows(newSelectesRows);
-      return newRows;
-    } catch (error) {
-      console.error("Error updating row: ", error);
-      throw error;
-    }
-  };
-
-  const handleProcessRowUpdateError = (error: any) => {
-    // Xử lý lỗi (hiển thị thông báo lỗi, log lỗi, v.v.)
-    console.error("Error occurred during row update: ", error);
-  };
+  }, [groupOrderDetails]);
 
   return (
     <Card
@@ -138,7 +114,7 @@ const Invoice = () => {
         {
           // (role === "CUSTOMER" || (role === "MANUFACTURER" && orderCode)) &&
           rows && rows.length > 0 ? (
-            <DialogUploadImages rows={rows} onPrint={reactToPrintFn} />
+            <DialogShipmentUploadImages rows={rows} onPrint={reactToPrintFn} />
           ) : null
         }
       </Box>
@@ -193,12 +169,23 @@ const Invoice = () => {
 
         {/* Items Table */}
         <DataGrid
-          sx={{ marginTop: 2, marginBottom: 2 }}
           rows={rows}
           columns={columns}
           hideFooter
-          processRowUpdate={processRowUpdate}
-          onProcessRowUpdateError={handleProcessRowUpdateError}
+          getEstimatedRowHeight={() => 100}
+          getRowHeight={() => "auto"}
+          sx={{
+            "& .MuiDataGrid-cell:hover": {
+              color: "primary.main",
+            },
+            "& .MuiDataGrid-cell": {
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              marginTop: 2,
+              marginBottom: 2,
+            },
+          }}
         />
 
         {/* Notes Section */}
@@ -214,34 +201,20 @@ const Invoice = () => {
             <Typography>Approved by:</Typography>
           </Grid>
           <Grid item xs={6}>
-            <Typography align="right">
-              Subtotal: $
-              {subTotalRows.toLocaleString("en-US", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 2,
-              })}
-            </Typography>
             {/* <Typography align="right">Discount (%): -</Typography> */}
             {/* <Typography align="right">
               Subtotal Less Discount: $435.00
             </Typography> */}
-            <Typography align="right">
+            {/* <Typography align="right">
               Shipping and Handling: $
               {selectShippingCost.toLocaleString("en-US", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
-            </Typography>
-            <Typography align="right">Tax Rate: {inputs.taxRate}%</Typography>
-            {/* <Typography align="right">Sales Tax: $37.41</Typography> */}
+            </Typography> */}
             <Typography align="right" sx={{ fontWeight: "bold" }}>
               Total: $
-              {(
-                subTotalRows +
-                selectShippingCost +
-                (subTotalRows + selectShippingCost) *
-                  (Number(inputs.taxRate) / 100)
-              ).toLocaleString("en-US", {
+              {selectShippingCost.toLocaleString("en-US", {
                 minimumFractionDigits: 2,
                 maximumFractionDigits: 2,
               })}
@@ -253,4 +226,4 @@ const Invoice = () => {
   );
 };
 
-export default Invoice;
+export default PurchaseShipmentOrderForm;

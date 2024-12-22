@@ -7,94 +7,136 @@ import DialogTitle from "@mui/material/DialogTitle";
 import { useDropzone } from "react-dropzone";
 import { Box, Button, CircularProgress, Typography } from "@mui/material";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import { GridActionsCellItem, GridRowsProp } from "@mui/x-data-grid";
+import { GridRowsProp } from "@mui/x-data-grid";
 import useDetailOrderStore from "@/app/zustands/useDetailOrderStore";
 import useInputPOStore from "@/app/zustands/useInputPOStore";
 import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
 import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
-import { useAddOrder } from "@/app/hook/useEthereum";
+import {
+  useAddOrder,
+  useAddSubOrder,
+  useAddSubOrderCarrier,
+} from "@/app/hook/useEthereum";
 import { uploadImages } from "@/app/apis/uploads-api";
-import ImageIcon from "@mui/icons-material/Image";
-import { getProductByOrderId } from "@/app/apis/products-api";
 import { updateStatusOrder } from "@/app/apis/order-api";
 import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
-import CircularLoading from "./CircularLoading";
+import { formatDateTime } from "@/app/hook/formatDateTime";
+import { getAccountById } from "@/app/apis/users-api";
+import { getShippingById } from "@/app/apis/shipping-api";
 
 interface DialogUploadImagesProps {
-  orderId: number;
+  rows: GridRowsProp;
+  onPrint: () => void;
 }
 
-const DialogUploadImagesUpdate: React.FC<DialogUploadImagesProps> = ({
-  orderId,
+const DialogShipmentUploadImages: React.FC<DialogUploadImagesProps> = ({
+  rows,
+  onPrint,
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
+  const { subTotalRows, setSelectedRowState } = useDetailOrderStore();
+  const { groupOrderId, groupOrder } = useGroupDetailOrderStore();
+  const { inputs, selectShippingCost } = useInputPOStore();
+  const { addressCompany } = useUserStore();
   const [fileInfo, setFileInfo] = React.useState<{
     name: string;
     src: string | null;
     type: string;
     acceptedFiles: File[];
   } | null>(null);
-  const { nameCompany, email, phoneNumber, taxCode, role } = useUserStore();
-  const { selectedRows, setSelectedRowState } = useDetailOrderStore();
-  const date = new Date();
+  const { selectedRows, orderCode, setOrderCode } = useDetailOrderStore();
+  const {
+    userId,
+    nameCompany,
+    email,
+    phoneNumber,
+    taxCode,
+    role,
+    initializeUser,
+  } = useUserStore();
   const router = useRouter();
 
-  const handleSend = async () => {
+  const storeAddSubOrderCarrierBlockChain = async (purchaseOrder: string) => {
+    if (
+      !inputs.sellerId ||
+      !inputs.shippingViaId ||
+      !orderCode ||
+      !purchaseOrder ||
+      !groupOrderId
+    )
+      return;
     try {
-      const result = await getProductByOrderId(orderId);
-      if (!result) return;
-      const lisrProduct: DetailOrder[] = result.map((item: any) => ({
-        productId: item.ProductId,
-        productName: item.ProductName,
-        categoryId: item.CategoryId,
-        categoryName: item.CategoryName,
-        images: item.Images,
-        specifications: item.Specifications,
-      }));
-      setSelectedRowState(lisrProduct);
-      setOpen(true);
-    } catch (error) {
-      router.push("/dashboard/Error");
-    }
-  };
-
-  const storeBlockChain = async (purchaseOrder: string) => {
-    if (!selectedRows || !orderId || !purchaseOrder) return;
-    try {
-      const history = [
-        `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`,
+      const [findUser, findShipping] = await Promise.all([
+        getAccountById(inputs.sellerId),
+        getShippingById(inputs.shippingViaId),
+      ]);
+      if (!findUser || !findShipping) return;
+      const history = `{CustomerName:${findUser.nameCompany},Email:${findUser.email},CustomerAddress:${findUser.phoneNumber},TaxCode:${findUser.taxCode},Role:${findUser.role}`;
+      const timeLine = `{Date:${formatDateTime()},Status:'Shipment-Ordered',Title:'Submit Order and Wait for Confirmation'`;
+      const subTimeLine = [
+        `{Date:${formatDateTime()},Status:'New',Title:'Valid Order'}`,
       ];
-      const timeLine = [
-        `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'}`,
-      ];
-      const productList = selectedRows.map(
-        (item) =>
-          // `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
-          `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
-      );
-      const po = `${purchaseOrder}`;
-      const checkTransac = await useAddOrder(
-        orderId,
-        productList,
-        history,
+      const shipping = `ShippingMethodID:${findShipping.ShippingMethodID},ShippingMethodName:${findShipping.ShippingMethodName},ShippingCost:${findShipping.ShippingCost},Description:${findShipping.Description}`;
+      const subpo = `${purchaseOrder}`;
+      const checkTransac = await useAddSubOrderCarrier(
+        groupOrderId,
+        orderCode,
+        subTimeLine,
+        subpo,
+        shipping,
         timeLine,
-        po
+        history
       );
       setLoading(checkTransac);
       setOpen(checkTransac);
-      window.location.reload();
-      await updateStatusOrder(orderId, "New");
+      Promise.all([
+        updateStatusOrder(orderCode, "New"),
+        updateStatusOrder(groupOrderId, "Shipment-Ordered"),
+      ]);
     } catch (error) {
       router.push("/dashboard/Error");
       throw error;
     }
   };
 
+  const handleSendPO = async () => {
+    try {
+      await initializeUser();
+      const purchaseOrder: IDataPurchaseOrder = {
+        deliveryDate: inputs.deliveryDate,
+        customerId: userId,
+        shippingAddress: inputs.shipTo ? inputs.shipTo : addressCompany,
+        paymentMethod: inputs.terms,
+        shippingMethodId: inputs.shippingViaId,
+        sellerId: inputs.sellerId,
+        subOrderId: role !== "CUSTOMER" && groupOrderId ? groupOrderId : null,
+        totalAmount:
+          role === "CUSTOMER" || role === "MANUFACTURER"
+            ? subTotalRows +
+              selectShippingCost +
+              (subTotalRows + selectShippingCost) *
+                (Number(inputs.taxRate) / 100)
+            : selectShippingCost,
+        taxRate: inputs.taxRate,
+        note: inputs.notes,
+      };
+      const result_order = await createOrder(purchaseOrder);
+      if (!result_order) return;
+      await setOrderCode(result_order.OrderId);
+      setOpen(true);
+      onPrint();
+    } catch (error) {
+      console.log(error);
+      router.push("/dashboard/Error");
+    }
+  };
+
   const handleClose = () => {
     setFileInfo(null);
     setOpen(false);
+    setOrderCode(null);
   };
 
   const handleConfirm = async () => {
@@ -107,7 +149,10 @@ const DialogUploadImagesUpdate: React.FC<DialogUploadImagesProps> = ({
     const result = await uploadImages(formData);
     if (!result) return;
     const filesData = result.join(",");
-    await storeBlockChain(filesData);
+    if (groupOrderId) {
+      await storeAddSubOrderCarrierBlockChain(filesData);
+    }
+    setOrderCode(null);
   };
 
   const onDrop = async (acceptedFiles: File[]) => {
@@ -139,14 +184,9 @@ const DialogUploadImagesUpdate: React.FC<DialogUploadImagesProps> = ({
 
   return (
     <React.Fragment>
-      <GridActionsCellItem
-        icon={<ImageIcon />}
-        label="Edit"
-        className="textPrimary"
-        color="inherit"
-        onClick={handleSend}
-      />
-
+      <Button variant="contained" color="primary" onClick={handleSendPO}>
+        Confirm
+      </Button>
       <Dialog
         open={open}
         // onClose={handleClose}
@@ -212,7 +252,24 @@ const DialogUploadImagesUpdate: React.FC<DialogUploadImagesProps> = ({
               Browse Files
             </Button>
           </Box>
-          {loading && <CircularLoading />}
+          {loading && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 0,
+                left: 0,
+                width: "100%",
+                height: "100%",
+                backgroundColor: "rgba(255, 255, 255, 0.3)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 2,
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} autoFocus>
@@ -225,4 +282,4 @@ const DialogUploadImagesUpdate: React.FC<DialogUploadImagesProps> = ({
   );
 };
 
-export default DialogUploadImagesUpdate;
+export default DialogShipmentUploadImages;

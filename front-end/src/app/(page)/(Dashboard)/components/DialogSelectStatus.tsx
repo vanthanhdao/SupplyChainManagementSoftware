@@ -12,64 +12,82 @@ import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { GridActionsCellItem } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
-import { DialogContentText, MenuList, TextField } from "@mui/material";
+import { DialogContentText, TextField } from "@mui/material";
 import { updateStatusOrder } from "@/app/apis/order-api";
 import {
+  usePushBothToTimeLine,
   usePushToSubTimeLine,
   usePushToTimeLine,
 } from "@/app/hook/useEthereum";
 import CircularLoading from "./CircularLoading";
 import useUserStore from "@/app/zustands/userStore";
-import { subscribe } from "diagnostics_channel";
+import { useRouter } from "next/navigation";
+import { formatDateTime } from "@/app/hook/formatDateTime";
 
 interface DialogUploadImagesProps {
   orderId: number;
   status: string;
   subOrderId: number;
 }
-// type MenuItem = {
-//   value: string;
-//   status: string[];
-//   role: string[];
-// };
 
-// const statusListItems: MenuItem[] = [
-//   {
-//     value: "Confirm",
-//     status: ["New"],
-//     role: [],
-//   },
-//   {
-//     value: "Reject",
-//     status: ["New"],
-//     role: [],
-//   },
-//   {
-//     value: "Analyzing",
-//     status: ["Confirm"],
-//     role: ["MANUFACTURER"],
-//   },
-//   {
-//     value: "Material-Ordered",
-//     status: ["Analyzing"],
-//     role: ["MANUFACTURER"],
-//   },
-//   // {
-//   //   value: "In-Transit",
-//   //   status: ["Confirm"],
-//   //   role: ["MANUFACTURER"],
-//   // },
-//   // {
-//   //   value: "Received",
-//   //   status: ["Confirm"],
-//   //   role: ["MANUFACTURER"],
-//   // },
-//   {
-//     value: "Production",
-//     status: ["Received"],
-//     role: ["MANUFACTURER"],
-//   },
-// ];
+const invalidStatuses = [
+  "Reject",
+  "Prepared-Shipment",
+  "In-Transit",
+  "Production",
+];
+const titleStatus = [
+  {
+    status: "Confirm",
+    titleTimeLine: "Confirmed Order",
+  },
+  {
+    status: "Reject",
+    titleTimeLine: "Order Rejected",
+  },
+  {
+    status: "Production",
+    titleTimeLine: "In Production",
+  },
+  {
+    status: "Prepared-Shipment",
+    titleTimeLine: "Prepared Shipment",
+  },
+  {
+    status: "In-Transit",
+    titleTimeLine: "In Transit",
+  },
+  {
+    status: "Delivered",
+    titleTimeLine: "Delivered",
+  },
+];
+
+const titleStatusSUPPLIER = [
+  {
+    newStatus: "Confirm",
+    subStatus: "Confirm",
+    subTitleTimeLine: "In Transit",
+  },
+  {
+    newStatus: "Material-Received",
+    subStatus: "Delivered",
+    subTitleTimeLine: "Material Received",
+  },
+];
+
+const titleStatusCARRIER = [
+  {
+    newStatus: "Confirm",
+    subStatus: "Confirm",
+    subTitleTimeLine: "In Transit",
+  },
+  {
+    newStatus: "Successfully",
+    subStatus: "Delivered",
+    subTitleTimeLine: "Shipping Successfully",
+  },
+];
 
 const DialogSelectStatus: React.FC<DialogUploadImagesProps> = ({
   orderId,
@@ -77,13 +95,12 @@ const DialogSelectStatus: React.FC<DialogUploadImagesProps> = ({
   subOrderId,
 }) => {
   const [open, setOpen] = React.useState(false);
-  const [checkTransac, setCheckTransac] = React.useState(true);
   const [newStatus, setNewStatus] = React.useState<string>(status);
   const [rejectReason, setRejectReason] = React.useState<string>("");
   const [title, setTitle] = React.useState<string>("");
   const [loading, setLoading] = React.useState<boolean>(false);
   const { role } = useUserStore();
-  const date = new Date();
+  const router = useRouter();
 
   const handleChange = (event: SelectChangeEvent<string>) => {
     setNewStatus(event.target.value);
@@ -99,41 +116,75 @@ const DialogSelectStatus: React.FC<DialogUploadImagesProps> = ({
   };
 
   const storeBlockChain = async () => {
-    if (!orderId || !newStatus || !subOrderId || !role) return;
-    if (rejectReason && rejectReason.length > 0) {
-      setTitle("Order Rejected");
-    }
-
-    const timeLine = `{Date:${date.toLocaleDateString()},Status:${newStatus},Title:${title} ${rejectReason}}`;
-    if (role === "MANUFACTURER") {
-      setCheckTransac(await usePushToTimeLine(subOrderId, timeLine));
-    }
-    setCheckTransac(await usePushToSubTimeLine(orderId, timeLine));
-    setLoading(checkTransac);
-    setOpen(checkTransac);
-    // window.location.reload();
-
-    handleUpdateStatusOrder;
-  };
-
-  const handleUpdateStatusOrder = async () => {
-    const invalidStatuses = [
-      "Reject",
-      "Prepared-Shipment",
-      "In-Transit",
-      "Production",
-    ];
-    await updateStatusOrder(orderId, newStatus);
-    if (subOrderId && !invalidStatuses.includes(newStatus)) {
-      if (newStatus === "Delivered")
-        await updateStatusOrder(subOrderId, "Material-Received");
-      if (newStatus === "Confirm")
-        await updateStatusOrder(subOrderId, "In-Transit");
+    console.log(subOrderId, orderId);
+    try {
+      if (rejectReason && rejectReason.length > 0) {
+        setTitle("Order Rejected");
+      }
+      const find = titleStatus.find((item) => item.status === newStatus);
+      const timeLine = find
+        ? `{Date:${formatDateTime()},Status:${newStatus},Title:${
+            find?.titleTimeLine
+          } ${rejectReason}}`
+        : "";
+      if (role === "MANUFACTURER") {
+        if (subOrderId) {
+          const checkTransac = await usePushToSubTimeLine(orderId, timeLine);
+          setLoading(checkTransac);
+          setOpen(checkTransac);
+        } else {
+          const checkTransac = await usePushToTimeLine(orderId, timeLine);
+          setLoading(checkTransac);
+          setOpen(checkTransac);
+        }
+      } else {
+        let find = null;
+        if (role === "SUPPLIER") {
+          find = titleStatusSUPPLIER.find(
+            (item) => item.subStatus === newStatus
+          );
+        } else {
+          find = titleStatusCARRIER.find(
+            (item) => item.subStatus === newStatus
+          );
+        }
+        const subTimeLine = find
+          ? `{Date:${formatDateTime()},Status:${find.newStatus},Title:${
+              find?.subTitleTimeLine
+            } ${rejectReason}}`
+          : "";
+        const checkTransac = await usePushBothToTimeLine(
+          subOrderId,
+          orderId,
+          subTimeLine,
+          timeLine
+        );
+        setLoading(checkTransac);
+        setOpen(checkTransac);
+      }
+      //Handle update status in backend
+      await updateStatusOrder(orderId, newStatus);
+      if (subOrderId && !invalidStatuses.includes(newStatus)) {
+        if (newStatus === "Delivered") {
+          if (role === "CARRIER")
+            await updateStatusOrder(subOrderId, "Succecfully");
+          else await updateStatusOrder(subOrderId, "Material-Received");
+        }
+        if (newStatus === "Confirm")
+          await updateStatusOrder(subOrderId, "In-Transit");
+      }
+    } catch (error) {
+      router.push("/dashboard/Error");
+      throw error;
     }
   };
 
   const handleSendStatus = async () => {
-    setLoading(checkTransac);
+    setLoading(true);
+    if (!orderId || !newStatus || !role) {
+      setLoading(false);
+      return;
+    }
     await storeBlockChain();
   };
 
@@ -192,19 +243,22 @@ const DialogSelectStatus: React.FC<DialogUploadImagesProps> = ({
                     Production
                   </MenuItem>
                 )}
-                {role === "SUPPLIER" &&
-                  status === "Confirm" && [
+                {(role === "SUPPLIER" || role === "CARRIER") &&
+                  (status === "Confirm" ||
+                    status === "Prepared-Shipment" ||
+                    status === "In-Transit" ||
+                    status === "Delivered") && [
                     <MenuItem key="Prepared-Shipment" value="Prepared-Shipment">
                       Prepared-Shipment
                     </MenuItem>,
                     <MenuItem key="In-Transit1" value="In-Transit">
                       In-Transit
                     </MenuItem>,
-                    <MenuItem key="Delivered" value="Delivered ">
+                    <MenuItem key="Delivered" value="Delivered">
                       Delivered
                     </MenuItem>,
                   ]}
-                <MenuItem key={status} value={status}>
+                <MenuItem key={status} value={status} sx={{ display: "none" }}>
                   {status}
                 </MenuItem>
               </Select>

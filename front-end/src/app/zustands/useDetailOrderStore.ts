@@ -5,8 +5,8 @@ interface DetailOrderState {
   selectedRows: DetailOrder[] | null;
   subTotalRows: number;
   orderCode: number | null;
-  setSelectedRowState: (newSelected: DetailOrder[]) => void;
-  setSubTotalRows: (newTotalRows: DetailOrder[]) => void;
+  setSelectedRowState: (newSelected: DetailOrder[] | null) => void;
+  setSubTotalRows: (newTotalRows: DetailOrder[] | null) => void;
   setOrderCode: (newOrderCode: number | null) => void;
 }
 
@@ -21,7 +21,7 @@ const useDetailOrderStore = create<DetailOrderState>((set, get) => ({
     });
   },
   setSubTotalRows: (newTotalRows) => {
-    const newSubTotal = newTotalRows.reduce((acc, row) => acc + row.money, 0);
+    const newSubTotal = newTotalRows?.reduce((acc, row) => acc + row.money, 0);
     set({ subTotalRows: Number(newSubTotal) });
   },
   setOrderCode: (newOrderCode) => {

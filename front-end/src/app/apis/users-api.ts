@@ -14,6 +14,19 @@ export const createAccount = async (data: IUser) => {
   }
 };
 
+export const getAccountById = async (userId: number) => {
+  try {
+    const access_token = await useGetAccessToken("access_token");
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/seller/${userId}`,
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(`getAccountById failed - ${error}`);
+  }
+};
+
 // Call api for create a new account
 export const revertAccount = async (data: IUser) => {
   try {
@@ -66,6 +79,20 @@ export const getAllAccountByRole = async () => {
     return response.data;
   } catch (error) {
     console.error("getAllAccountByRole failed: ", error);
+    throw error;
+  }
+};
+
+export const getAllAccountByRoleShipment = async () => {
+  try {
+    const access_token = await useGetAccessToken("access_token");
+    const response = await axios.get(
+      `${process.env.NEXT_PUBLIC_API_URL}/users/roleShipment`,
+      { headers: { Authorization: `Bearer ${access_token}` } }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("getAllAccountByRoleShipment failed: ", error);
     throw error;
   }
 };

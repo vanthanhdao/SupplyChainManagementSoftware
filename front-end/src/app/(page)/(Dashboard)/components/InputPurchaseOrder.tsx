@@ -40,7 +40,7 @@ export default function InputPurchaseOrder(props: IProps) {
       });
       setShippingCost(dataShippings[0].ShippingCost);
     }
-  }, [dataShippings, dataUsers]);
+  }, []);
 
   return (
     <Card
@@ -187,37 +187,38 @@ export default function InputPurchaseOrder(props: IProps) {
           </Grid>
 
           {/* Seller */}
-          {role && role !== "CUSTOMER"}
-          <Grid item xs={12}>
-            <FormControl fullWidth>
-              <FormLabel htmlFor="seller">Seller</FormLabel>
-              <TextField
-                id="seller"
-                name="seller"
-                value={inputs.sellerId || ""}
-                select
-                onChange={(e) => {
-                  const selectedKey = e.target.value;
+          {role && role !== "CUSTOMER" && (
+            <Grid item xs={12}>
+              <FormControl fullWidth>
+                <FormLabel htmlFor="seller">Seller</FormLabel>
+                <TextField
+                  id="seller"
+                  name="seller"
+                  value={inputs.sellerId || ""}
+                  select
+                  onChange={(e) => {
+                    const selectedKey = e.target.value;
 
-                  const findUser = dataUsers.find(
-                    (item) => item.userId === Number(selectedKey)
-                  );
-                  if (findUser) {
-                    setInputPO({
-                      seller: findUser.nameCompany,
-                      sellerId: findUser.userId,
-                    });
-                  }
-                }}
-              >
-                {dataUsers.map((option) => (
-                  <MenuItem key={option.userId} value={option.userId}>
-                    {option.nameCompany}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </FormControl>
-          </Grid>
+                    const findUser = dataUsers.find(
+                      (item) => item.userId === Number(selectedKey)
+                    );
+                    if (findUser) {
+                      setInputPO({
+                        seller: findUser.nameCompany,
+                        sellerId: findUser.userId,
+                      });
+                    }
+                  }}
+                >
+                  {dataUsers.map((option) => (
+                    <MenuItem key={option.userId} value={option.userId}>
+                      {option.nameCompany}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              </FormControl>
+            </Grid>
+          )}
 
           {/* Note */}
           <Grid item xs={12}>

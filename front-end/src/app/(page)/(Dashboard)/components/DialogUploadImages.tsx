@@ -13,10 +13,17 @@ import useInputPOStore from "@/app/zustands/useInputPOStore";
 import useUserStore from "@/app/zustands/userStore";
 import { useRouter } from "next/navigation";
 import { createOrder, createOrderDetails } from "@/app/apis/purchase-orders";
-import { useAddOrder, useAddSubOrder } from "@/app/hook/useEthereum";
+import {
+  useAddOrder,
+  useAddSubOrder,
+  useAddSubOrderCarrier,
+} from "@/app/hook/useEthereum";
 import { uploadImages } from "@/app/apis/uploads-api";
 import { updateStatusOrder } from "@/app/apis/order-api";
 import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
+import { formatDateTime } from "@/app/hook/formatDateTime";
+import { getAccountById } from "@/app/apis/users-api";
+import { getShippingById } from "@/app/apis/shipping-api";
 
 interface DialogUploadImagesProps {
   rows: GridRowsProp;
@@ -29,8 +36,8 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
 }) => {
   const [open, setOpen] = React.useState<boolean>(false);
   const [loading, setLoading] = React.useState<boolean>(false);
-  const { subTotalRows } = useDetailOrderStore();
-  const { groupOrderId } = useGroupDetailOrderStore();
+  const { subTotalRows, setSelectedRowState } = useDetailOrderStore();
+  const { groupOrderId, groupOrder } = useGroupDetailOrderStore();
   const { inputs, selectShippingCost } = useInputPOStore();
   const { addressCompany } = useUserStore();
   const [fileInfo, setFileInfo] = React.useState<{
@@ -50,63 +57,112 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
     initializeUser,
   } = useUserStore();
   const router = useRouter();
-  const date = new Date();
 
   const storeAddOrderBlockChain = async (purchaseOrder: string) => {
     if (!selectedRows || !orderCode || !purchaseOrder) return;
-    const history = [
-      `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`,
-    ];
-    const timeLine = [
-      `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'}`,
-    ];
-    const productList = selectedRows.map(
-      (item) =>
-        // `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName},Images:${item.images},specifications:${item.specifications}}`
-        `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
-    );
-    const po = [`${purchaseOrder}`];
-    const checkTransac = await useAddOrder(
-      orderCode,
-      productList,
-      history,
-      timeLine,
-      po
-    );
-    setLoading(checkTransac);
-    setOpen(checkTransac);
-    window.location.reload();
-    await updateStatusOrder(orderCode, "New");
+    try {
+      const history = [
+        `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`,
+      ];
+      const timeLine = [
+        `{Date:${formatDateTime()},Status:'New',Title:'Valid Order'}`,
+      ];
+      const productList = selectedRows.map(
+        (item) =>
+          `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
+      );
+      const po = `${purchaseOrder}`;
+      const checkTransac = await useAddOrder(
+        orderCode,
+        productList,
+        history,
+        timeLine,
+        po
+      );
+      setLoading(checkTransac);
+      setOpen(checkTransac);
+      await updateStatusOrder(orderCode, "New");
+    } catch (error) {
+      router.push("/dashboard/Error");
+      throw error;
+    }
   };
 
   const storeAddSubOrderBlockChain = async (purchaseOrder: string) => {
     if (!selectedRows || !orderCode || !purchaseOrder || !groupOrderId) return;
-    const history = `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`;
-    const timeLine = `{Date:${date.toLocaleDateString()},Status:'Material-Ordered',Title:'Submit Order and Wait for Confirmation'`;
-    const subTimeLine = [
-      `{Date:${date.toLocaleDateString()},Status:'New',Title:'Valid Order'`,
-    ];
-    const materialList = selectedRows.map(
-      (item) =>
-        `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
-    );
-    const subpo = `${purchaseOrder}`;
-    const checkTransac = await useAddSubOrder(
-      groupOrderId,
-      subTimeLine,
-      subpo,
-      orderCode,
-      history,
-      timeLine,
-      materialList
-    );
-    setLoading(checkTransac);
-    setOpen(checkTransac);
-    window.location.reload();
-    Promise.all([
-      updateStatusOrder(groupOrderId, "New"),
-      updateStatusOrder(orderCode, "Material-Ordered"),
-    ]);
+    try {
+      const history = `{CustomerName:${nameCompany},Email:${email},CustomerAddress:${phoneNumber},TaxCode:${taxCode},Role:${role}`;
+      const timeLine = `{Date:${formatDateTime()},Status:'Material-Ordered',Title:'Submit Order and Wait for Confirmation'`;
+      const subTimeLine = [
+        `{Date:${formatDateTime()},Status:'New',Title:'Valid Order'}`,
+      ];
+      const materialList = selectedRows.map(
+        (item) =>
+          `{ProductId:${item.productId},ProductName:${item.productName},CategoryName:${item.categoryName}}`
+      );
+      const subpo = `${purchaseOrder}`;
+      const checkTransac = await useAddSubOrder(
+        groupOrderId,
+        orderCode,
+        subTimeLine,
+        subpo,
+        materialList,
+        history,
+        timeLine
+      );
+      setLoading(checkTransac);
+      setOpen(checkTransac);
+      Promise.all([
+        updateStatusOrder(orderCode, "New"),
+        updateStatusOrder(groupOrderId, "Material-Ordered"),
+      ]);
+    } catch (error) {
+      router.push("/dashboard/Error");
+      throw error;
+    }
+  };
+
+  const storeAddSubOrderCarrierBlockChain = async (purchaseOrder: string) => {
+    if (
+      !inputs.sellerId ||
+      !inputs.shippingViaId ||
+      !orderCode ||
+      !purchaseOrder ||
+      !groupOrderId
+    )
+      return;
+    try {
+      const [findUser, findShipping] = await Promise.all([
+        getAccountById(inputs.sellerId),
+        getShippingById(inputs.shippingViaId),
+      ]);
+      if (!findUser || !findShipping) return;
+      const history = `{CustomerName:${findUser.nameCompany},Email:${findUser.email},CustomerAddress:${findUser.phoneNumber},TaxCode:${findUser.taxCode},Role:${findUser.role}`;
+      const timeLine = `{Date:${formatDateTime()},Status:'Shipment-Ordered',Title:'Submit Order and Wait for Confirmation'`;
+      const subTimeLine = [
+        `{Date:${formatDateTime()},Status:'New',Title:'Valid Order'}`,
+      ];
+      const shipping = `ShippingMethodID:${findShipping.ShippingMethodID},ShippingMethodName:${findShipping.ShippingMethodName},ShippingCost:${findShipping.ShippingCost},Description:${findShipping.Description}`;
+      const subpo = `${purchaseOrder}`;
+      const checkTransac = await useAddSubOrderCarrier(
+        groupOrderId,
+        orderCode,
+        subTimeLine,
+        subpo,
+        shipping,
+        timeLine,
+        history
+      );
+      setLoading(checkTransac);
+      setOpen(checkTransac);
+      Promise.all([
+        updateStatusOrder(orderCode, "New"),
+        updateStatusOrder(groupOrderId, "Shipment-Ordered"),
+      ]);
+    } catch (error) {
+      router.push("/dashboard/Error");
+      throw error;
+    }
   };
 
   const handleSendPO = async () => {
@@ -119,33 +175,58 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
         paymentMethod: inputs.terms,
         shippingMethodId: inputs.shippingViaId,
         sellerId: inputs.sellerId,
-        subOrderId: groupOrderId ? groupOrderId : null,
+        subOrderId: role !== "CUSTOMER" && groupOrderId ? groupOrderId : null,
         totalAmount:
-          subTotalRows +
-          selectShippingCost +
-          (subTotalRows + selectShippingCost) * (Number(inputs.taxRate) / 100),
+          role === "CUSTOMER" || role === "MANUFACTURER"
+            ? subTotalRows +
+              selectShippingCost +
+              (subTotalRows + selectShippingCost) *
+                (Number(inputs.taxRate) / 100)
+            : selectShippingCost,
         taxRate: inputs.taxRate,
         note: inputs.notes,
       };
       const result_order = await createOrder(purchaseOrder);
       if (!result_order) return;
-      setOrderCode(result_order.OrderId);
-      const formatProps = Object.values(rows);
-      const purchaseOrderDetails: IDataPurchaseOrderDetail[] = formatProps.map(
-        (item) => ({
-          orderId: result_order.OrderId,
-          productId: item.productId,
-          unitPrice: item.price,
-          unit: item.unit,
-          quantity: item.quantity,
-          subTotal: item.money,
-          subOrderId: role !== "CUSTOMER" ? orderCode : null,
-        })
-      );
-      const result_orderDetail = await createOrderDetails(purchaseOrderDetails);
-      if (!result_orderDetail) return;
-      onPrint();
+      await setOrderCode(result_order.OrderId);
+      if (result_order.SellerId) {
+        const findUser = await getAccountById(result_order.SellerId);
+        if (findUser && findUser.Role !== "CARRIER") {
+          const formatProps = Object.values(rows);
+          const purchaseOrderDetails: IDataPurchaseOrderDetail[] =
+            formatProps.map((item) => ({
+              orderId: result_order.OrderId,
+              productId: item.productId,
+              unitPrice: item.price,
+              unit: item.unit,
+              quantity: item.quantity,
+              subTotal: item.money,
+              subOrderId: role !== "CUSTOMER" ? orderCode : null,
+            }));
+          const result_orderDetail = await createOrderDetails(
+            purchaseOrderDetails
+          );
+          if (!result_orderDetail) return;
+        }
+      } else {
+        const formatProps = Object.values(rows);
+        const purchaseOrderDetails: IDataPurchaseOrderDetail[] =
+          formatProps.map((item) => ({
+            orderId: result_order.OrderId,
+            productId: item.productId,
+            unitPrice: item.price,
+            unit: item.unit,
+            quantity: item.quantity,
+            subTotal: item.money,
+            subOrderId: role !== "CUSTOMER" ? orderCode : null,
+          }));
+        const result_orderDetail = await createOrderDetails(
+          purchaseOrderDetails
+        );
+        if (!result_orderDetail) return;
+      }
       setOpen(true);
+      onPrint();
     } catch (error) {
       console.log(error);
       router.push("/dashboard/Error");
@@ -168,8 +249,21 @@ const DialogUploadImages: React.FC<DialogUploadImagesProps> = ({
     const result = await uploadImages(formData);
     if (!result) return;
     const filesData = result.join(",");
-    if (groupOrderId) await storeAddSubOrderBlockChain(filesData);
-    else await storeAddOrderBlockChain(filesData);
+    if (groupOrderId) {
+      var findUser;
+      if (groupOrder?.SellerId) {
+        findUser = await getAccountById(groupOrder?.SellerId as number);
+      }
+      if (role === "CUSTOMER") await storeAddSubOrderBlockChain(filesData);
+      else if (findUser) {
+        if (findUser.Role !== "CARRIER")
+          await storeAddSubOrderBlockChain(filesData);
+        else await storeAddSubOrderCarrierBlockChain(filesData);
+      } else await storeAddSubOrderBlockChain(filesData);
+    } else {
+      await storeAddOrderBlockChain(filesData);
+    }
+    setOrderCode(null);
   };
 
   const onDrop = async (acceptedFiles: File[]) => {

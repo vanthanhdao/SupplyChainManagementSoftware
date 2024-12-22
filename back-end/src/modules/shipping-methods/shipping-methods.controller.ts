@@ -28,6 +28,11 @@ export class ShippingMethodsController {
     return this.shippingMethodsService.findAll(query);
   }
 
+  @Get(':id')
+  findById(@Param('id') shippingId: string) {
+    return this.shippingMethodsService.findById(+shippingId);
+  }
+
   @Post('updateRecords')
   updateRecord(@Body() data: any) {
     return this.shippingMethodsService.updateRecord(data);

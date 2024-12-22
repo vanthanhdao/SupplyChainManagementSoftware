@@ -73,6 +73,12 @@ const mainListItems: MenuItem[] = [
     route: "Shippings",
     role: ["ADMIN", "CARRIER"],
   },
+  {
+    text: "Shipments",
+    icon: <LocalShippingIcon />,
+    route: "Shipments",
+    role: ["ADMIN", "MANUFACTURER"],
+  },
 ];
 
 export default function MenuContent() {

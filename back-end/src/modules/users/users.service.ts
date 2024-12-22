@@ -97,6 +97,22 @@ export class UsersService {
     return respone;
   }
 
+  async findByRoleShipment() {
+    const resultProcedure = await this.usersRepository.findBy({
+      Role: 'CARRIER',
+    });
+    const respone = resultProcedure.map((item) => ({
+      userId: item.UserId,
+      nameCompany: item.NameCompany,
+      role: item.Role,
+    }));
+    if (!respone || respone.length === 0) {
+      throw new Error(`No users found `);
+    }
+
+    return respone;
+  }
+
   // Delete users by id
   async remove(deleteUserDto: DeleteUserDto): Promise<void> {
     const { email, walletAddress } = deleteUserDto;

@@ -34,10 +34,16 @@ export class UsersController {
   findByRole() {
     return this.usersService.findByRole();
   }
-  // @Get(':id')
-  // findById(@Param('id') userId: number) {
-  //   return this.usersService.findById(userId);
-  // }
+
+  @Get('roleShipment')
+  findByRoleShipment() {
+    return this.usersService.findByRoleShipment();
+  }
+
+  @Get('seller/:id')
+  findById(@Param('id') userId: string) {
+    return this.usersService.findById(+userId);
+  }
 
   // @Post('getByBlock')
   // getUserByBlock(@Body() data: any) {

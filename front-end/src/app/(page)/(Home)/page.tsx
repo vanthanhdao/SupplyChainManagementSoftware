@@ -14,17 +14,16 @@ export default function MarketingPage() {
     <div>
       <Hero />
       <div>
-        <LogoCollection />
-        <Features />
+        {/* <LogoCollection /> */}
         <Divider />
-        <Testimonials />
+        {/* <Testimonials />
         <Divider />
         <Highlights />
         <Divider />
         <Pricing />
         <Divider />
         <FAQ />
-        <Divider />
+        <Divider /> */}
       </div>
     </div>
   );

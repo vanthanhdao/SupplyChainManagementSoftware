@@ -16,6 +16,18 @@ export class ShippingMethodsService {
     return 'This action adds a new shippingMethod';
   }
 
+  async findById(shippingId: number): Promise<ShippingMethod> {
+    const shipping = await this.shippingMethodsRepo.findOneBy({
+      ShippingMethodID: shippingId,
+    });
+
+    if (!shipping) {
+      throw new Error(`shippingId ${shippingId} not found`);
+    }
+
+    return shipping;
+  }
+
   async findAll(query: any) {
     const { page, limit } = query;
     if (page && limit) {

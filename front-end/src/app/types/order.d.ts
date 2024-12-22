@@ -11,6 +11,7 @@ interface OrderGroup {
   SubOrderId: number | null;
   TaxRate: number;
   TotalAmount: number;
+  SellerId: number;
 
   // User information
   UserId: number;

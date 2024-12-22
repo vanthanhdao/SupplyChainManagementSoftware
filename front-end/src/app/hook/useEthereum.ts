@@ -1,11 +1,13 @@
 import contract from "@/app/contracts/OrderTracking.json";
 import contractSC from "@/app/contracts/SupplyChain.json";
 import { ethers, verifyMessage } from "ethers";
+import { getAccountById } from "../apis/users-api";
+import { Varela_Round } from "next/font/google";
 
 // const { ethers } = require("ethers");
 
 // Địa chỉ của smart contract
-const contractAddress = "0x3385Bd907872051bB5A2e4381D60cF5ad956E359"; // SuppyChain
+const contractAddress = "0x3e5508f8E3369937e7D929f00f5C0A1D04146382"; // SuppyChain
 // Các hàm trong smart contract
 const contractABISuppyChain = contract.abi;
 const contractABI = contract.abi;
@@ -22,7 +24,7 @@ export const useProvideEthUser = async (walletAddress: string) => {
     const signer = new ethers.Wallet(privateKey, provider);
     // Địa chỉ của người nhận và số lượng ETH để gửi
     const recipient = walletAddress; // Địa chỉ người nhận
-    const amountInEther = "0.1"; // Số lượng ETH muốn gửi,
+    const amountInEther = "100"; // Số lượng ETH muốn gửi,
     // Chuyển số lượng ETH sang đơn vị Wei
     const amount = ethers.parseEther(amountInEther);
     // Tạo giao dịch
@@ -222,7 +224,7 @@ export const useAddOrder = async (
   productList: string[],
   history: string[],
   timeLine: string[],
-  po: string[]
+  po: string
 ): Promise<boolean> => {
   try {
     if (!window.ethereum) {
@@ -258,13 +260,13 @@ export const useAddOrder = async (
 };
 
 export const useAddSubOrder = async (
+  orderId: number,
   subOrderId: number,
   subTimeLine: string[],
   subpo: string,
-  orderId: number,
+  materialList: string[],
   history: string,
-  timeLine: string,
-  materialList: string[]
+  timeLine: string
 ): Promise<boolean> => {
   try {
     if (!window.ethereum) {
@@ -274,18 +276,50 @@ export const useAddSubOrder = async (
     const signer = await provider.getSigner();
     const contract = new ethers.Contract(contractAddress, contractABI, signer);
     const txResponse = await contract.addSubOrderManufacturer(
+      orderId,
       subOrderId,
       subTimeLine,
       subpo,
-      orderId,
+      materialList,
       history,
-      timeLine,
-      materialList
+      timeLine
     );
     await txResponse.wait();
     return false;
   } catch (error) {
-    throw new Error(`useAddOrder failed: ${error}`);
+    throw new Error(`useAddSubOrder failed: ${error}`);
+  }
+};
+
+export const useAddSubOrderCarrier = async (
+  orderId: number,
+  subOrderId: number,
+  subTimeLine: string[],
+  subpo: string,
+  shipping: string,
+  timeLine: string,
+  history: string
+): Promise<boolean> => {
+  try {
+    if (!window.ethereum) {
+      throw new Error(`MetaMask is not installed.`);
+    }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    const txResponse = await contract.addSubOrderCarrier(
+      orderId,
+      subOrderId,
+      subTimeLine,
+      subpo,
+      shipping,
+      timeLine,
+      history
+    );
+    await txResponse.wait();
+    return false;
+  } catch (error) {
+    throw new Error(`useAddSubOrder failed: ${error}`);
   }
 };
 
@@ -305,7 +339,7 @@ export const usePushToTimeLine = async (
     await txResponse.wait();
     return false;
   } catch (error) {
-    throw new Error(`useAddOrder failed: ${error}`);
+    throw new Error(`usePushToTimeLine failed: ${error}`);
   }
 };
 
@@ -328,6 +362,125 @@ export const usePushToSubTimeLine = async (
     await txResponse.wait();
     return false;
   } catch (error) {
-    throw new Error(`useAddOrder failed: ${error}`);
+    throw new Error(`usePushToSubTimeLine failed: ${error}`);
+  }
+};
+
+export const usePushBothToTimeLine = async (
+  orderId: number,
+  subOrderId: number,
+  timeline: string,
+  subTimeLine: string
+): Promise<boolean> => {
+  try {
+    if (!window.ethereum) {
+      throw new Error(`MetaMask is not installed.`);
+    }
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const signer = await provider.getSigner();
+    const contract = new ethers.Contract(contractAddress, contractABI, signer);
+    const txResponse = await contract.pushBothToTimeLine(
+      orderId,
+      subOrderId,
+      timeline,
+      subTimeLine
+    );
+    // Đợi cho giao dịch được xác nhận
+    await txResponse.wait();
+    return false;
+  } catch (error) {
+    throw new Error(`usePushBothToTimeLine failed: ${error}`);
+  }
+};
+
+// export const parsedData = (data:any) => {
+//   const parsed = data.map(item => {
+//   const result = {};
+//   item.replace(/{|}/g, '')  // Loại bỏ dấu ngoặc nhọn
+//     .split(',')  // Chia chuỗi thành các phần
+//     .forEach(part => {
+//       const [key, value] = part.split(':').map(str => str.trim().replace(/['"]/g, ''));  // Xử lý trim và loại bỏ dấu nháy
+//       result[key] = value;
+//     });
+//   return result;
+// });
+// };
+
+type Order = {
+  Date: string;
+  Status: string;
+  Title: string;
+};
+
+export const useGetOderById = async (
+  role: string,
+  id: number,
+  groupOrder: OrderGroup
+) => {
+  try {
+    if (!window.ethereum) {
+      throw new Error(`MetaMask is not installed.`);
+    }
+    if (!role && !id) throw new Error(`Role and Id is null`);
+    const provider = new ethers.BrowserProvider(window.ethereum);
+    const contract = new ethers.Contract(
+      contractAddress,
+      contractABI,
+      provider
+    );
+    var order = "";
+    if (role !== "CUSTOMER") {
+      if (groupOrder.SubOrderId) {
+        order = await contract.getSubOrder(id);
+      } else {
+        order = await contract.getOrder(id);
+      }
+    } else {
+      order = await contract.getOrder(id);
+    }
+    if (!order) return;
+    const formatArray = Object.values(order);
+    const processedData = formatArray.map((item: any, index) => {
+      if (typeof item === "bigint") {
+        return Number(item);
+      } else if (typeof item === "object") {
+        return Object.values(item);
+      } else {
+        return item;
+      }
+    });
+    const checkProcessedData =
+      role !== "CUSTOMER"
+        ? groupOrder && groupOrder.SubOrderId
+          ? processedData[2]
+          : processedData[4]
+        : processedData[4];
+    // Tối ưu hóa: Sử dụng RegEx để phân tích cú pháp chuỗi và chuyển thành đối tượng
+    const parsedData: Order[] = checkProcessedData.map(
+      (item: string): Order => {
+        // Loại bỏ dấu ngoặc nhọn và chia chuỗi thành các phần
+        const result: Order = { Date: "", Status: "", Title: "" };
+
+        item
+          .replace(/{|}/g, "") // Loại bỏ dấu ngoặc nhọn
+          .split(",") // Chia chuỗi thành các phần
+          .forEach((part) => {
+            const [key, value] = part
+              .split(":")
+              .map((str) => str.trim().replace(/['"]/g, "")); // Xử lý trim và loại bỏ dấu nháy
+            if (key in result) {
+              result[key as keyof Order] = value;
+            }
+          });
+
+        return result;
+      }
+    );
+    return {
+      ordertracking: parsedData,
+      purchaseOrder: role !== "CUSTOMER" ? processedData[3] : processedData[6],
+    };
+  } catch (error) {
+    console.error("Error fetching user data:", error);
   }
 };

@@ -7,6 +7,7 @@ import {
   Menu,
   MenuItem,
   IconButton,
+  Button,
 } from "@mui/material";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
@@ -21,6 +22,8 @@ import {
 } from "@mui/x-data-grid";
 import ExpandableCellImages from "./ExpandableCellImages";
 import Timeline from "./TimeLineStatus";
+import useSWR from "swr";
+import SaveAltIcon from "@mui/icons-material/SaveAlt";
 
 const columns: GridColDef[] = [
   { field: "id", headerName: "NO.", width: 20, headerAlign: "center" },
@@ -92,11 +95,20 @@ const columns: GridColDef[] = [
   },
 ];
 
+interface FileDownloadProps {
+  fileUrl: string;
+  fileName: string;
+}
+
 const OrderDetail = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [rows, setRows] = useState<GridRowsProp>([]);
   const { groupOrder, groupOrderDetails } = useGroupDetailOrderStore();
   const open = Boolean(anchorEl);
+
+  const { data, error, isLoading } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/useGetOderById`
+  );
 
   const handleMenuOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -121,6 +133,28 @@ const OrderDetail = () => {
       setRows(dataRows);
     }
   }, [groupOrderDetails]);
+
+  const FileDownload: React.FC<FileDownloadProps> = ({ fileUrl, fileName }) => {
+    const handleDownload = () => {
+      const link = document.createElement("a");
+      link.href = fileUrl;
+      // link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+
+    return (
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<SaveAltIcon />}
+        onClick={handleDownload}
+      >
+        Download File
+      </Button>
+    );
+  };
 
   return (
     <>
@@ -388,7 +422,7 @@ const OrderDetail = () => {
               </Grid>
 
               {/* Item Summary */}
-              <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
+              <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12 }} sx={{ mb: 5 }}>
                 <Typography variant="h6" fontWeight="bold" gutterBottom>
                   Item Summary
                 </Typography>
@@ -410,6 +444,21 @@ const OrderDetail = () => {
                   }}
                 />
               </Grid>
+
+              {/* Purchase Order */}
+              {data && data.purchaseOrder && (
+                <Grid size={{ xs: 12, sm: 12, md: 12, lg: 12 }}>
+                  <Typography variant="h6" fontWeight="bold" gutterBottom>
+                    Purchase Order
+                  </Typography>
+                  <div style={{ padding: "20px" }}>
+                    <FileDownload
+                      fileUrl={data.purchaseOrder}
+                      fileName="sample-file.pdf"
+                    />
+                  </div>
+                </Grid>
+              )}
             </Grid>
 
             <Grid container size={{ xs: 12, sm: 12, md: 12, lg: 4 }}>

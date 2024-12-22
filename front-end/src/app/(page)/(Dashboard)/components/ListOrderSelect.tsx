@@ -324,8 +324,16 @@ export default function ListOrderSelect(props: IProps) {
           ((role === "MANUFACTURER" || role === "SUPPLIER") &&
             row.status === "New" &&
             row.customerId !== userId) ||
-          (role === "SUPPLIER" && row.status === "Confirm") ||
-          (role === "MANUFACTURER" && row.status === "Material-Received") ? (
+          (role === "SUPPLIER" &&
+            (row.status === "Confirm" ||
+              row.status === "Prepared-Shipment" ||
+              row.status === "In-Transit")) ||
+          (role === "MANUFACTURER" && row.status === "Material-Received") ||
+          (role === "CARRIER" &&
+            (row.status === "New" ||
+              row.status === "Confirm" ||
+              row.status === "Prepared-Shipment" ||
+              row.status === "In-Transit")) ? (
             <DialogSelectStatus
               orderId={row.orderId}
               status={row.status}

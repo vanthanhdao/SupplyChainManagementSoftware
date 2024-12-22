@@ -8,17 +8,29 @@ import {
   ListItemText,
 } from "@mui/material";
 import CircleIcon from "@mui/icons-material/Circle";
+import useGroupDetailOrderStore from "@/app/zustands/useDetailOrder-User-ShippingStore";
+import useSWR from "swr";
+import { useGetOderById } from "@/app/hook/useEthereum";
+import useUserStore from "@/app/zustands/userStore";
 
 const Timeline = () => {
-  const steps = [
-    { label: "Delivered", date: "24 May 2022", active: true },
-    { label: "Shipped", date: "24 May 2022", active: false },
-    { label: "Dispatched from hub", date: "24 May 2022", active: false },
-    { label: "Pickup being arranged", date: "24 May 2022", active: false },
-    { label: "Delivered", date: "24 May 2022", active: false },
-    { label: "Shipped", date: "24 May 2022", active: false },
-    { label: "Dispatched from hub", date: "24 May 2022", active: false },
-  ];
+  const { groupOrderId, groupOrder } = useGroupDetailOrderStore();
+  const { role } = useUserStore();
+
+  const fetcher = async () =>
+    await useGetOderById(
+      role as string,
+      groupOrderId as number,
+      groupOrder as OrderGroup
+    );
+  const { data, error, isLoading } = useSWR(
+    `${process.env.NEXT_PUBLIC_API_URL}/useGetOderById`,
+    fetcher
+  );
+  if (error) return <div>Failed to load</div>;
+  if (isLoading) return <div>Loading...</div>;
+
+  const lengthOrderTracking = data ? data.ordertracking.length - 1 : 0;
 
   return (
     <Box
@@ -41,7 +53,7 @@ const Timeline = () => {
         }}
       />
       <List>
-        {steps.map((step, index) => (
+        {data?.ordertracking.map((step, index) => (
           <ListItem
             key={index}
             sx={{
@@ -53,25 +65,27 @@ const Timeline = () => {
             <ListItemIcon sx={{ minWidth: "30px", zIndex: 1 }}>
               <CircleIcon
                 fontSize="inherit"
-                sx={{ color: step.active ? "blue" : "gray" }}
+                sx={{
+                  color: index === lengthOrderTracking ? "blue" : "gray",
+                }}
               />
             </ListItemIcon>
             <ListItemText
               primary={
                 <Typography
                   variant="body1"
-                  fontWeight={step.active ? "bold" : "normal"}
-                  color={step.active ? "blue" : "gray"}
+                  fontWeight={index === lengthOrderTracking ? "bold" : "normal"}
+                  color={index === lengthOrderTracking ? "blue" : "gray"}
                 >
-                  {step.label}
+                  {step.Title}
                 </Typography>
               }
               secondary={
                 <Typography
                   variant="body2"
-                  color={step.active ? "textPrimary" : "gray"}
+                  color={index === lengthOrderTracking ? "textPrimary" : "gray"}
                 >
-                  {step.date}
+                  {step.Date}
                 </Typography>
               }
             />
